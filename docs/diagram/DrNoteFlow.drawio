@@ -1,0 +1,56 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
+  <diagram name="Page-1" id="6gXHWddE5RTyZehUQQXz">
+    <mxGraphModel dx="1106" dy="632" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="XDt65qjledd9NgicJG8v-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="XDt65qjledd9NgicJG8v-1" target="XDt65qjledd9NgicJG8v-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-1" value="login" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="20" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="XDt65qjledd9NgicJG8v-22">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="245" y="85" as="sourcePoint" />
+            <mxPoint x="245" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-13" value="Auth" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="220" y="25" width="50" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-22" value="" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="130" width="590" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="XDt65qjledd9NgicJG8v-23" target="XDt65qjledd9NgicJG8v-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-23" value="Register Patient Info" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="90" y="160" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-28" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="XDt65qjledd9NgicJG8v-24" target="XDt65qjledd9NgicJG8v-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-24" value="Manage Diagnosis" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="250" y="160" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-25" value="Manage Prescription" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="430" y="160" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-30" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.46;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="XDt65qjledd9NgicJG8v-26" target="XDt65qjledd9NgicJG8v-24">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="275" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-32" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="XDt65qjledd9NgicJG8v-26" target="XDt65qjledd9NgicJG8v-25">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="505" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XDt65qjledd9NgicJG8v-26" value="Review History" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="90" y="250" width="110" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
