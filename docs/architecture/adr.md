@@ -64,6 +64,8 @@ The training will specifically cover these Claude Code capabilities:
 | **Commands** | Slash commands for quick actions and workflows |
 | **Hooks** | Custom triggers for automated behaviors on tool calls |
 
+> 📖 See [Claude Code Tools](claude-code-tools.md) for detailed examples and usage patterns.
+
 ### Tech Stack (Supporting)
 
 The tech stack is chosen for simplicity and fast setup — it serves the demo, not the other way around:
