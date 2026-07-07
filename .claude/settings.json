@@ -1,0 +1,34 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/secret-scan.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/lint.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/typecheck.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/progress-reminder.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
