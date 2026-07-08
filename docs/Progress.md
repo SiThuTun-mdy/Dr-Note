@@ -12,6 +12,7 @@ Phase 1: Product
 - Sprint planning
 - Project scaffolded
 - Supabase configured (database migrated, tables created)
+- US-001: TASK-001 through TASK-005 (Next.js init, Supabase client, middleware)
 
 ## In Progress
 
