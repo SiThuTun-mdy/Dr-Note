@@ -346,7 +346,7 @@ US-001 (Auth)
 | TASK-009 | Implement `getUserProfile` server action | 1.0h |
 | TASK-010 | Test login/logout flow end-to-end | 0.5h |
 
-**Blockers:** Supabase project must be created and credentials available.
+**Blockers:** Supabase project must be created and credentials available. GitHub repo & project board must be set up first.
 **Deliverable:** Working login/logout with Supabase Auth.
 
 ---

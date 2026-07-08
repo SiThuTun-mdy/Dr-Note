@@ -11,6 +11,7 @@ Phase 1: Product
 - Architecture
 - Sprint planning
 - Project scaffolded
+- Supabase configured (database migrated, tables created)
 
 ## In Progress
 
@@ -18,6 +19,8 @@ Phase 1: Product
 
 ## Pending
 
+- GitHub repo & project board setup (waiting for SiThuTun-mdy to create project)
+- Create "Development Framework Setup" issue (command saved, run after project created)
 - Review
 - QA
 - Release management

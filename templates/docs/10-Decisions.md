@@ -4,10 +4,10 @@ Use this file as the project decision log.
 
 ## DEC-001: Initial Stack
 
-Decision: Use Next.js, TypeScript, Supabase, PostgreSQL, Tailwind CSS, shadcn/ui, and Vercel.
+Decision: TODO
 
-Reason: Fast MVP delivery with modern full-stack capabilities.
+Reason: TODO
 
-Owner: Orchestrator
+Owner: TODO
 
-Status: Accepted
+Status: Proposed

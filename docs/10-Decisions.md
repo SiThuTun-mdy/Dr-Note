@@ -4,9 +4,9 @@ Use this file as the project decision log.
 
 ## DEC-001: Initial Stack
 
-Decision: Use Next.js, TypeScript, Supabase, PostgreSQL, Tailwind CSS, shadcn/ui, and Vercel.
+Decision: Use Next.js 14, TypeScript, Supabase, PostgreSQL, Tailwind CSS, shadcn/ui, Vercel, React Query, Zustand, React Hook Form, Zod, and GitHub Projects.
 
-Reason: Fast MVP delivery with modern full-stack capabilities.
+Reason: Fast MVP delivery with modern full-stack capabilities. Simple stack ensures participants can follow along without infrastructure friction.
 
 Owner: Orchestrator
 
@@ -45,5 +45,24 @@ Decision: Use MoSCoW method for feature prioritization. Must-Have features must 
 Reason: 2-week timeline requires strict scope discipline. MoSCoW provides clear cut-off criteria.
 
 Owner: Product Manager Agent
+
+Status: Accepted
+
+---
+
+## DEC-005: External Document Import
+
+Decision: `/warmup` supports importing external PRD, Architecture, and Sprint Backlog documents from other team members.
+
+Reason: Team members may provide documents in their own format. Instead of reformatting, we copy their document directly to `docs/` output folder. This preserves their content and avoids agent re-generation.
+
+Flow:
+- Check `templates/docs/{doc}-External.md`
+- If exists → copy to `docs/{doc}.md` (skip generation)
+- If not exists → generate via agent (normal flow)
+
+Example: `templates/docs/02-PRD-External.md` → `docs/02-PRD.md`
+
+Owner: Orchestrator
 
 Status: Accepted
