@@ -32,3 +32,46 @@ Plan → Implement → Security Review → Review → QA → Fix → Regression 
 - No Critical or High defects may remain before release.
 - **Always update `docs/tools-and-stack.md` when tools, stack, or plugins change.** Check this AFTER every tool/skill/plugin/MCP change.
 
+## Mandatory Development Workflow
+
+You MUST follow this workflow for EVERY task. No exceptions.
+
+### Workflow Steps (in order)
+
+1. **Implement** - Write the code
+2. **Security Review** - Check for:
+   - Authentication/authorization vulnerabilities
+   - Data exposure risks
+   - Input validation gaps
+   - SQL injection, XSS, CSRF risks
+3. **Code Review** - Check for:
+   - TypeScript type safety
+   - Error handling completeness
+   - Following project patterns
+   - Edge cases
+4. **QA Testing** - Verify:
+   - Feature works as expected
+   - Error states handled
+   - Loading states present
+   - Edge cases covered
+5. **Fix** - Address any Critical/High issues found
+6. **Commit** - Only after all above steps pass
+
+### Rules
+
+- NEVER skip review and QA steps
+- NEVER commit before completing all review steps
+- If you find issues, fix them BEFORE committing
+- Document any issues found and how they were fixed
+- Run TypeScript check (`npx tsc --noEmit`) and linting (`npm run lint`) before committing
+
+### Output Format
+
+After completing all steps, report:
+- What was implemented
+- Security review findings (if any)
+- Code review findings (if any)
+- QA test results
+- Fixes applied
+- Final status (Ready to commit / Issues found)
+
