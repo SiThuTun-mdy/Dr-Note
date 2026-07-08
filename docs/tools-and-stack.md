@@ -70,12 +70,15 @@ claude mcp add --scope user github -- npx -y @modelcontextprotocol/server-github
 4. Copy token to `.env.local` as `GITHUB_TOKEN`
 5. Restart Claude Code to load the MCP server
 
-### 4. Install Plugins (Optional)
+### 4. Install Plugins (Individual - Each Developer)
+
+Each developer must install these plugins in Claude Code:
 
 ```
 /plugin code-review
 /plugin vercel
 /plugin frontend-design
+/plugin context7
 ```
 
 ### 5. Start Development
@@ -88,17 +91,28 @@ Open http://localhost:3000
 
 ---
 
-## Auto-included Tools
+## Auto-included Tools (From Repo)
 
 These are part of the repo — no installation needed:
 
-| Tool | Location |
-|------|----------|
-| Skills (16) | `.claude/skills/` |
-| Agents (10) | `.claude/agents/` |
-| Commands (16) | `.claude/commands/` |
-| Hooks (4) | `.claude/hooks/` |
-| Project MCP | `.mcp.json` |
+| Tool | Location | Notes |
+|------|----------|-------|
+| Skills (16) | `.claude/skills/` | Auto-loaded from repo |
+| Agents (10) | `.claude/agents/` | Auto-loaded from repo |
+| Commands (16) | `.claude/commands/` | Auto-loaded from repo |
+| Hooks (6) | `.claude/hooks/` | Auto-loaded from repo |
+| Project MCP | `.mcp.json` | Auto-loaded (needs env vars) |
+
+## Individual Tools (Each Developer Must Install)
+
+| Tool | Type | Install Command |
+|------|------|-----------------|
+| `code-review` | Plugin | `/plugin code-review` |
+| `vercel` | Plugin | `/plugin vercel` |
+| `frontend-design` | Plugin | `/plugin frontend-design` |
+| `context7` | Plugin | `/plugin context7` |
+| Supabase CLI | Global | `npm install -g supabase` |
+| Vercel CLI | Global | `npm install -g vercel` |
 
 ---
 

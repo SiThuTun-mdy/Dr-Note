@@ -30,28 +30,69 @@ Claude Code is an AI-powered coding assistant that understands your project cont
 - **MCP** — External tool integrations (Supabase, GitHub, Playwright)
 - **Plugins** — Extended functionality packages
 
-### First-Time Setup (5 minutes)
+### First-Time Setup (10 minutes)
+
+#### Step 1: Clone & Install (Auto from repo)
 
 ```bash
-# 1. Clone the repo
+# Clone the repo
 git clone https://github.com/SiThuTun-mdy/Dr-Note.git
 cd Dr-Note
 
-# 2. Install dependencies
+# Install dependencies
 npm install
 
-# 3. Copy environment variables
+# Copy environment variables
 cp .env.example .env.local
+```
 
-# 4. Edit .env.local with your credentials
-# - NEXT_PUBLIC_SUPABASE_URL
-# - NEXT_PUBLIC_SUPABASE_ANON_KEY
-# - SUPABASE_SERVICE_ROLE_KEY
-# - SUPABASE_ACCESS_TOKEN
-# - GITHUB_TOKEN
+#### Step 2: Environment Variables (Manual)
 
-# 5. Start Claude Code
+Edit `.env.local` with your personal credentials:
+```bash
+# Supabase (from Supabase dashboard)
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Supabase MCP Token (from https://supabase.com/dashboard/account/tokens)
+SUPABASE_ACCESS_TOKEN=your-access-token
+
+# GitHub Token (from https://github.com/settings/tokens)
+GITHUB_TOKEN=your-github-token
+```
+
+#### Step 3: Install Claude Code Plugins (Individual)
+
+Each developer must install these plugins:
+
+```bash
+# In Claude Code, run:
+/plugin code-review
+/plugin vercel
+/plugin frontend-design
+/plugin context7
+```
+
+#### Step 4: Verify MCP Servers (Auto)
+
+MCP servers auto-load from `.mcp.json`. Verify they're working:
+```bash
+# In Claude Code, run:
+/status
+```
+
+#### Step 5: Start Development
+
+```bash
+# Start Claude Code
 claude
+
+# Run setup commands
+/warmup
+/bootstrap
+/supabase-setup
+/status
 ```
 
 ---
