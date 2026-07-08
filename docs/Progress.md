@@ -13,6 +13,7 @@ Phase 1: Product
 - Project scaffolded
 - Supabase configured (database migrated, tables created)
 - US-001: TASK-001 through TASK-005 (Next.js init, Supabase client, middleware)
+- UI/UX Design System documented
 
 ## In Progress
 
