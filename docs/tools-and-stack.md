@@ -99,7 +99,7 @@ These are part of the repo — no installation needed:
 |------|----------|-------|
 | Skills (16) | `.claude/skills/` | Auto-loaded from repo |
 | Agents (10) | `.claude/agents/` | Auto-loaded from repo |
-| Commands (16) | `.claude/commands/` | Auto-loaded from repo |
+| Commands (17) | `.claude/commands/` | Auto-loaded from repo |
 | Hooks (6) | `.claude/hooks/` | Auto-loaded from repo |
 | Project MCP | `.mcp.json` | Auto-loaded (needs env vars) |
 
@@ -176,6 +176,7 @@ Slash commands for quick actions.
 | `/bugfix` | Fix QA defects |
 | `/regression` | Run regression after bug fixes |
 | `/pr` | Prepare pull request draft |
+| `/pr-review` | Review PR on GitHub |
 | `/publish-pr` | Publish pull request |
 | `/deploy-check` | DevOps readiness check |
 | `/release-check` | Release manager workflow |

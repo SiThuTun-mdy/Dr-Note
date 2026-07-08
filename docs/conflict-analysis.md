@@ -48,6 +48,7 @@ Tracks potential conflicts between skills, plugins, and tools. Use this to under
 | Command | Overlaps With | Conflict? |
 |---------|---------------|-----------|
 | `/review` | `/code-review` (plugin) | ❌ Different scope |
+| `/pr-review` | `/code-review` (plugin) | ⚠️ Similar scope |
 | `/qa` | — | ✅ No overlap |
 | `/feature` | — | ✅ No overlap |
 | `/security-review` | `security-review-skill` | ❌ Complementary |
@@ -57,6 +58,14 @@ Tracks potential conflicts between skills, plugins, and tools. Use this to under
 **No conflict** — different workflow stages:
 - `/review` = Internal code review (during development)
 - `/code-review` = External PR review (before merge)
+
+### `/pr-review` vs `/code-review`
+
+**Potential conflict** — both review PRs on GitHub:
+- `/pr-review` = Command: detailed review with report generation
+- `/code-review` = Plugin: automated PR review with comments
+
+**Resolution:** Keep both — `/pr-review` generates detailed reports, `/code-review` provides quick automated checks. Use `/pr-review` for thorough reviews, `/code-review` for quick checks.
 
 ### `/security-review` vs `security-review-skill`
 
@@ -119,6 +128,7 @@ Tracks potential conflicts between skills, plugins, and tools. Use this to under
 | 2026-07-08 | Installed `context7` plugin | No conflict |
 | 2026-07-08 | Installed `github` MCP | No conflict — PR/issue management |
 | 2026-07-08 | Created `server-actions-skill` | No conflict — Next.js Server Actions patterns |
+| 2026-07-08 | Created `/pr-review` command | Similar to `/code-review` but different depth |
 | 2026-07-08 | Removed `documentation-skill.md` | Redundant with `context7` plugin |
 | 2026-07-08 | Installed `react-best-practices` skill | No conflict — complementary |
 | 2026-07-08 | Installed `frontend-design` plugin | No conflict — complementary |
