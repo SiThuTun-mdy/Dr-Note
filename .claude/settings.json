@@ -6,15 +6,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/secret-scan.sh"
+            "command": "bash $(git rev-parse --show-toplevel)/.claude/hooks/secret-scan.sh"
           },
           {
             "type": "command",
-            "command": ".claude/hooks/lint.sh"
+            "command": "bash $(git rev-parse --show-toplevel)/.claude/hooks/lint.sh"
           },
           {
             "type": "command",
-            "command": ".claude/hooks/typecheck.sh"
+            "command": "bash $(git rev-parse --show-toplevel)/.claude/hooks/typecheck.sh"
           }
         ]
       }
@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/progress-reminder.sh"
+            "command": "bash $(git rev-parse --show-toplevel)/.claude/hooks/progress-reminder.sh"
           }
         ]
       }

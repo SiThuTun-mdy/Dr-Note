@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+# Get git root directory
+GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+
 MATCHES=$(grep -RIn \
   -E "(SUPABASE_SERVICE_ROLE_KEY|SERVICE_ROLE_KEY|sk_live_|sk_test_|AKIA[0-9A-Z]{16})" \
-  . \
+  "$GIT_ROOT" \
   --exclude-dir=node_modules \
   --exclude-dir=.next \
   --exclude-dir=.git \

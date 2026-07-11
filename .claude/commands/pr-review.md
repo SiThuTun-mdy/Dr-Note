@@ -2,8 +2,6 @@
 
 Review a pull request on GitHub.
 
----
-
 ## Usage
 
 ```
@@ -12,26 +10,36 @@ Review a pull request on GitHub.
 
 If no PR number provided, list open PRs first.
 
----
-
 ## Steps
 
-### 1. List Open PRs (if no number provided)
+### 1. Get GitHub Project Info
+
+Read the repo name from `docs/Progress.md`:
+```bash
+grep "GitHub Project:" docs/Progress.md
+```
+
+If not found, ask the user:
+```
+What is your GitHub repo? (e.g., SiThuTun-mdy/Dr-Note)
+```
+
+### 2. List Open PRs (if no number provided)
 
 ```bash
-gh pr list --repo SiThuTun-mdy/Dr-Note
+gh pr list --repo <REPO>
 ```
 
 Ask user which PR to review.
 
-### 2. Get PR Details
+### 3. Get PR Details
 
 ```bash
-gh pr view <PR_NUMBER> --repo SiThuTun-mdy/Dr-Note
-gh pr diff <PR_NUMBER> --repo SiThuTun-mdy/Dr-Note
+gh pr view <PR_NUMBER> --repo <REPO>
+gh pr diff <PR_NUMBER> --repo <REPO>
 ```
 
-### 3. Review Code Changes
+### 4. Review Code Changes
 
 For each changed file, check:
 - **Security:** Hardcoded secrets, SQL injection, XSS, auth bypass
@@ -40,19 +48,18 @@ For each changed file, check:
 - **Testing:** Test coverage, edge cases
 - **Documentation:** Comments, README updates
 
-### 4. Post Review Comments
+### 5. Post Review Comments
 
 ```bash
-gh pr comment <PR_NUMBER> --repo SiThuTun-mdy/Dr-Note --body "review comments"
+gh pr comment <PR_NUMBER> --repo <REPO> --body "review comments"
 ```
 
 Or use inline comments:
-
 ```bash
-gh api repos/SiThuTun-mdy/Dr-Note/pulls/<PR_NUMBER>/comments --method POST -f body="comment" -f path="file.ts" -F position=1
+gh api repos/<REPO>/pulls/<PR_NUMBER>/comments --method POST -f body="comment" -f path="file.ts" -F position=1
 ```
 
-### 5. Generate Review Report
+### 6. Generate Review Report
 
 Create `docs/51-PR-Review.md` with:
 
@@ -85,7 +92,7 @@ TODO (APPROVE / REQUEST_CHANGES / COMMENT)
 - [ ] Documentation reviewed
 ```
 
-### 6. Set PR Status
+### 7. Set PR Status
 
 Based on findings:
 - **APPROVE** — No HIGH/MEDIUM issues

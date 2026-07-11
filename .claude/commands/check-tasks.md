@@ -1,47 +1,74 @@
 # Check Assigned Tasks
 
-List all GitHub issues assigned to you in the Dr-Note project.
+List all GitHub issues assigned to you in the project.
 
 ## Input
 
-- `$ARGUMENTS` (optional): Label name to filter tasks (e.g., `demo-blocker`, `task`, `epic:records`)
+- `$ARGUMENTS` (optional): Label name to filter tasks (e.g., `bug`, `user-story`, `task`)
 - If no input provided, show all tasks without filter
 
-## Instructions
+## Steps
 
-### 1. Determine filter
+### 1. Get GitHub Project Info
 
+Read from `CLAUDE.md` (GitHub Project section):
 ```bash
-# Check if label argument is provided
-if [ -z "$ARGUMENTS" ]; then
-  # No filter - show all tasks
-  gh issue list --repo SiThuTun-mdy/Dr-Note --assignee @me
-else
-  # Filter by label
-  gh issue list --repo SiThuTun-mdy/Dr-Note --assignee @me --label "$ARGUMENTS"
-fi
+grep "Repository:" CLAUDE.md
+grep "Project Board:" CLAUDE.md
 ```
 
-### 2. Display results
+Extract:
+- **CODE_REPO** — from `Repository:` line (format: `owner/repo`)
+- **PROJECT_URL** — from `Project Board:` line (full URL)
 
-Show tasks in a clean, organized format:
+If missing or contains `<!--` placeholders, ask the user:
+```
+What is your GitHub repo? (e.g., ChanOoDev/drnotes)
+```
+
+Extract **ISSUE_REPO** from `PROJECT_URL`:
+- Format: `https://github.com/<OWNER>/<REPO>/projects/<NUMBER>`
+- Extract `<OWNER>/<REPO>` as **ISSUE_REPO**
+
+### 2. List Tasks
+
+**First, try CODE_REPO:**
+```bash
+gh issue list --repo <CODE_REPO> --assignee @me --state all
+```
+
+**If no issues found AND CODE_REPO ≠ ISSUE_REPO, try ISSUE_REPO:**
+```bash
+gh issue list --repo <ISSUE_REPO> --assignee @me --state all
+```
+
+**With filter:**
+```bash
+gh issue list --repo <REPO> --assignee @me --state all --label "$ARGUMENTS"
+```
+
+### 3. Display Results
+
+Show tasks in a clean format:
 - Issue number
 - Title
 - Labels
 - State
-- Last updated date
+- Last updated
 
-### 3. Group by priority
+**Note which repo the issues came from.**
 
-- 🔴 **Demo Blockers** (high priority)
-- 🟡 **Other Tasks** (regular priority)
+### 4. Group by Priority
 
-### 4. Summary
+- 🔴 **High Priority** (demo-blocker label)
+- 🟡 **Medium Priority** (type:dev label)
+- 🟢 **Low Priority** (other)
 
-Provide a count at the end:
+### 5. Summary
+
 - Total tasks
-- Demo blockers count (if unfiltered)
 - Label filter applied (if any)
+- Which repo issues came from
 
 ---
 
@@ -50,21 +77,6 @@ Provide a count at the end:
 | Command | Description |
 |---------|-------------|
 | `/check-tasks` | Show all assigned tasks |
-| `/check-tasks demo-blocker` | Filter by demo-blocker label |
-| `/check-tasks task` | Filter by task label (excludes epics) |
-| `/check-tasks epic:records` | Filter by records epic |
-| `/check-tasks epic:auth` | Filter by auth epic |
-| `/check-tasks epic:user-reg` | Filter by user registration epic |
-| `/check-tasks epic:history` | Filter by history epic |
-| `/check-tasks epic:infra` | Filter by infrastructure epic |
-
-### Common Filters
-
-| Filter | Use Case |
-|--------|----------|
-| `demo-blocker` | Show only critical demo tasks |
-| `task` | Show only implementation tasks (not epics) |
-| `epic:records` | Show clinical/records features |
-| `epic:auth` | Show authentication features |
-| `epic:user-reg` | Show user registration features |
-| `epic:history` | Show patient history features |
+| `/check-tasks bug` | Filter by bug label |
+| `/check-tasks user-story` | Filter by user-story label |
+| `/check-tasks task` | Filter by task label |

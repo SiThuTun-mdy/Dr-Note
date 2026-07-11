@@ -4,9 +4,10 @@ PR title input:
 $ARGUMENTS
 
 Read:
+- .github/PULL_REQUEST_TEMPLATE.md
 - docs/02-PRD.md
 - docs/12-Architecture.md
-- docs/18-Sprint-Backlog.md
+- docs/18-Sprint-Backlog.md (if exists — tasks may come from GitHub Project)
 - docs/23-Review-Report.md
 - docs/26-QA-Report.md
 - docs/31-Release-Report.md
