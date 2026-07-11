@@ -12,10 +12,15 @@ Phase 1: Product
 - Sprint planning
 - Project scaffolded
 - Supabase configured (database migrated, tables created)
+- US-001: TASK-001 through TASK-005 (Next.js init, Supabase client, middleware)
+- UI/UX Design System documented
+- Supabase project provisioned, MCP connected, .env.local configured
+
 
 ## In Progress
 
 - Development
+- Supabase schema migration (local migration file exists, not yet applied to remote)
 
 ## Pending
 
