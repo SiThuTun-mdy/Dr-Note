@@ -64,3 +64,4 @@ Just add your token to `.env.local` and restart Claude Code.
 - [Supabase MCP Documentation](https://supabase.com/docs/guides/mcp)
 - [Claude Code MCP Setup](https://docs.anthropic.com/en/docs/claude-code/mcp)
 - [Next.js Documentation](https://nextjs.org/docs)
+n

@@ -209,20 +209,20 @@ gh auth status
 
 ```bash
 # Create a new repo on GitHub
-gh repo create ai_sdlc_framework --private --source=. --push
+gh repo create DRNotes --private --source=. --push
 
 # Or if repo already exists, just set the remote
-git remote add origin https://github.com/ChanOoDev/ai_sdlc_framework.git
-git push -u origin master
+git remote add origin https://github.com/SiThuTun-mdy/Dr-Note.git
+git push -u origin main
 ```
 
 ### 5.5 Configure Branch Protection
 
-Protect the `master` branch so all changes go through PRs:
+Protect the `main` branch so all changes go through PRs:
 
 ```bash
 # Enable branch protection via API
-gh api repos/{owner}/{repo}/branches/master/protection -X PUT -f '{
+gh api repos/{owner}/{repo}/branches/main/protection -X PUT -f '{
   "required_status_checks": null,
   "enforce_admins": false,
   "required_pull_request_reviews": {
@@ -238,7 +238,7 @@ gh api repos/{owner}/{repo}/branches/master/protection -X PUT -f '{
 Or manually:
 1. Go to **Settings** → **Branches**
 2. Click **Add branch protection rule**
-3. Branch name pattern: `master`
+3. Branch name pattern: `main`
 4. Enable: **Require a pull request before merging**
 5. Save changes
 
@@ -358,7 +358,7 @@ Instead of manually updating issue status, use Claude Code commands:
                         ▼ (merge PR)
 ┌─────────────────────────────────────────────────────────┐
 │  Deploy Workflow (deploy.yml)                           │
-│  Triggers: Push to master                               │
+│  Triggers: Push to main                                │
 │                                                         │
 │  Step 1: CI (lint + test + security + build)            │
 │  Step 2: Deploy Preview (staging)                       │
@@ -370,7 +370,7 @@ Instead of manually updating issue status, use Claude Code commands:
 
 ### 6.2 CI Workflow (`.github/workflows/ci.yml`)
 
-Runs automatically on **pull requests only** (not on push to master):
+Runs automatically on **pull requests only** (not on push to main):
 
 | Job | What It Does | Runs On |
 |---|---|---|
@@ -383,7 +383,7 @@ Runs automatically on **pull requests only** (not on push to master):
 
 ### 6.3 Deploy Workflow (`.github/workflows/deploy.yml`)
 
-Runs on push to master (after PR is merged):
+Runs on push to main (after PR is merged):
 
 | Step | What It Does | Requires |
 |---|---|---|
@@ -399,7 +399,7 @@ You need **2 environments** for the approval flow:
 
 #### Production Environment
 
-1. Go to https://github.com/ChanOoDev/ai_sdlc_framework/settings/environments
+1. Go to https://github.com/SiThuTun-mdy/Dr-Note/settings/environments
 2. Click **New environment**
 3. Name: `production`
 4. Enable **Required reviewers**
@@ -495,7 +495,7 @@ Create Pull Request
           │ ✅ Pass
           ▼
 ┌─────────────────────┐
-│ Merge PR to master  │
+│ Merge PR to main   │
 └─────────┬───────────┘
           │
           ▼
@@ -682,6 +682,30 @@ Consider upgrading when:
 
 ## 11. Troubleshooting
 
+### Claude Code Permission Prompts
+
+When running commands like `/import-project`, `/next-task`, or any `gh` CLI commands, Claude Code will ask for permission before executing shell commands.
+
+**Symptom:** Commands appear to "not work" or fail silently.
+
+**Cause:** The permission prompt was rejected (clicked "reject" or "Deny").
+
+**Fix:**
+1. When you see a permission prompt, click **"Allow"** or **"Always allow"**
+2. For `gh` commands (GitHub CLI), always allow — they are safe read/write operations
+3. If you accidentally reject, just run the command again and click "Allow"
+
+**Example:**
+```
+You: /import-project
+Claude: Runs `gh project list --owner SiThuTun-mdy --format json`
+Permission prompt: "Allow this command?" → Click "Allow"
+```
+
+> **Tip:** If you keep rejecting prompts, commands will never complete. Always approve `gh` and `git` commands when working with GitHub projects.
+
+---
+
 ### Supabase connection errors
 
 1. Check `.env.local` has correct values
@@ -736,7 +760,7 @@ npm run build
 ### GitHub Setup
 - [ ] GitHub CLI authenticated (`gh auth status`)
 - [ ] Repository created and pushed
-- [ ] Branch protection enabled on `master`
+- [ ] Branch protection enabled on `main`
 - [ ] Issue labels created
 - [ ] GitHub Project board created
 - [ ] Repository secrets added (Supabase keys)

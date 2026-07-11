@@ -47,11 +47,19 @@ Workflow:
    SUPABASE_ACCESS_TOKEN=your-access-token
    ```
 
-7. Update `docs/Progress.md`:
+7. Verify `.claude/` setup:
+   - Check `.claude/skills/` contains: `frontend-design`, `ui-ux-pro-max`, `supabase-skill`, `react-best-practices`, `security-review-skill`, `server-actions-skill`, `doctor-note-domain-skill`, `qa-testing-skill`
+   - If `frontend-design` is missing, install it: `npx claude-code-templates@latest --skill creative-design/frontend-design`
+   - Check `.claude/agents/` contains all 10 agent definitions
+   - Check `.claude/commands/` contains all command definitions
+   - Check `.claude/hooks/` contains: `secret-scan.sh`, `lint.sh`, `typecheck.sh`, `progress-reminder.sh`
+   - If any are missing, report which ones need to be created
+
+8. Update `docs/Progress.md`:
    - Set Current Phase to "Phase 1: Product"
    - Add "Project scaffolded" to Completed
    - Mark "Sprint planning" and "Development" as In Progress
 
-8. Stage and commit: `git add -A && git commit -m "feat: scaffold Next.js + Supabase project"`
+9. Stage and commit: `git add -A && git commit -m "feat: scaffold Next.js + Supabase project"`
 
 Report what was created and what is next.

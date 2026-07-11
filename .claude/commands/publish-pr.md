@@ -5,8 +5,8 @@ $ARGUMENTS
 
 Read:
 - docs/50-Pull-Request.md
-- templates/pull-request-template.md
-- docs/18-Sprint-Backlog.md
+- .github/PULL_REQUEST_TEMPLATE.md
+- docs/18-Sprint-Backlog.md (if exists — tasks may come from GitHub Project)
 - docs/23-Review-Report.md
 - docs/26-QA-Report.md
 - docs/31-Release-Report.md

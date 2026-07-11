@@ -18,11 +18,15 @@ Tracks potential conflicts between skills, plugins, and tools. Use this to under
 | Skill | Domain | Overlaps With | Conflict? |
 |-------|--------|---------------|-----------|
 | `ui-ux-pro-max` | Universal UI/UX | `frontend-design` | ❌ Complementary |
+| `frontend-design` | Creative code generation | `ui-ux-pro-max` | ❌ Complementary |
 | `react-best-practices` | React/Next.js performance | — | ✅ No overlap |
-| `supabase-skill` | Database | — | ✅ No overlap |
+| `supabase-skill` | Database, Auth, RLS | `backend-skill` | ✅ Resolved — `backend-skill` references `supabase-skill` for client setup |
 | `security-review-skill` | Security | — | ✅ No overlap |
 | `qa-testing-skill` | Testing | — | ✅ No overlap |
-| `backend-skill` | Backend | — | ✅ No overlap |
+| `backend-skill` | Backend, Server Actions | `supabase-skill` | ✅ Resolved — merged `server-actions-skill`, references `supabase-skill` |
+| `design` | Design routing hub | `slides`, `banner-design`, `brand` | ✅ Resolved — `design` now routes to standalone skills |
+| `design-system` | Token architecture | `ui-styling` | ⚠️ Watch — complementary pipeline (tokens → code) |
+| `ui-styling` | shadcn/ui + Tailwind | `design-system` | ⚠️ Watch — complementary pipeline (tokens → code) |
 
 ---
 
@@ -123,11 +127,15 @@ Tracks potential conflicts between skills, plugins, and tools. Use this to under
 
 | Date | Change | Resolution |
 |------|--------|------------|
+| 2026-07-11 | Merged `server-actions-skill` into `backend-skill` | HIGH conflict resolved — Zod, try/catch, error sanitization patterns merged |
+| 2026-07-11 | Fixed Supabase API conflict | HIGH conflict resolved — `supabase-skill` updated to `getAll/setAll` API |
+| 2026-07-11 | Restructured `design/SKILL.md` as router | HIGH conflict resolved — delegated slides/banner to standalone skills |
+| 2026-07-11 | Installed `frontend-design` skill | No conflict — complementary to `ui-ux-pro-max` |
 | 2026-07-08 | Installed `@playwright/test` | No conflict — E2E test runner |
 | 2026-07-08 | Installed `playwright` MCP | No conflict — complementary to `qa-testing-skill` |
 | 2026-07-08 | Installed `context7` plugin | No conflict |
 | 2026-07-08 | Installed `github` MCP | No conflict — PR/issue management |
-| 2026-07-08 | Created `server-actions-skill` | No conflict — Next.js Server Actions patterns |
+| 2026-07-08 | Created `server-actions-skill` | Merged into `backend-skill` (2026-07-11) |
 | 2026-07-08 | Created `/pr-review` command | Similar to `/code-review` but different depth |
 | 2026-07-08 | Removed `documentation-skill.md` | Redundant with `context7` plugin |
 | 2026-07-08 | Installed `react-best-practices` skill | No conflict — complementary |

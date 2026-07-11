@@ -32,7 +32,7 @@ Does this table contain user-specific data?
 
 ```typescript
 // lib/supabase/server.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export function createClient() {
@@ -43,21 +43,16 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
+        getAll() {
+          return cookieStore.getAll()
         },
-        set(name: string, value: string, options: CookieOptions) {
+        setAll(cookiesToSet) {
           try {
-            cookieStore.set({ name, value, ...options })
-          } catch (error) {
-            // Server Component, ignore
-          }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: '', ...options })
-          } catch (error) {
-            // Server Component, ignore
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // Server Component — ignore
           }
         },
       },
@@ -84,7 +79,7 @@ export function createClient() {
 
 ```typescript
 // middleware.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
@@ -95,16 +90,17 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
+        getAll() {
+          return request.cookies.getAll()
         },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({ name, value, ...options })
-          response.cookies.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({ name, value: '', ...options })
-          response.cookies.set({ name, value: '', ...options })
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
+          response = NextResponse.next({ request: { headers: request.headers } })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
         },
       },
     }
@@ -207,6 +203,47 @@ CREATE TRIGGER profiles_updated_at
 - ❌ Hardcoding table names instead of using schema
 - ❌ Not maintaining migrations (using dashboard SQL editor)
 
+## MCP Setup (Supabase Server)
+
+The Supabase MCP server lets Claude query your database directly.
+
+### Option A: Global Config (Recommended)
+
+Each developer runs this once:
+```bash
+claude mcp add --scope user supabase -- npx -y @supabase/mcp-server-supabase@latest --access-token sbp_THEIR_TOKEN
+```
+
+Config saved to `~/.claude/.mcp.json` (never committed).
+
+### Option B: Project Config
+
+Create `.mcp.json` in project root:
+```json
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_YOUR_TOKEN_HERE"
+      ]
+    }
+  }
+}
+```
+
+**⚠️ SECURITY:** `.mcp.json` is in `.gitignore` — never commit real tokens.
+
+### Verify MCP Works
+
+Run `/supabase-setup` to check status. If MCP is available, you can:
+- Query tables directly
+- Apply migrations via MCP
+- Check database health
+
 ## Checklist
 
 - [ ] RLS enabled on all business tables
@@ -215,3 +252,4 @@ CREATE TRIGGER profiles_updated_at
 - [ ] Migrations in `supabase/migrations/`
 - [ ] Seed data in `supabase/seed.sql`
 - [ ] Environment variables documented
+- [ ] MCP configured (global or project level)
