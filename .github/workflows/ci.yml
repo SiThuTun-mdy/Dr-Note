@@ -52,6 +52,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
       - name: Run TruffleHog secret scan
         uses: trufflesecurity/trufflehog@v3.95.9
         with:
@@ -60,8 +70,8 @@ jobs:
       - name: Run npm audit
         run: npm audit --audit-level=high
 
-      - name: Run ESLint security plugin
-        run: npm run lint -- --plugin security
+      - name: Run ESLint
+        run: npm run lint
 
       - name: Check for vulnerable dependencies
         run: npx audit-ci --high
