@@ -22,6 +22,7 @@
 | Admin user management screen | #19 |
 | Clinical notes: typed notes during consult (doctor) | #32 |
 | Project restructure: move app to `app/`, consolidate docs | PR #47 |
+| Supabase configured: MCP connected, schema + seed data verified live in project `irqkiyqpymeezboppkwh` | — |
 
 ### 🔄 In Progress
 
