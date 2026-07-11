@@ -70,6 +70,10 @@ web_modules/
 .env.*
 !.env.example
 
+# Claude Code local MCP config (user-specific tokens)
+# .mcp.json is now committed for team sharing (uses env vars)
+# ~/.claude/.mcp.json is for global user-specific config
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache

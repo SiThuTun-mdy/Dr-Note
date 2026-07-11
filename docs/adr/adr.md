@@ -17,7 +17,7 @@ An ADR is mandatory when:
 
 ## ADR Format
 
-ADRs are created and discussed in the `/docs/architecture/decisions/` directory, using the format `NNNN-title-with-dashes.md`.
+ADRs are created and discussed in the `/docs/adr/decisions/` directory, using the format `NNNN-title-with-dashes.md`.
 
 Each ADR should include:
 
@@ -63,6 +63,8 @@ The training will specifically cover these Claude Code capabilities:
 | **MCP** | Model Context Protocol for external tool integration |
 | **Commands** | Slash commands for quick actions and workflows |
 | **Hooks** | Custom triggers for automated behaviors on tool calls |
+
+> 📖 See [Claude Code Tools](claude-code-tools.md) for detailed examples and usage patterns.
 
 ### Tech Stack (Supporting)
 
