@@ -24,3 +24,11 @@ export const patientRegistrationSchema = z.object({
 })
 
 export type PatientRegistrationInput = z.infer<typeof patientRegistrationSchema>
+
+export const emergencyContactSchema = z.object({
+  name: z.string().min(1, "Name is required").max(200),
+  relationship: z.string().max(100).optional().or(z.literal("")),
+  phone: z.string().max(30).optional().or(z.literal("")),
+})
+
+export type EmergencyContactInput = z.infer<typeof emergencyContactSchema>

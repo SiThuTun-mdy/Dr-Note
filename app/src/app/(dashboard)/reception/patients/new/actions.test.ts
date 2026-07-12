@@ -46,6 +46,11 @@ function mockRoleLookup(roleName: string) {
 describe('registerPatient', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // clearAllMocks only clears call history — it leaves any queued
+    // mockReturnValueOnce/mockResolvedValueOnce implementations in place,
+    // which otherwise leak into the next test once a test short-circuits
+    // before consuming everything it queued. mockReset() clears those too.
+    mockFrom.mockReset()
     mockGetUser.mockResolvedValue({ data: { user: mockUser } })
   })
 

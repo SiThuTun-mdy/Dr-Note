@@ -95,3 +95,67 @@ Mitigation: `next` is checked against a hardcoded allowlist (`ALLOWED_NEXT_PATHS
 
 ### Gate status
 No Critical or High findings remaining — FIND-021-01 was Critical-severity but was caught and fixed before any commit, during this same review pass, by driving the flow through the real middleware rather than trusting unit tests of the page in isolation.
+
+---
+
+## Emergency contacts section on registration (13 Jul 2026)
+
+Follow-up, requested directly: a reusable "emergency contacts" component, added as a section inside the patient registration form — its own `<form>`, submit disabled until the patient exists, errors surfaced via toast + inline retry.
+
+**Files added:** `src/components/features/patients/emergency-contacts.tsx` (component), `emergency-contacts-actions.ts` (`addEmergencyContact`, `removeEmergencyContact`), `emergency-contacts-actions.test.ts`. Changed: `patient-registration-form.tsx` (tracks `patientId`, locks fields post-submit, no longer navigates away), `lib/validators/patient.ts` (`emergencyContactSchema`).
+
+### Verified as sound
+- No new RLS migration needed: `emergency_contacts_insert` already requires `patients.create`, `_update`/`_delete` already require `patients.update` — both held by admin/receptionist (checked against `00001_initial_schema.sql`, unchanged since #20).
+- Both actions re-check auth (`getUser`) and role (admin/receptionist) server-side — the UI-disabled state on the add form (before a patient exists) is UX only, not the security boundary, per `docs/12-Architecture.md` §3.
+- Add/remove failures each get their own inline "Something went wrong — retry" block (keeps the last-attempted values so Retry resubmits exactly what failed) plus a `toast.error`, matching design system §6.
+- Live-verified: the add-contact form and its submit button are genuinely disabled (not just visually) before the patient is registered — confirmed via a real receptionist session in a browser (`isDisabled()` true pre-registration, and the section correctly identifies as the *last* `<form>` on the page, distinct from the patient form which shares some field names like "phone").
+
+### Known gap — live E2E of the full add/remove cycle not completed
+Registering a real patient to reach the "enabled" state hit the same Supabase `over_email_send_rate_limit` (429) documented in FIND-020-02 — the "Confirm email" setting appears to have reverted to ON again, or the built-in email quota is exhausted from earlier testing tonight. Added 9 unit tests (`emergency-contacts-actions.test.ts`, mocked Supabase client) covering both actions' auth/role/validation/success/failure paths instead, all passing. The add/remove/retry UI itself has **not** been driven through a real post-registration browser session — recommend a manual smoke test once the Supabase Auth email limit clears or "Confirm email" is confirmed off again.
+
+### Gate status (superseded by the redesign below)
+No Critical or High findings.
+
+---
+
+## Emergency contacts: redesigned to submit with registration (13 Jul 2026)
+
+Direct follow-up superseding the section above: the emergency contacts UX changed from "separate form, enabled only after the patient is registered" to "collected as a draft list, submitted together with the single Register-patient action." The component is still fully reusable — it's now a controlled list (`contacts`/`onChange` props) with no server calls of its own, so it can drive either flow depending on what the parent wants.
+
+**Files changed:** `emergency-contacts.tsx` (redesigned as a controlled draft-list, no longer calls `addEmergencyContact` itself), `patient-registration-form.tsx` (single submit sends patient fields + the draft contacts list together), `reception/patients/new/actions.ts` (`registerPatient` now accepts an `emergencyContacts` array and inserts them in the same call), plus 3 new tests in `actions.test.ts`.
+
+### Design decision: partial-failure handling
+`emergency_contacts` rows are inserted as one multi-row `insert()` *after* the patient (auth user + `users` + `patient_profiles` + `user_roles`) is already committed. Postgres treats a multi-row insert as one statement — it can't leave some contacts saved and others not — but the patient and the contacts are still two separate network calls, so failure between them is possible. If the patient succeeds but contacts fail, `registerPatient` returns `{ success: true, patientId, contactsError }` rather than treating it as a whole-request failure — because a whole-request retry would resubmit `signUp` for an email that now already exists, hitting the duplicate-email path incorrectly. The client surfaces `contactsError` via `toast.warning` + an inline retry block that re-attempts *only* the contacts, using the now-known `patientId` and the pre-existing single-contact `addEmergencyContact` action.
+
+### Verified as sound
+- Both `patientRegistrationSchema` and each entry in `emergencyContacts` are re-validated server-side inside `registerPatient` before anything is written — client-side RHF validation on the draft-add mini-form is UX only.
+- No new RLS surface: the bulk insert into `emergency_contacts` runs under the same policy as before (`patients.create`), unchanged since #20.
+- Live-verified in a browser (real receptionist session): empty-name draft-add is blocked client-side (no server call, list stays empty); two valid drafts add and display correctly; removing one from the draft list works; no console errors throughout. The final `registerPatient` network call was confirmed to carry the correct payload shape (`[{"name":"Jane Emergency","phone":"0912345678","relationship":"Sister"}]`) via server logs.
+- Unit tests cover: full success with contacts, patient-succeeds-but-contacts-fail (`contactsError` set, `success` still `true`), and invalid-contact-blocks-before-signUp.
+
+### Known gap — RESOLVED (13 Jul 2026, later same night)
+The developer configured a custom SMTP provider in the Supabase dashboard, which removes the built-in email service's very low rate limit (Supabase's own docs describe the built-in provider as "intended for demonstration purposes only"). Full end-to-end run confirmed:
+- `registerPatient` call succeeded (3.4s — consistent with a real SMTP round-trip, vs. the ~500-700ms fast-fail seen on every prior rate-limited attempt), toast showed "Patient registered", UI locked to the ✓ state correctly.
+- Independently re-read via a separate admin session (not just trusting the action's return value): `users` row correct (`is_active: true`, right name/email), `patient_profiles` row correct (dob/gender set, untouched optional fields correctly `null`), `user_roles` correctly assigned the `patient` role, and the submitted `emergency_contacts` row landed with the right `patient_id`/name/relationship/phone.
+
+This closes out the last open gap from both the #20 and emergency-contacts passes — the full combined registration flow (patient + emergency contact, single submit) is now verified working end-to-end against the live database, not just up to the network boundary.
+
+### Gate status
+No Critical or High findings. Full flow verified live end-to-end.
+
+---
+
+## Emergency contacts: reverted to separate form (13 Jul 2026, later same night)
+
+Direct follow-up: the combined-submission design (previous two sections) was reverted back to the original separate-form approach — `EmergencyContactsSection` owns its own `<form>`, `addEmergencyContact`/`removeEmergencyContact` calls again, and stays disabled until `patientId` is set by a successful "Register patient" submit. `registerPatient` no longer accepts an `emergencyContacts` parameter or returns `contactsError` — `actions.ts` is now byte-identical to the version committed before the combined-submission redesign existed (confirmed via `git diff --stat HEAD`). The `contactsError`-retry code path in `patient-registration-form.tsx` is gone along with it. `emergency-contacts-actions.ts` (add/remove) and its tests were never touched by either redesign and needed no changes.
+
+The "Register patient" button stays at the bottom-right (that was a separate, already-confirmed request, unaffected by this revert).
+
+### Verified as sound (re-confirmed live, not just assumed from the earlier pass)
+- Before registration: both the contact-name input and "Add contact" button are genuinely disabled (`isDisabled()` true via Playwright against a real receptionist session).
+- After a successful "Register patient" submit: both become enabled, and adding a contact through its own separate submit succeeds.
+- Independently re-read via a separate admin session: `users` row correct, and the added `emergency_contacts` row correctly linked to `patient_id` with the right name/relationship (phone left blank in this run, correctly stored as `null`).
+- No console errors throughout; QA gates (typecheck, lint, build, tests) all pass — 36/36 tests (3 fewer than the combined-submission version, matching the removed `emergencyContacts`-in-`registerPatient` test cases; `emergency-contacts-actions.test.ts`'s 9 tests are unaffected).
+
+### Gate status
+No Critical or High findings.
