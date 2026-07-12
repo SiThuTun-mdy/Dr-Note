@@ -49,40 +49,55 @@
 }
 
 :root {
+  /* Dr.Note EMR Design Tokens — design system §2 */
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: oklch(0.22 0.06 250);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.22 0.06 250);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  /* Clinical teal #22867a — design system §2 */
-  --primary: oklch(0.45 0.12 173);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.96 0.01 173);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.96 0.01 173);
-  --muted-foreground: oklch(0.5 0 0);
-  --accent: oklch(0.96 0.01 173);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.22 0.06 250);
+
+  /* Primary: Material Light Blue #64B5F6 — design system §2 */
+  --primary: oklch(0.72 0.14 250);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Secondary: Deep Navy #1E3A8A — design system §2 */
+  --secondary: oklch(0.32 0.14 260);
+  --secondary-foreground: oklch(1 0 0);
+
+  /* Muted: Light Blue #BBDEFB — design system §2 */
+  --muted: oklch(0.93 0.04 250);
+  --muted-foreground: oklch(0.45 0.04 250);
+
+  /* Accent */
+  --accent: oklch(0.93 0.04 250);
+  --accent-foreground: oklch(0.22 0.06 250);
+
+  /* Destructive — design system §2 */
   --destructive: oklch(0.577 0.245 27.325);
-  /* Borders — design system §2 */
-  --border: oklch(0.91 0.01 173);
-  --input: oklch(0.91 0.01 173);
-  --ring: oklch(0.45 0.12 173);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Border — design system §2 */
+  --border: oklch(0.85 0.04 250);
+  --input: oklch(0.85 0.04 250);
+  --ring: oklch(0.72 0.14 250);
+
+  --chart-1: oklch(0.72 0.14 250);
+  --chart-2: oklch(0.32 0.14 260);
+  --chart-3: oklch(0.65 0.1 240);
+  --chart-4: oklch(0.85 0.04 250);
+  --chart-5: oklch(0.45 0.12 260);
+
+  --radius: 0.5rem;
+
+  /* Sidebar — design system §4 */
+  --sidebar: oklch(0.98 0.01 250);
+  --sidebar-foreground: oklch(0.22 0.06 250);
+  --sidebar-primary: oklch(0.72 0.14 250);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.93 0.04 250);
+  --sidebar-accent-foreground: oklch(0.22 0.06 250);
+  --sidebar-border: oklch(0.85 0.04 250);
+  --sidebar-ring: oklch(0.72 0.14 250);
 }
 
 .dark {
@@ -128,5 +143,73 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
+
+  /* Accessibility: Focus states for keyboard navigation — design system §7 */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  /* Touch targets: Minimum 44×44px — design system §7 */
+  button, a, input, select, textarea, [role="button"], [role="tab"] {
+    @apply min-h-[44px];
+  }
+
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Skip link for accessibility — design system §7 */
+.skip-link {
+  @apply absolute -top-10 left-0 z-50 bg-primary text-primary-foreground px-4 py-2;
+  @apply focus:top-0 transition-all duration-200;
+}
+
+/* Status badges — design system §2 */
+.status-waiting {
+  @apply bg-amber-100 text-amber-800;
+}
+
+.status-screening {
+  @apply bg-sky-100 text-sky-800;
+}
+
+.status-with_doctor {
+  @apply bg-violet-100 text-violet-800;
+}
+
+.status-completed {
+  @apply bg-green-100 text-green-800;
+}
+
+/* EMR card utility */
+.emr-card {
+  @apply bg-card rounded-lg border shadow-sm p-6;
+}
+
+/* EMR table header — design system §3 */
+.emr-table-header {
+  @apply bg-muted text-muted-foreground font-medium text-sm;
+}
+
+/* Custom animations */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
 }

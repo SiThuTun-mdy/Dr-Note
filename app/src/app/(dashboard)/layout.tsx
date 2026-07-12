@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import DashboardHeader from "./header"
+import { DashboardShell } from "./shell"
 
 const roleDashboard: Record<string, string> = {
   admin: "/admin",
@@ -47,13 +47,12 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader
-        userName={profile?.name || user.email || ""}
-        roleName={roleName}
-        dashboardUrl={allowedPrefix}
-      />
-      <main className="max-w-7xl mx-auto px-4 py-8">{children}</main>
-    </div>
+    <DashboardShell
+      userName={profile?.name || user.email || ""}
+      userRole={roleName}
+      dashboardUrl={allowedPrefix}
+    >
+      {children}
+    </DashboardShell>
   )
 }

@@ -1,143 +1,156 @@
 import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
-import { Users, Activity, Calendar, ArrowRight, Settings, FileText } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Users, Activity, Calendar, Settings, FileText, Shield, BarChart3, ClipboardList } from "lucide-react"
 
 export default function AdminPage() {
   return (
-    <div className="space-y-8">
-      {/* Welcome section */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Welcome back, Admin</h1>
-        <p className="text-muted-foreground mt-1">Here&apos;s what&apos;s happening with your clinic today.</p>
-      </div>
-
-      {/* Stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border border-border/50 hover:border-primary/20 transition-colors">
+    <div className="space-y-6">
+      {/* Stats cards — design system §4: admin → user management */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Patients</p>
-                <p className="text-3xl font-bold text-foreground mt-1">—</p>
+                <p className="text-sm font-medium text-muted-foreground">Total patients</p>
+                <p className="text-3xl font-semibold text-foreground mt-1">—</p>
               </div>
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Users className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-4">Registered in system</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-border/50 hover:border-primary/20 transition-colors">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Today&apos;s Visits</p>
-                <p className="text-3xl font-bold text-foreground mt-1">—</p>
+                <p className="text-sm font-medium text-muted-foreground">Today&apos;s visits</p>
+                <p className="text-3xl font-semibold text-foreground mt-1">—</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                <Calendar className="h-6 w-6 text-blue-500" />
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-4">Scheduled for today</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-border/50 hover:border-primary/20 transition-colors">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Active Staff</p>
-                <p className="text-3xl font-bold text-foreground mt-1">—</p>
+                <p className="text-sm font-medium text-muted-foreground">Active staff</p>
+                <p className="text-3xl font-semibold text-foreground mt-1">—</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-green-500/10 flex items-center justify-center">
-                <Activity className="h-6 w-6 text-green-500" />
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Activity className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-4">Currently active</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-border/50 hover:border-primary/20 transition-colors">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                <p className="text-3xl font-bold text-foreground mt-1">—</p>
+                <p className="text-3xl font-semibold text-foreground mt-1">—</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                <FileText className="h-6 w-6 text-amber-500" />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-4">Awaiting action</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border border-border/50">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Link
-                href="/admin/users"
-                className="flex items-center justify-between p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Users className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">User Management</p>
-                    <p className="text-sm text-muted-foreground">Manage staff accounts and roles</p>
-                  </div>
-                </div>
-                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-              </Link>
-
-              <div className="flex items-center justify-between p-4 rounded-lg border border-border/30 opacity-50">
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
-                    <Settings className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">System Settings</p>
-                    <p className="text-sm text-muted-foreground">Coming soon</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-border/50">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-foreground mb-4">System Overview</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-border/30">
-                <span className="text-sm text-muted-foreground">Database Status</span>
-                <span className="text-sm font-medium text-green-600 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-green-500" />
-                  Connected
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-3 border-b border-border/30">
-                <span className="text-sm text-muted-foreground">Auth Provider</span>
-                <span className="text-sm font-medium text-foreground">Supabase</span>
-              </div>
-              <div className="flex items-center justify-between py-3 border-b border-border/30">
-                <span className="text-sm text-muted-foreground">Hosting</span>
-                <span className="text-sm font-medium text-foreground">Vercel</span>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-muted-foreground">Environment</span>
-                <span className="text-sm font-medium text-primary">Development</span>
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <FileText className="h-6 w-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Quick actions — Bento Grid style, design system §4 */}
+      <div>
+        <h2 className="text-lg font-semibold text-foreground mb-4">Quick actions</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link href="/admin/users" className="group">
+            <div className="h-full p-5 bg-card rounded-2xl border border-border shadow-sm
+              hover:shadow-md hover:border-primary/30 hover:scale-[1.02]
+              transition-all duration-200 ease-out cursor-pointer">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4
+                group-hover:bg-primary/20 transition-colors">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-semibold text-foreground text-sm mb-1">Manage users</h3>
+              <p className="text-xs text-muted-foreground">Add, edit, or deactivate staff accounts</p>
+            </div>
+          </Link>
+
+          <Link href="/admin/reports" className="group">
+            <div className="h-full p-5 bg-card rounded-2xl border border-border shadow-sm
+              hover:shadow-md hover:border-primary/30 hover:scale-[1.02]
+              transition-all duration-200 ease-out cursor-pointer">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4
+                group-hover:bg-primary/20 transition-colors">
+                <BarChart3 className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-semibold text-foreground text-sm mb-1">View reports</h3>
+              <p className="text-xs text-muted-foreground">Analytics and clinic performance</p>
+            </div>
+          </Link>
+
+          <Link href="/admin/audit" className="group">
+            <div className="h-full p-5 bg-card rounded-2xl border border-border shadow-sm
+              hover:shadow-md hover:border-primary/30 hover:scale-[1.02]
+              transition-all duration-200 ease-out cursor-pointer">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4
+                group-hover:bg-primary/20 transition-colors">
+                <Shield className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-semibold text-foreground text-sm mb-1">Audit log</h3>
+              <p className="text-xs text-muted-foreground">Track system activity and changes</p>
+            </div>
+          </Link>
+
+          <Link href="/admin/settings" className="group">
+            <div className="h-full p-5 bg-card rounded-2xl border border-border shadow-sm
+              hover:shadow-md hover:border-primary/30 hover:scale-[1.02]
+              transition-all duration-200 ease-out cursor-pointer">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4
+                group-hover:bg-primary/20 transition-colors">
+                <Settings className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-semibold text-foreground text-sm mb-1">Settings</h3>
+              <p className="text-xs text-muted-foreground">System configuration and preferences</p>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* System overview — design system §3 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">System overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-3 border-b border-border">
+              <span className="text-sm text-muted-foreground">Database status</span>
+              <span className="text-sm font-medium text-green-600 flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-green-500" />
+                Connected
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-3 border-b border-border">
+              <span className="text-sm text-muted-foreground">Auth provider</span>
+              <span className="text-sm font-medium text-foreground">Supabase</span>
+            </div>
+            <div className="flex items-center justify-between py-3 border-b border-border">
+              <span className="text-sm text-muted-foreground">Hosting</span>
+              <span className="text-sm font-medium text-foreground">Vercel</span>
+            </div>
+            <div className="flex items-center justify-between py-3">
+              <span className="text-sm text-muted-foreground">Environment</span>
+              <span className="text-sm font-medium text-primary">Development</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
