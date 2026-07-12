@@ -50,7 +50,7 @@ One Next.js app does everything — there is no separate backend service. Supaba
 ## 4. Auth flow
 
 1. Login page → Supabase Auth (email/password), SSR cookie session (`@supabase/ssr`).
-2. `src/middleware.ts` refreshes the session on every request and redirects unauthenticated users to `/login`.
+2. `src/proxy.ts` refreshes the session on every request and redirects unauthenticated users to `/login`.
 3. After login, fetch the user's roles once (chain in 01 §5) and route to the role's dashboard.
 4. Route groups guard by role (layout-level check + redirect). RLS backs it up at the data layer.
 5. Demo scope (D4): patients do not log in until after 15 Jul.
