@@ -149,7 +149,7 @@ export function PatientRegistrationForm() {
                 <FormLabel>Gender *</FormLabel>
                 <Select
                   disabled={isSubmitting}
-                  value={field.value}
+                  value={field.value ?? ""}
                   onValueChange={field.onChange}
                 >
                   <FormControl>

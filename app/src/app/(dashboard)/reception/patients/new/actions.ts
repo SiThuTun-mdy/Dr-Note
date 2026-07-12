@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
 import { generateTempPassword } from "@/lib/utils/password"
+import { getSiteUrl } from "@/lib/utils/site-url"
 import {
   patientRegistrationSchema,
   type PatientRegistrationInput,
@@ -59,14 +60,17 @@ export async function registerPatient(
 
   // Create the auth user on a non-cookie client so this call cannot touch
   // the receptionist's own session (docs/guide/01-database-schema.md,
-  // issue #20 context). Email confirmation must be off (#40) for signUp to
-  // return an active account immediately — patients don't log in this demo.
+  // issue #20 context). The temp password is random and never surfaced —
+  // the patient sets their own via the emailRedirectTo confirmation link.
   const serviceClient = createServiceClient()
   const tempPassword = generateTempPassword()
   const { data: signUpData, error: signUpError } =
     await serviceClient.auth.signUp({
       email,
       password: tempPassword,
+      options: {
+        emailRedirectTo: `${getSiteUrl()}/auth/confirm?next=/set-password`,
+      },
     })
 
   if (signUpError || !signUpData.user) {
@@ -77,6 +81,7 @@ export async function registerPatient(
         fieldErrors: { email: "This email is already registered" },
       }
     }
+    console.error("[PatientRegistration] signUp failed", signUpError)
     return { success: false, error: "Unable to register patient. Please try again." }
   }
 
@@ -100,7 +105,7 @@ export async function registerPatient(
     name,
     email,
     phone: phone || null,
-    is_active: false, // patients don't log in this demo (D4)
+    is_active: true,
   })
 
   if (usersError) {
