@@ -10,11 +10,12 @@ High-fidelity UI mockups for the Dr. Note healthcare application, designed with 
 | 2 | Admin | Dashboard, Doctor List, Doctor Registration, Doctor Detail, Edit Doctor, Admin Settings |
 | 3 | Receptionist | Dashboard, Patient List, Patient Registration, Patient Detail, Settings |
 | 4 | Doctor | Dashboard, Consultation List, Consultation Form, Consultation Detail, Patient Detail, Settings |
-| 5 | Patient | Dashboard, My Consultations, Consultation Detail, Profile, Settings |
-| 6 | States & Modals | Empty State, No Results, Error, Skeleton Loading, Session Timeout, Delete Confirmation, Logout, Toast Notifications |
-| 7 | Sidebars | Role-specific sidebars for Admin, Receptionist, Doctor, Patient |
+| 5 | Nurse | Dashboard, Patient List, Screening Form, Settings |
+| 6 | Patient | Dashboard, My Consultations, Consultation Detail, Profile, Settings |
+| 7 | States & Modals | Empty State, No Results, Error, Skeleton Loading, Session Timeout, Delete Confirmation, Logout, Toast Notifications |
+| 8 | Sidebars | Role-specific sidebars for Admin, Receptionist, Doctor, Nurse, Patient |
 
-**Total: 30 screens + 4 role-specific sidebars**
+**Total: 34 screens + 5 role-specific sidebars**
 
 ## How to View
 
@@ -45,6 +46,7 @@ Each role sees only relevant screens and actions:
 
 - **Admin** — Full access: manage doctors, view dashboards, settings
 - **Receptionist** — Patient management: register, view, delete patients
+- **Nurse** — Clinical support: take vitals, record screenings, update visit status
 - **Doctor** — Clinical workflow: consultations, patient history, export PDF
 - **Patient** — Read-only: view own consultations, profile, settings
 

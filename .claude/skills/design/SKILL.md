@@ -30,10 +30,10 @@ Unified design skill: brand, tokens, UI, logo, CIP, slides, banners, social phot
 | Brand identity, voice, assets | `brand` | External skill |
 | Tokens, specs, CSS vars | `design-system` | External skill |
 | shadcn/ui, Tailwind, code | `ui-styling` | External skill |
+| Presentations, pitch decks | `slides` | External skill |
+| Banners, covers, headers | `banner-design` | External skill |
 | Logo creation, AI generation | Logo (built-in) | `references/logo-design.md` |
 | CIP mockups, deliverables | CIP (built-in) | `references/cip-design.md` |
-| Presentations, pitch decks | Slides (built-in) | `references/slides.md` |
-| Banners, covers, headers | Banner (built-in) | `references/banner-sizes-and-styles.md` |
 | Social media images/photos | Social Photos (built-in) | `references/social-photos-design.md` |
 | SVG icons, icon sets | Icon (built-in) | `references/icon-design.md` |
 
@@ -113,68 +113,13 @@ python3 ~/.claude/skills/design/scripts/cip/render-html.py --brand "TopGroup" --
 
 **Tip:** If no logo exists, use Logo Design section above first.
 
-## Slides (Built-in)
+## Slides
 
-Strategic HTML presentations with Chart.js, design tokens, copywriting formulas.
+> **For presentations and pitch decks, use the `slides` skill.** It contains the full creation workflow, layout patterns, HTML templates, copywriting formulas, and strategies.
 
-Load `references/slides-create.md` for the creation workflow.
+## Banner Design
 
-### Slides: Knowledge Base
-
-| Topic | File |
-|-------|------|
-| Creation Guide | `references/slides-create.md` |
-| Layout Patterns | `references/slides-layout-patterns.md` |
-| HTML Template | `references/slides-html-template.md` |
-| Copywriting | `references/slides-copywriting-formulas.md` |
-| Strategies | `references/slides-strategies.md` |
-
-## Banner Design (Built-in)
-
-22 art direction styles across social, ads, web, print. Uses `frontend-design`, `ai-artist`, `ai-multimodal`, `chrome-devtools` skills.
-
-Load `references/banner-sizes-and-styles.md` for complete sizes and styles reference.
-
-### Banner: Workflow
-
-1. **Gather requirements** via `AskUserQuestion` — purpose, platform, content, brand, style, quantity
-2. **Research** — Activate `ui-ux-pro-max`, browse Pinterest for references
-3. **Design** — Create HTML/CSS banner with `frontend-design`, generate visuals with `ai-artist`/`ai-multimodal`
-4. **Export** — Screenshot to PNG at exact dimensions via `chrome-devtools`
-5. **Present** — Show all options side-by-side, iterate on feedback
-
-### Banner: Quick Size Reference
-
-| Platform | Type | Size (px) |
-|----------|------|-----------|
-| Facebook | Cover | 820 x 312 |
-| Twitter/X | Header | 1500 x 500 |
-| LinkedIn | Personal | 1584 x 396 |
-| YouTube | Channel art | 2560 x 1440 |
-| Instagram | Story | 1080 x 1920 |
-| Instagram | Post | 1080 x 1080 |
-| Google Ads | Med Rectangle | 300 x 250 |
-| Website | Hero | 1920 x 600-1080 |
-
-### Banner: Top Art Styles
-
-| Style | Best For |
-|-------|----------|
-| Minimalist | SaaS, tech |
-| Bold Typography | Announcements |
-| Gradient | Modern brands |
-| Photo-Based | Lifestyle, e-com |
-| Geometric | Tech, fintech |
-| Glassmorphism | SaaS, apps |
-| Neon/Cyberpunk | Gaming, events |
-
-### Banner: Design Rules
-
-- Safe zones: critical content in central 70-80%
-- One CTA per banner, bottom-right, min 44px height
-- Max 2 fonts, min 16px body, ≥32px headline
-- Text under 20% for ads (Meta penalizes)
-- Print: 300 DPI, CMYK, 3-5mm bleed
+> **For banners, covers, and headers, use the `banner-design` skill.** It contains the full workflow, size references, art styles, and export process.
 
 ## Icon Design (Built-in)
 
@@ -267,14 +212,10 @@ Load `references/social-photos-design.md` for sizes, templates, best practices.
 | CIP Deliverables | `references/cip-deliverable-guide.md` |
 | CIP Styles | `references/cip-style-guide.md` |
 | CIP Prompts | `references/cip-prompt-engineering.md` |
-| Slides Create | `references/slides-create.md` |
-| Slides Layouts | `references/slides-layout-patterns.md` |
-| Slides Template | `references/slides-html-template.md` |
-| Slides Copy | `references/slides-copywriting-formulas.md` |
-| Slides Strategy | `references/slides-strategies.md` |
-| Banner Sizes & Styles | `references/banner-sizes-and-styles.md` |
 | Social Photos Guide | `references/social-photos-design.md` |
 | Icon Design Guide | `references/icon-design.md` |
+
+> **Slides and Banner references are in their respective skills:** `slides/SKILL.md`, `banner-design/SKILL.md`
 
 ## Scripts
 
@@ -309,5 +250,5 @@ pip install google-genai pillow
 
 ## Integration
 
-**External sub-skills:** brand, design-system, ui-styling
+**External sub-skills:** brand, design-system, ui-styling, slides, banner-design
 **Related Skills:** frontend-design, ui-ux-pro-max, ai-multimodal, chrome-devtools

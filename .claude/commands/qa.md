@@ -2,7 +2,7 @@ Run Phase 6 QA.
 
 Read:
 - docs/02-PRD.md
-- docs/18-Sprint-Backlog.md
+- docs/18-Sprint-Backlog.md (if exists — tasks may come from GitHub Project)
 - docs/23-Review-Report.md
 - docs/Progress.md
 

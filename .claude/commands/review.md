@@ -2,7 +2,7 @@ Run Phase 5 code review.
 
 Read:
 - docs/12-Architecture.md
-- docs/18-Sprint-Backlog.md
+- docs/18-Sprint-Backlog.md (if exists — tasks may come from GitHub Project)
 - docs/Progress.md
 
 Review:

@@ -1,6 +1,6 @@
 # AI Tools Usage Guide
 
-Complete guide for using Claude Code AI tools in the Dr-Note project.
+Complete guide for using Claude Code AI tools in the DRNotes project.
 
 ---
 
@@ -42,8 +42,8 @@ cd Dr-Note
 # Install dependencies
 npm install
 
-# Copy environment variables
-cp .env.example .env.local
+# Copy environment variables (create from template)
+cp .env.example .env.local  # Note: .env.example must be created first
 ```
 
 #### Step 2: Environment Variables (Manual)
@@ -62,27 +62,15 @@ SUPABASE_ACCESS_TOKEN=your-access-token
 GITHUB_TOKEN=your-github-token
 ```
 
-#### Step 3: Install Claude Code Plugins (Individual)
+#### Step 3: Verify MCP Servers (Auto)
 
-Each developer must install these plugins:
-
-```bash
-# In Claude Code, run:
-/plugin code-review
-/plugin vercel
-/plugin frontend-design
-/plugin context7
-```
-
-#### Step 4: Verify MCP Servers (Auto)
-
-MCP servers auto-load from `.mcp.json`. Verify they're working:
+MCP servers are configured in `.claude/settings.local.json`. Verify they're working:
 ```bash
 # In Claude Code, run:
 /status
 ```
 
-#### Step 5: Start Development
+#### Step 4: Start Development
 
 ```bash
 # Start Claude Code
@@ -178,8 +166,9 @@ Sprint End:
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `/pr` | Prepare pull request draft | Ready to merge |
-| `/publish-pr` | Publish PR to GitHub | After /pr |
+| `/pr` | Prepare pull request draft | When you need a detailed PR doc first |
+| `/create-pr` | One-step PR creation | Quick: commit + push + PR in one command |
+| `/publish-pr` | Publish PR to GitHub | After /pr prepared the draft |
 | `/regression` | Run regression tests | After bugfix |
 
 ### Release Commands
@@ -210,7 +199,7 @@ These skills are automatically applied by Claude Code when relevant:
 
 | Skill | How to Use |
 |-------|------------|
-| `server-actions-skill` | "Use server-actions-skill to implement this action" |
+| `backend-skill` | "Use backend-skill to implement this server action" |
 | `doctor-note-domain-skill` | "Apply medical domain knowledge" |
 | `qa-testing-skill` | "Use qa-testing-skill to write tests" |
 
@@ -218,7 +207,7 @@ These skills are automatically applied by Claude Code when relevant:
 
 | Task Type | Recommended Skills |
 |-----------|-------------------|
-| New Feature | `server-actions-skill`, `supabase-skill`, `react-best-practices` |
+| New Feature | `backend-skill`, `supabase-skill`, `react-best-practices` |
 | UI Component | `ui-ux-pro-max`, `frontend-design`, `react-best-practices` |
 | Bug Fix | `security-review-skill`, `qa-testing-skill` |
 | Database | `supabase-skill`, `server-actions-skill` |
@@ -273,15 +262,15 @@ These skills are automatically applied by Claude Code when relevant:
 **Purpose:** Direct database operations from Claude Code
 
 **Usage:**
-```bash
+```
 # List tables
-supabase list_tables
+mcp__supabase__list_tables(project_id="your-project-id", schemas=["public"], verbose=true)
 
 # Run query
-supabase execute_sql "SELECT * FROM patients LIMIT 10"
+mcp__supabase__execute_sql(project_id="your-project-id", query="SELECT * FROM patients LIMIT 10")
 
-# Check RLS policies
-supabase list_policies
+# Apply migration
+mcp__supabase__apply_migration(project_id="your-project-id", name="migration_name", query="SQL HERE")
 ```
 
 **Common Operations:**
@@ -295,18 +284,18 @@ supabase list_policies
 **Purpose:** Browser automation and E2E testing
 
 **Usage:**
-```bash
+```
 # Navigate to page
-playwright navigate http://localhost:3000
+mcp__playwright__browser_navigate(url="http://localhost:3000")
 
 # Take screenshot
-playwright screenshot
+mcp__playwright__browser_take_screenshot(type="png", scale="css")
 
 # Click element
-playwright click "button[type=submit]"
+mcp__playwright__browser_click(target="button[type=submit]", element="Submit button")
 
 # Fill form
-playwright fill "input[name=email]" "test@example.com"
+mcp__playwright__browser_fill_form(fields=[{target: "email input", name: "email", type: "textbox", value: "test@example.com"}])
 ```
 
 **Common Operations:**
@@ -320,18 +309,18 @@ playwright fill "input[name=email]" "test@example.com"
 **Purpose:** Repository and PR management
 
 **Usage:**
-```bash
+```
 # List issues
-github list_issues
+mcp__github__list_issues(owner="ChanOoDev", repo="DRNotes")
 
 # Create issue
-github create_issue "Bug: Login fails" "Description..."
+mcp__github__create_issue(owner="ChanOoDev", repo="DRNotes", title="Bug: Login fails", body="Description...")
 
 # List PRs
-github list_prs
+mcp__github__list_pull_requests(owner="ChanOoDev", repo="DRNotes")
 
 # Get PR details
-github get_pr 123
+mcp__github__get_pull_request(owner="ChanOoDev", repo="DRNotes", pull_number=123)
 ```
 
 **Common Operations:**
@@ -344,35 +333,16 @@ github get_pr 123
 
 ## Plugins
 
-### code-review
+### Installed Plugins
 
-**Purpose:** Automated PR review on GitHub
+| Plugin | Purpose | Status |
+|--------|---------|--------|
+| `context7` | Up-to-date library documentation | Auto-triggered |
+| `supabase` | Database operations via MCP | Auto-configured |
+| `playwright` | Browser automation via MCP | Auto-configured |
+| `github` | Repository management via MCP | Auto-configured |
 
-**Usage:**
-```
-/code-review
-```
-
-**What it does:**
-- Analyzes changed files
-- Posts review comments on GitHub
-- Checks for code quality, security, performance
-
-### vercel
-
-**Purpose:** Deployment management
-
-**Usage:**
-```
-/deploy-check
-```
-
-**What it does:**
-- Checks deployment readiness
-- Verifies environment variables
-- Tests build process
-
-### context7
+### Using Context7
 
 **Purpose:** Up-to-date library documentation
 
@@ -383,18 +353,6 @@ Automatic — Claude Code uses it when you ask about libraries
 ```
 "How do I use Supabase.auth.getUser() in the latest version?"
 ```
-
-### frontend-design
-
-**Purpose:** Production-grade UI design
-
-**Usage:**
-Automatic — Applied when creating UI components
-
-**What it does:**
-- Avoids generic AI aesthetics
-- Applies bold, distinctive design
-- Uses proper typography and colors
 
 ---
 
@@ -428,12 +386,9 @@ Automatic — Applied when creating UI components
    → Runs tests
    → Verifies acceptance criteria
 
-7. git commit
-   → Commit with conventional message
-
-8. /pr
-   → Create pull request
-   → Link to issue
+7. /create-pr
+   → Commit, push, and create PR in one step
+   → Or use /pr + /publish-pr for detailed PR docs
 ```
 
 ### Workflow 2: Fixing a Bug
@@ -461,7 +416,38 @@ Automatic — Applied when creating UI components
    → Create PR with bug description
 ```
 
-### Workflow 3: Sprint Start
+### Workflow 3: Emergency Hotfix
+
+```
+1. /hotfix <issue or description>
+   → Assess severity (confirm production affected)
+   → Branch from main (NOT from feature branch)
+
+2. Implement minimal fix
+   → Fix the exact bug only
+   → No refactoring, no new features
+
+3. Self-review (fast)
+   → Security, side effects, RLS, auth
+
+4. QA checks (essential only)
+   → lint + tsc + build (skip full regression)
+
+5. Commit and push
+   → "hotfix(scope): description"
+
+6. Create PR with hotfix label
+   → Fast-track review requested
+
+7. After merge — cherry-pick to active feature branches
+   → git cherry-pick <hotfix-sha>
+```
+
+**Key differences from /bugfix:**
+- `/bugfix` = QA defects on feature branches (normal pace)
+- `/hotfix` = production issues from main (emergency pace, minimal changes)
+
+### Workflow 4: Sprint Start
 
 ```
 1. /warmup
@@ -583,7 +569,10 @@ docs/<scope>-<description>   → Documentation branches
 ## Resources
 
 - [Project Documentation](./Progress.md)
-- [Architecture Decisions](./adr/adr.md)
+- [Architecture Decisions](./10-Decisions.md)
 - [Sprint Backlog](./18-Sprint-Backlog.md)
 - [Tools & Stack](./tools-and-stack.md)
 - [Conflict Analysis](./conflict-analysis.md)
+- [Claude Changelog](./claude-changelog.md)
+- [Sentry Setup Guide](./guide/05-sentry-setup.md)
+- [Branch Protection Rules](./guide/06-branch-protection.md)

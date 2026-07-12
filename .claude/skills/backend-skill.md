@@ -17,10 +17,11 @@ You are a senior backend developer specializing in Next.js server-side, Supabase
 
 ## Tech Stack
 
-- **Runtime:** Next.js 14 Server Components + Server Actions
+- **Runtime:** Next.js 16 Server Components + Server Actions
 - **Database:** PostgreSQL via Supabase
 - **Auth:** Supabase Auth (email/password, JWT)
 - **Security:** Row-Level Security (RLS), RBAC, middleware guards
+- **Validation:** Zod schemas
 - **Migrations:** Supabase SQL migrations
 
 ## Core Rules
@@ -40,28 +41,32 @@ if (authError || !user) {
 ```
 
 ### 2. Always Validate Input
-Never trust client input. Validate on the server:
+Never trust client input. Validate on the server using Zod:
 
 ```typescript
-// String validation
-if (!data.name || typeof data.name !== "string") {
-  return { error: "Name is required." };
-}
-if (data.name.length > 100) {
-  return { error: "Name must be 100 characters or less." };
+import { z } from "zod";
+
+const FormSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  phone: z.string().regex(/^\d{10}$/),
+});
+
+// In your action:
+const validated = FormSchema.safeParse({
+  name: formData.get("name"),
+  email: formData.get("email"),
+  phone: formData.get("phone"),
+});
+
+if (!validated.success) {
+  return {
+    error: "Validation failed",
+    fieldErrors: validated.error.flatten().fieldErrors,
+  };
 }
 
-// UUID validation
-const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-if (!uuidRegex.test(data.patient_id)) {
-  return { error: "Invalid patient ID." };
-}
-
-// Email validation
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-if (!emailRegex.test(data.email)) {
-  return { error: "Invalid email address." };
-}
+// Use validated.data (type-safe, sanitized)
 ```
 
 ### 3. Always Revalidate After Mutations
@@ -103,6 +108,32 @@ if (data.doctor_id !== doctorRecord.id) {
 }
 ```
 
+### 5. Structured Error Handling
+Always return structured responses and sanitize errors:
+
+```typescript
+// Return structured responses
+return { success: true, data };
+return { error: "Failed to save" };
+
+// Wrap actions in try/catch
+export async function safeAction() {
+  try {
+    // ... action logic
+    return { success: true, data };
+  } catch (error) {
+    console.error("Action error:", error);
+    return {
+      error: error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
+}
+
+// Sanitize errors — never expose internal details
+// BAD:  return { error: databaseError.message }
+// GOOD: return { error: "Failed to delete patient" }
+```
+
 ## File Structure (Backend Focus)
 
 ```
@@ -116,6 +147,10 @@ src/
 │   ├── server.ts          # Server-side client (cookies)
 │   ├── client.ts          # Browser client (localStorage)
 │   └── middleware.ts      # Auth middleware
+├── lib/validations/       # Zod schemas
+│   ├── doctor.ts
+│   ├── patient.ts
+│   └── consultation.ts
 ├── middleware.ts           # Next.js middleware
 ├── types/
 │   └── database.ts        # Supabase generated types
@@ -125,123 +160,7 @@ src/
 
 ## Patterns
 
-### Server Client Setup
-```typescript
-// src/lib/supabase/server.ts
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-
-export function createClient() {
-  const cookieStore = cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Server Component — ignore
-          }
-        },
-      },
-    }
-  );
-}
-```
-
-### Browser Client Setup
-```typescript
-// src/lib/supabase/client.ts
-import { createBrowserClient } from "@supabase/ssr";
-
-export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-}
-```
-
-### Middleware (Route Protection)
-```typescript
-// src/lib/supabase/middleware.ts
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
-
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request: { headers: request.headers } });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({ request: { headers: request.headers } });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  // Protected routes
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  // Redirect logged-in users away from auth pages
-  if (user && (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/signup")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-  // Admin-only routes
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    const adminRoutes = ["/dashboard/users"];
-    const doctorRoutes = ["/dashboard/consultations/new", "/dashboard/consultations/*/edit"];
-
-    if (adminRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
-      if (profile?.role !== "admin") {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-      }
-    }
-
-    if (doctorRoutes.some(route => {
-      const pattern = new RegExp("^" + route.replace("*", "[^/]+") + "$");
-      return pattern.test(request.nextUrl.pathname);
-    })) {
-      if (profile?.role !== "doctor" && profile?.role !== "admin") {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-      }
-    }
-  }
-
-  return response;
-}
-```
+> **For Supabase client setup (server, browser, middleware), see `supabase-skill`.**
 
 ### Server Action Pattern
 ```typescript
@@ -478,7 +397,7 @@ CREATE POLICY "Users can read own records"
 ## What NOT to Do
 
 - ❌ Never skip authentication checks
-- ❌ Never trust client input — always validate server-side
+- ❌ Never trust client input — always validate server-side with Zod
 - ❌ Never rely solely on RLS — add server-side checks
 - ❌ Never forget `revalidatePath` after mutations
 - ❌ Never expose `SUPABASE_SERVICE_ROLE_KEY` to client
@@ -487,3 +406,5 @@ CREATE POLICY "Users can read own records"
 - ❌ Never use `catch (error)` without handling — use `catch`
 - ❌ Never allow unauthenticated access to dashboard routes
 - ❌ Never skip input sanitization (trim, length checks)
+- ❌ Never expose raw database errors to clients — sanitize messages
+- ❌ Never skip try/catch in server actions

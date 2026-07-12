@@ -172,10 +172,13 @@ Slash commands for quick actions.
 | `/next-task` | Pick next sprint task |
 | `/feature` | Implement one MVP feature |
 | `/review` | Run code review |
+| `/security-review` | Security vulnerability scan |
 | `/qa` | Run QA testing |
 | `/bugfix` | Fix QA defects |
+| `/hotfix` | Emergency production fix (fast-track) |
 | `/regression` | Run regression after bug fixes |
 | `/pr` | Prepare pull request draft |
+| `/create-pr` | One-step PR creation (commit + push + PR) |
 | `/pr-review` | Review PR on GitHub |
 | `/publish-pr` | Publish pull request |
 | `/deploy-check` | DevOps readiness check |
@@ -211,6 +214,27 @@ Automated triggers on tool events.
 | `lint` | After Edit/Write | Runs ESLint |
 | `typecheck` | After Edit/Write | Runs TypeScript check |
 | `progress-reminder` | On Stop | Reminds to update Progress.md |
+| `pre-commit` | Before git commit | Runs lint-staged + safe-code-check.sh |
+
+### Code Safety Guardrails
+
+The repo includes automated detection of dangerous code patterns. See `docs/guardrails.md` for full details.
+
+**Pre-commit hook runs:**
+1. `lint-staged` — ESLint with auto-fix on staged JS/TS files
+2. `scripts/safe-code-check.sh` — Detects dangerous patterns (fork bombs, infinite loops, eval(), rm -rf, etc.)
+
+**Claude Code instructions** in `.claude/CLAUDE.md` include safety rules for AI-generated code.
+
+### Branch Protection
+
+Main branch is protected. See `docs/guide/06-branch-protection.md` for full rules.
+
+**Summary:**
+- No direct commits to `main`
+- PRs require 1 approval + CI passing (`test`, `security`)
+- Squash and merge (linear history)
+- Force push disabled
 
 ---
 
@@ -264,7 +288,7 @@ The `frontend-design` plugin provides guidance for distinctive, intentional visu
 
 | Library | Version | Purpose |
 |---------|---------|---------|
-| Next.js | 14 | React framework (App Router) |
+| Next.js | 16 | React framework (App Router) |
 | TypeScript | ^5 | Type safety |
 | React | ^19 | UI library |
 | React DOM | ^19 | React DOM renderer |
@@ -310,15 +334,22 @@ The `frontend-design` plugin provides guidance for distinctive, intentional visu
 | PostCSS | — | CSS processing |
 | Turbopack | (built-in) | Dev server bundler |
 
+### Monitoring & Observability
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| @sentry/nextjs | latest | Error tracking, performance monitoring |
+
 ---
 
 ## Tech Stack Summary
 
 ```
-Frontend:   Next.js 14 + TypeScript + Tailwind + shadcn/ui
+Frontend:   Next.js 16 + TypeScript + Tailwind + shadcn/ui
 Backend:    Supabase (PostgreSQL + auto REST API)
 Hosting:    Vercel + Supabase free tier
 State:      React Query + Zustand
 Forms:      React Hook Form + Zod
+Monitoring: Sentry (error tracking + performance)
 AI Tools:   Claude Code (Skills, Agents, MCP, Commands, Hooks)
 ```
