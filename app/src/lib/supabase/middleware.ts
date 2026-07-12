@@ -91,7 +91,18 @@ export async function updateSession(request: NextRequest) {
     // Role-based route protection for protected routes
     if (!isPublicPath && roleName) {
       const allowedPrefixes = roleRoutes[roleName] || []
-      const isAllowed = allowedPrefixes.some((prefix) => pathname.startsWith(prefix))
+
+      // Special-case: patients may only access their own patient path
+      let isAllowed = false
+      if (roleName === 'patient' && user) {
+        const patientPrefix = `/patients/${user.id}`
+        isAllowed = pathname === patientPrefix || pathname.startsWith(patientPrefix + '/')
+      }
+
+      // Fallback to prefix-based checks for other roles (or additional allowed prefixes)
+      if (!isAllowed) {
+        isAllowed = allowedPrefixes.some((prefix) => pathname.startsWith(prefix))
+      }
 
       // If user tries to access another role's route, redirect to own dashboard
       if (!isAllowed) {
