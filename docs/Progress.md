@@ -23,6 +23,7 @@
 | Clinical notes: typed notes during consult (doctor) | #32 |
 | Project restructure: move app to `app/`, consolidate docs | PR #47 |
 | Supabase configured: MCP connected, schema + seed data verified live in project `irqkiyqpymeezboppkwh` | — |
+| CI security workflow fix: full git history checkout for gitleaks PR range scan | PR #52 |
 
 ### 🔄 In Progress
 
