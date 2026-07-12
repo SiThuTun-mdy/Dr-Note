@@ -30,6 +30,7 @@
 |------|-------|----------|
 | Scaffold Next.js 14 app + repo structure + branch strategy | #11 | 🔴 demo-blocker |
 | Seed data: roles, permissions, diagnosis catalog, demo users | #15 | 🔴 demo-blocker |
+| Patient registration form (demographics) | #20 | 🔴 demo-blocker — code complete, blocked on applying RLS migration `00003` to the live project (Supabase MCP unauthorized this session) |
 | Diagnosis entry: catalog picker + visit diagnoses | #33 | 🔴 demo-blocker |
 | Prescription + prescription items (doctor) | #34 | 🔴 demo-blocker |
 | Production release: prod env config, public URL, deployed smoke test | #40 | 🔴 demo-blocker |
@@ -39,10 +40,9 @@
 | Task | Issue | Epic |
 |------|-------|------|
 | Attachments: upload files to a visit (Supabase Storage) | #36 | Record Taking |
-| Patient registration form (demographics) | — | User Registration |
-| Staff onboarding: create doctor/nurse/receptionist accounts | — | User Registration |
-| Patient profile page (view/edit) | — | User Registration |
-| Emergency contacts (add/edit/remove on patient profile) | — | User Registration |
+| Staff onboarding: create doctor/nurse/receptionist accounts | #21 | User Registration |
+| Patient profile page (view/edit) | #22 | User Registration |
+| Emergency contacts (add/edit/remove on patient profile) | #23 | User Registration |
 | Visit creation flow (receptionist) | — | Record Taking |
 | Visit status workflow + patient queue view | — | Record Taking |
 | Screening form: vitals (nurse) | — | Record Taking |

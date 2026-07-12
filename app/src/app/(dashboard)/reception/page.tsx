@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/features/shared/StatusBadge"
@@ -45,7 +46,7 @@ export default function ReceptionPage() {
           <CardTitle className="text-lg font-semibold">Quick actions</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto" render={<Link href="/reception/patients/new" />}>
             Register patient
           </Button>
           <Button variant="outline" className="w-full sm:w-auto">
