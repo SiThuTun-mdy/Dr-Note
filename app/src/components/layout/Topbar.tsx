@@ -1,0 +1,112 @@
+"use client";
+
+import { Menu, Bell, LogOut, User, Settings } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+interface TopbarProps {
+  onMenuClick: () => void;
+  pageTitle: string;
+  userName: string;
+  userRole: string;
+}
+
+export function Topbar({
+  onMenuClick,
+  pageTitle,
+  userName,
+  userRole,
+}: TopbarProps) {
+  const initials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  return (
+    <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6 sticky top-0 z-30">
+      {/* Left: Menu button + Page title — design system §4 */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors min-h-[44px] min-w-[44px]"
+          aria-label="Toggle menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <h1 className="text-2xl font-semibold text-foreground">{pageTitle}</h1>
+      </div>
+
+      {/* Right: Notifications + User — design system §4 */}
+      <div className="flex items-center gap-4">
+        {/* Notifications */}
+        <button
+          className="relative p-2 rounded-lg hover:bg-muted transition-colors min-h-[44px] min-w-[44px]"
+          aria-label="Notifications"
+        >
+          <Bell className="w-5 h-5 text-muted-foreground" />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full" />
+        </button>
+
+        {/* User dropdown menu — design system §4 */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center cursor-pointer outline-none"
+            aria-label="User menu"
+          >
+            <span className="text-sm font-medium text-primary">{initials}</span>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="p-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+                    <span className="text-sm font-semibold text-primary">{initials}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{userName}</p>
+                    <p className="text-xs text-muted-foreground truncate capitalize">
+                      {userRole}
+                    </p>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={async () => {
+                  const { logout } = await import("@/app/(auth)/login/actions");
+                  await logout();
+                }}
+                className="text-destructive focus:text-destructive"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  );
+}
