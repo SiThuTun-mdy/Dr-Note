@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { DiagnosisPicker } from "./diagnosis-picker";
 import { DiagnosisList } from "./diagnosis-list";
 import { DiagnosisNote } from "./diagnosis-note";
+import { PrescriptionForm } from "./prescription-form";
+import { PrescriptionList } from "./prescription-list";
 import { toast } from "sonner";
-import { addDiagnosis, removeDiagnosis } from "@/app/(dashboard)/doctor/visits/[id]/actions";
+import { addDiagnosis, removeDiagnosis, getVisitPrescriptions, assignDoctorToVisit } from "@/app/(dashboard)/doctor/visits/[id]/actions";
 
 interface VisitData {
   id: string;
+  doctor_id: string | null;
   chief_complaint: string;
   visit_type: string;
   status: string;
@@ -48,6 +52,29 @@ const statusBadgeClasses: Record<string, string> = {
 
 export function ConsultView({ visit }: ConsultViewProps) {
   const [diagnoses, setDiagnoses] = useState(visit.diagnoses);
+  const [prescriptions, setPrescriptions] = useState<Array<{
+    id: string;
+    instruction: string | null;
+    created_at: string;
+    diagnosis: { code: string; title: string } | null;
+    items: Array<{
+      id: string;
+      medicine_name: string;
+      dosage: string | null;
+      frequency: string | null;
+      duration: string | null;
+      route: string | null;
+      quantity: number | null;
+    }>;
+  }>>([]);
+
+  useEffect(() => {
+    const fetchPrescriptions = async () => {
+      const data = await getVisitPrescriptions(visit.id);
+      setPrescriptions(data);
+    };
+    fetchPrescriptions();
+  }, [visit.id]);
 
   const handleAddDiagnosis = async (
     diagnosis: { id: string; code: string; title: string },
@@ -63,8 +90,20 @@ export function ConsultView({ visit }: ConsultViewProps) {
       toast.error(result.error);
     } else {
       toast.success(`Added ${diagnosis.code} as ${type} diagnosis`);
-      // Re-fetch to get the full diagnosis data
-      window.location.reload();
+      // Add to local state without page reload
+      setDiagnoses((prev) => [
+        ...prev,
+        {
+          id: result.visit_diagnosis_id || crypto.randomUUID(),
+          diagnosis_type: type as "primary" | "secondary" | "suspected",
+          notes: null,
+          diagnosis: {
+            id: diagnosis.id,
+            code: diagnosis.code,
+            title: diagnosis.title,
+          },
+        },
+      ]);
     }
   };
 
@@ -98,12 +137,30 @@ export function ConsultView({ visit }: ConsultViewProps) {
             <CardTitle className="text-lg">
               {visit.patient?.name || "Unknown Patient"}
             </CardTitle>
-            <Badge
-              variant="secondary"
-              className={statusBadgeClasses[visit.status]}
-            >
-              {visit.status.replace("_", " ")}
-            </Badge>
+            <div className="flex items-center gap-2">
+              {!visit.doctor_id && (
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    const result = await assignDoctorToVisit(visit.id);
+                    if (result.error) {
+                      toast.error(result.error);
+                    } else {
+                      toast.success("You are now assigned to this visit");
+                      window.location.reload();
+                    }
+                  }}
+                >
+                  Assume care
+                </Button>
+              )}
+              <Badge
+                variant="secondary"
+                className={statusBadgeClasses[visit.status]}
+              >
+                {visit.status.replace("_", " ")}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -180,6 +237,22 @@ export function ConsultView({ visit }: ConsultViewProps) {
         visitId={visit.id}
         initialNote={visit.diagnosis_note || ""}
       />
+
+      <div className="border-t" />
+
+      {/* Prescriptions */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Prescriptions</h2>
+        <PrescriptionList prescriptions={prescriptions} />
+        <PrescriptionForm
+          visitId={visit.id}
+          doctorId={visit.doctor?.email || ""}
+          diagnoses={visit.diagnoses.map((d) => d.diagnosis)}
+          onSuccess={() => {
+            getVisitPrescriptions(visit.id).then(setPrescriptions);
+          }}
+        />
+      </div>
     </div>
   );
 }

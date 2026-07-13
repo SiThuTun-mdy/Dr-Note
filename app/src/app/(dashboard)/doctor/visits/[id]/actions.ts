@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { prescriptionSchema } from "@/lib/validators/prescription";
 import { revalidatePath } from "next/cache";
 
 export type DiagnosisType = "primary" | "secondary" | "suspected";
@@ -25,11 +26,11 @@ export interface SaveDiagnosisNoteInput {
 export async function addDiagnosis(input: AddDiagnosisInput) {
   const supabase = await createClient();
 
-  const { error } = await supabase.from("visit_diagnoses").insert({
+  const { data, error } = await supabase.from("visit_diagnoses").insert({
     visit_id: input.visit_id,
     diagnosis_id: input.diagnosis_id,
     diagnosis_type: input.diagnosis_type,
-  });
+  }).select("id").single();
 
   if (error) {
     if (error.code === "23505") {
@@ -39,7 +40,7 @@ export async function addDiagnosis(input: AddDiagnosisInput) {
   }
 
   revalidatePath(`/doctor/visits/${input.visit_id}`);
-  return { success: true };
+  return { success: true, visit_diagnosis_id: data?.id };
 }
 
 export async function removeDiagnosis(input: RemoveDiagnosisInput) {
@@ -144,4 +145,136 @@ export async function getVisitWithDetails(visitId: string) {
     screening,
     diagnoses: diagnoses || [],
   };
+}
+
+// Prescription actions
+
+export interface CreatePrescriptionInput {
+  visit_id: string;
+  doctor_id: string;
+  diagnosis_id?: string | null;
+  instruction?: string;
+  items: Array<{
+    medicine_name: string;
+    dosage?: string;
+    frequency?: string;
+    duration?: string;
+    route?: string;
+    quantity?: number;
+  }>;
+}
+
+export async function createPrescription(input: CreatePrescriptionInput) {
+  const supabase = await createClient();
+
+  // Step 1: Server-side input validation
+  const parsed = prescriptionSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: "Invalid input. Please check all fields." };
+  }
+
+  // Step 2: Get authenticated user
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return { error: "Authentication required." };
+  }
+
+  // Step 3: Verify doctor is assigned to this visit
+  const { data: visit, error: visitError } = await supabase
+    .from("visits")
+    .select("doctor_id")
+    .eq("id", input.visit_id)
+    .single();
+
+  if (visitError || !visit) {
+    return { error: "Visit not found." };
+  }
+
+  if (visit.doctor_id !== user.id) {
+    return { error: "You are not authorized to create prescriptions for this visit." };
+  }
+
+  // Step 4: Create prescription header (using auth.uid() for doctor_id)
+  const { data: prescription, error: prescriptionError } = await supabase
+    .from("prescriptions")
+    .insert({
+      visit_id: input.visit_id,
+      doctor_id: user.id, // Use authenticated user ID, not client-provided
+      diagnosis_id: input.diagnosis_id || null,
+      instruction: input.instruction || null,
+    })
+    .select("id")
+    .single();
+
+  if (prescriptionError || !prescription) {
+    return { error: "Failed to create prescription. Please try again." };
+  }
+
+  // Step 5: Create prescription items
+  const items = input.items.map((item) => ({
+    prescription_id: prescription.id,
+    medicine_name: item.medicine_name,
+    dosage: item.dosage || null,
+    frequency: item.frequency || null,
+    duration: item.duration || null,
+    route: item.route || null,
+    quantity: item.quantity || null,
+  }));
+
+  const { error: itemsError } = await supabase
+    .from("prescription_items")
+    .insert(items);
+
+  if (itemsError) {
+    return { error: "Failed to add prescription items. Please try again." };
+  }
+
+  revalidatePath(`/doctor/visits/${input.visit_id}`);
+  return { success: true, prescription_id: prescription.id };
+}
+
+export async function getVisitPrescriptions(visitId: string) {
+  const supabase = await createClient();
+
+  const { data: prescriptions, error } = await supabase
+    .from("prescriptions")
+    .select(
+      `
+      *,
+      items:prescription_items(*),
+      diagnosis:diagnoses(id, code, title)
+    `
+    )
+    .eq("visit_id", visitId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return [];
+  }
+
+  return prescriptions || [];
+}
+
+export async function assignDoctorToVisit(visitId: string) {
+  const supabase = await createClient();
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return { error: "Authentication required." };
+  }
+
+  const { error } = await supabase
+    .from("visits")
+    .update({ doctor_id: user.id, status: "with_doctor" })
+    .eq("id", visitId)
+    .is("doctor_id", null);
+
+  if (error) {
+    return { error: "Failed to assign doctor." };
+  }
+
+  revalidatePath(`/doctor/visits/${visitId}`);
+  revalidatePath("/my-queue");
+  revalidatePath("/consultations");
+  return { success: true };
 }
