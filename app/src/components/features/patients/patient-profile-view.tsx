@@ -284,17 +284,6 @@ export function PatientProfileView({
       </Card>
 
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Visit history</CardTitle>
-            <Button type="button" variant="outline" size="sm" disabled>
-              Visit history (coming soon)
-            </Button>
-          </div>
-        </CardHeader>
-      </Card>
-
-      <Card>
         <CardContent className="pt-6">
           <EmergencyContactsSection
             key={contactsVersion}

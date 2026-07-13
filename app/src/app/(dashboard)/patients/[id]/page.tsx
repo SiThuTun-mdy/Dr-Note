@@ -3,6 +3,10 @@ import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getUserRoles } from "@/lib/auth/roles"
 import { PatientProfileView } from "@/components/features/patients/patient-profile-view"
+import {
+  PatientVisitsDataTable,
+  type PatientVisitRow,
+} from "@/components/features/patients/patient-visits-data-table"
 import type { PatientProfileData } from "@/components/features/patients/patient-profile-actions"
 import type { EmergencyContact } from "@/components/features/patients/emergency-contacts-actions"
 import { normalizeProfile } from "@/lib/utils/patient-profile"
@@ -90,6 +94,23 @@ export default async function PatientProfilePage({ params }: Props) {
   }
 
   const canEdit = !isOwner && roles.some((role) => UPDATE_ROLES.has(role))
+  const { data: visits, error: visitsError } = await supabase
+    .from("visits")
+    .select("id, visit_date, status, visit_type, chief_complaint")
+    .eq("patient_id", id)
+    .order("visit_date", { ascending: false })
+
+  if (visitsError) {
+    console.error("[PatientProfile] visits fetch failed", visitsError)
+  }
+
+  const visitRows: PatientVisitRow[] = (visits ?? []).map((visit) => ({
+    id: visit.id,
+    visitDate: visit.visit_date,
+    status: visit.status,
+    visitType: visit.visit_type,
+    chiefComplaint: visit.chief_complaint,
+  }))
 
   return (
     <div className="p-4 space-y-6">
@@ -98,6 +119,19 @@ export default async function PatientProfilePage({ params }: Props) {
         <p className="text-sm text-muted-foreground">Patient ID: {id}</p>
       </div>
       <PatientProfileView patientId={id} initialData={profileData} canEdit={canEdit} />
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold">Visit history</h2>
+          
+        </div>
+        {visitsError ? (
+          <p className="text-sm text-muted-foreground">
+            We couldn&apos;t load visit history right now. Please try again.
+          </p>
+        ) : (
+          <PatientVisitsDataTable data={visitRows} />
+        )}
+      </section>
     </div>
   )
 }
