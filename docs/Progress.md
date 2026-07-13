@@ -30,14 +30,13 @@
 | Diagnosis entry: catalog picker + visit diagnoses — PR #59 | #33 |
 | Prescription + prescription items (doctor) — PR #60 | #34 |
 | Visit creation flow (receptionist) — PR #62 | #24 |
+| Visit status workflow + patient queue view — PR #64 | #25 |
 
 
 ### 🔄 In Progress
 
 | Task | Issue | Priority |
 |------|-------|----------|
-| Scaffold Next.js 14 app + repo structure + branch strategy | #11 | 🔴 demo-blocker |
-| Seed data: roles, permissions, diagnosis catalog, demo users | #15 | 🔴 demo-blocker |
 | Production release: prod env config, public URL, deployed smoke test | #40 | 🔴 demo-blocker |
 
 ### 📋 Backlog
@@ -45,9 +44,6 @@
 | Task | Issue | Epic |
 |------|-------|------|
 | Attachments: upload files to a visit (Supabase Storage) | #36 | Record Taking |
-| Patient profile page (view/edit) | #22 | User Registration |
-| Emergency contacts (add/edit/remove on patient profile) | #23 | User Registration |
-| Visit status workflow + patient queue view | #25 | Record Taking |
 | Screening form: vitals (nurse) | #26 | Record Taking |
 | Role-based access to history | #27 | History Management |
 | Patient & visit search + filters | #28 | History Management |
@@ -73,6 +69,11 @@
 
 | PR | Title | Status |
 |----|-------|--------|
+<<<<<<< HEAD
+=======
+| #64 | feat(queue): add visit status workflow and patient queue view (#25) | ✅ Open |
+| #63 | fix(next-task): spawn developer agent for implementation step | ✅ Open |
+>>>>>>> feat/visit-status-queue
 | #62 | feat(visit): add visit creation flow for receptionist (#24) | ✅ Open |
 | #61 | feat(pages): implement list pages with pagination | ✅ Open |
 | #60 | feat(prescription): add prescription form with dynamic items (#34) | ✅ Open |
