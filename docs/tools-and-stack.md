@@ -311,6 +311,8 @@ The `frontend-design` plugin provides guidance for distinctive, intentional visu
 |---------|---------|---------|
 | @supabase/supabase-js | ^2.110 | Supabase client |
 | @supabase/ssr | ^0.12 | SSR support for Supabase |
+| @emnapi/runtime | ^1.11.2 | Node-API runtime support for wasm/native bindings |
+| @emnapi/core | ^1.11.2 | Core helpers for emnapi runtime integration |
 
 ### Forms & Validation
 
