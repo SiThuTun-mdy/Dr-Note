@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DiagnosisPicker } from "./diagnosis-picker";
 import { DiagnosisList } from "./diagnosis-list";
 import { DiagnosisNote } from "./diagnosis-note";
+import { PrescriptionForm } from "./prescription-form";
+import { PrescriptionList } from "./prescription-list";
 import { toast } from "sonner";
-import { addDiagnosis, removeDiagnosis } from "@/app/(dashboard)/doctor/visits/[id]/actions";
+import { addDiagnosis, removeDiagnosis, getVisitPrescriptions } from "@/app/(dashboard)/doctor/visits/[id]/actions";
 
 interface VisitData {
   id: string;
@@ -48,6 +50,29 @@ const statusBadgeClasses: Record<string, string> = {
 
 export function ConsultView({ visit }: ConsultViewProps) {
   const [diagnoses, setDiagnoses] = useState(visit.diagnoses);
+  const [prescriptions, setPrescriptions] = useState<Array<{
+    id: string;
+    instruction: string | null;
+    created_at: string;
+    diagnosis: { code: string; title: string } | null;
+    items: Array<{
+      id: string;
+      medicine_name: string;
+      dosage: string | null;
+      frequency: string | null;
+      duration: string | null;
+      route: string | null;
+      quantity: number | null;
+    }>;
+  }>>([]);
+
+  useEffect(() => {
+    const fetchPrescriptions = async () => {
+      const data = await getVisitPrescriptions(visit.id);
+      setPrescriptions(data);
+    };
+    fetchPrescriptions();
+  }, [visit.id]);
 
   const handleAddDiagnosis = async (
     diagnosis: { id: string; code: string; title: string },
@@ -180,6 +205,22 @@ export function ConsultView({ visit }: ConsultViewProps) {
         visitId={visit.id}
         initialNote={visit.diagnosis_note || ""}
       />
+
+      <div className="border-t" />
+
+      {/* Prescriptions */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Prescriptions</h2>
+        <PrescriptionList prescriptions={prescriptions} />
+        <PrescriptionForm
+          visitId={visit.id}
+          doctorId={visit.doctor?.email || ""}
+          diagnoses={visit.diagnoses.map((d) => d.diagnosis)}
+          onSuccess={() => {
+            getVisitPrescriptions(visit.id).then(setPrescriptions);
+          }}
+        />
+      </div>
     </div>
   );
 }

@@ -145,3 +145,84 @@ export async function getVisitWithDetails(visitId: string) {
     diagnoses: diagnoses || [],
   };
 }
+
+// Prescription actions
+
+export interface CreatePrescriptionInput {
+  visit_id: string;
+  doctor_id: string;
+  diagnosis_id?: string | null;
+  instruction?: string;
+  items: Array<{
+    medicine_name: string;
+    dosage?: string;
+    frequency?: string;
+    duration?: string;
+    route?: string;
+    quantity?: number;
+  }>;
+}
+
+export async function createPrescription(input: CreatePrescriptionInput) {
+  const supabase = await createClient();
+
+  // Create prescription header
+  const { data: prescription, error: prescriptionError } = await supabase
+    .from("prescriptions")
+    .insert({
+      visit_id: input.visit_id,
+      doctor_id: input.doctor_id,
+      diagnosis_id: input.diagnosis_id || null,
+      instruction: input.instruction || null,
+    })
+    .select("id")
+    .single();
+
+  if (prescriptionError || !prescription) {
+    return { error: "Failed to create prescription. Please try again." };
+  }
+
+  // Create prescription items
+  const items = input.items.map((item) => ({
+    prescription_id: prescription.id,
+    medicine_name: item.medicine_name,
+    dosage: item.dosage || null,
+    frequency: item.frequency || null,
+    duration: item.duration || null,
+    route: item.route || null,
+    quantity: item.quantity || null,
+  }));
+
+  const { error: itemsError } = await supabase
+    .from("prescription_items")
+    .insert(items);
+
+  if (itemsError) {
+    return { error: "Failed to add prescription items. Please try again." };
+  }
+
+  revalidatePath(`/doctor/visits/${input.visit_id}`);
+  return { success: true, prescription_id: prescription.id };
+}
+
+export async function getVisitPrescriptions(visitId: string) {
+  const supabase = await createClient();
+
+  const { data: prescriptions, error } = await supabase
+    .from("prescriptions")
+    .select(
+      `
+      *,
+      items:prescription_items(*),
+      diagnosis:diagnoses(id, code, title)
+    `
+    )
+    .eq("visit_id", visitId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return [];
+  }
+
+  return prescriptions || [];
+}
