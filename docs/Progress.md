@@ -26,6 +26,7 @@
 | Patient registration form (demographics) — RLS applied + verified live end-to-end; see `docs/24-Security-Report.md` | #20 |
 | Patient activation + set-password flow: patients now `is_active` on registration, confirm their email via `/auth/confirm`, and set their own password at `/set-password`. Note: patients still cannot log in through `/login` after this — no patient dashboard exists yet (see `docs/24-Security-Report.md`) | — |
 | Staff onboarding: admin creates doctor/nurse/receptionist/admin accounts at `/admin/staff/new`; temp password shown once; reviewer + QA passed (5/5 acceptance criteria) — PR #54 open into `feat/userRegistration` | #21 |
+| Diagnosis entry: catalog picker + visit diagnoses — PR #59 | #33 |
 
 
 ### 🔄 In Progress
@@ -34,7 +35,6 @@
 |------|-------|----------|
 | Scaffold Next.js 14 app + repo structure + branch strategy | #11 | 🔴 demo-blocker |
 | Seed data: roles, permissions, diagnosis catalog, demo users | #15 | 🔴 demo-blocker |
-| Diagnosis entry: catalog picker + visit diagnoses | #33 | 🔴 demo-blocker |
 | Prescription + prescription items (doctor) | #34 | 🔴 demo-blocker |
 | Production release: prod env config, public URL, deployed smoke test | #40 | 🔴 demo-blocker |
 
@@ -72,6 +72,7 @@
 
 | PR | Title | Status |
 |----|-------|--------|
+| #59 | feat(consult): add diagnosis entry with catalog picker and diagnostic notes (#33) | ✅ Open |
 | #54 | feat(staff): staff onboarding — admin creates doctor/nurse/receptionist accounts (#21) | ✅ Open (into `feat/userRegistration`) |
 | #47 | chore(project-restructure): consolidate docs, remove legacy code | ✅ Open |
 
