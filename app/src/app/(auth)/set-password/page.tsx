@@ -1,6 +1,7 @@
 "use client"
 
 import { Suspense, useState } from "react"
+import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -33,6 +34,7 @@ function LinkExpiredNotice() {
 export default function SetPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [done, setDone] = useState(false)
+  const [canLogin, setCanLogin] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const form = useForm<SetPasswordInput>({
@@ -49,6 +51,7 @@ export default function SetPasswordPage() {
         setError(result.error || "Unable to set your password. Please try again.")
         return
       }
+      setCanLogin(result.canLogin ?? false)
       setDone(true)
     } finally {
       setIsSubmitting(false)
@@ -72,9 +75,17 @@ export default function SetPasswordPage() {
         )}
 
         {done ? (
-          <div className="rounded-lg bg-primary/10 border border-primary/20 p-4 text-sm text-foreground">
-            Your password has been set. Please contact the clinic to complete your account
-            setup.
+          <div className="space-y-4">
+            <div className="rounded-lg bg-primary/10 border border-primary/20 p-4 text-sm text-foreground">
+              {canLogin
+                ? "Your password has been set. Log in to get started."
+                : "Your password has been set. Please contact the clinic to complete your account setup."}
+            </div>
+            {canLogin && (
+              <Button className="w-full" render={<Link href="/login" />}>
+                Go to login
+              </Button>
+            )}
           </div>
         ) : (
           <Form {...form}>

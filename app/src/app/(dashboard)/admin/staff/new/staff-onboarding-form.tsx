@@ -152,9 +152,11 @@ export function StaffOnboardingForm() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              A confirmation email was sent to {created.email}. The staff
-              member must confirm their email before logging in — the link
-              also lets them set their own password.
+              A confirmation email was sent to {created.email}. This password
+              will not work until the staff member opens that link — logging
+              in first shows &ldquo;email not confirmed&rdquo;. If they choose
+              to set their own password on that page, this temporary one is
+              replaced.
             </p>
           </CardContent>
         </Card>

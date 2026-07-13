@@ -6,6 +6,12 @@ import { setPasswordSchema, type SetPasswordInput } from "@/lib/validators/auth"
 interface SetPasswordResult {
   success: boolean
   error?: string
+  /**
+   * Whether this account can use /login afterwards. Staff roles have
+   * dashboards; patients don't yet (no patient dashboard this sprint), so
+   * their success screen must not point them at the login page.
+   */
+  canLogin?: boolean
 }
 
 export async function setPassword(values: SetPasswordInput): Promise<SetPasswordResult> {
@@ -32,6 +38,20 @@ export async function setPassword(values: SetPasswordInput): Promise<SetPassword
     return { success: false, error: "Unable to set your password. Please try again." }
   }
 
+  // Staff land on a role dashboard after login; patients have none yet, so
+  // only non-patient roles should be sent to /login from the success screen.
+  const { data: roleRows } = await supabase
+    .from("user_roles")
+    .select("roles(name)")
+    .eq("user_id", user.id)
+
+  const canLogin =
+    roleRows?.some((row) => {
+      const roleName = (row as unknown as { roles: { name: string } | null })
+        .roles?.name
+      return !!roleName && roleName !== "patient"
+    }) ?? false
+
   await supabase.auth.signOut()
-  return { success: true }
+  return { success: true, canLogin }
 }

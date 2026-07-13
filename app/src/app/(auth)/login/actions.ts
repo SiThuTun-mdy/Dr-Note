@@ -61,6 +61,19 @@ export async function login(values: LoginInput): Promise<LoginResult> {
     if (error.message.includes("Invalid login credentials")) {
       return { error: "Wrong email or password. Please try again." }
     }
+    // New accounts (staff onboarding, patient registration) cannot sign in —
+    // even with the correct password — until the confirmation email is
+    // clicked. Masking this as a wrong-password error sends people down the
+    // wrong debugging path.
+    if (
+      error.code === "email_not_confirmed" ||
+      error.message.includes("Email not confirmed")
+    ) {
+      return {
+        error:
+          "This email hasn't been confirmed yet. Open the confirmation link we emailed you, then log in.",
+      }
+    }
     return { error: "Unable to sign in. Please try again later." }
   }
 

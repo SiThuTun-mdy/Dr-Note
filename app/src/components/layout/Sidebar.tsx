@@ -123,6 +123,11 @@ const navigationByRole: Record<
       icon: <Users className="h-5 w-5" />,
     },
     {
+      name: "Add staff",
+      href: "/admin/staff/new",
+      icon: <UserPlus className="h-5 w-5" />,
+    },
+    {
       name: "Settings",
       href: "/admin/settings",
       icon: <Settings className="h-5 w-5" />,
