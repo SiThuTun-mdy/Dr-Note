@@ -1,5 +1,5 @@
 ---
-name: staff-registration-ux
+name: patient-registration
 description: >-
   Generates and validates Clinical Staff Registration Forms using high-density UI constraints 
   combined with modern frontend implementation code. Trigger this skill when the user asks to build, 
