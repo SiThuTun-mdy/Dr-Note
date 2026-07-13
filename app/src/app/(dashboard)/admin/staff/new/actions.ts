@@ -107,10 +107,8 @@ export async function onboardStaff(
 
   // With email confirmation ON, signUp does NOT error for an existing email —
   // enumeration protection returns an obfuscated user with no identities.
-  // Detect that here, before any inserts run against the fake user id.
-  // Detect that here, before any inserts run against the fake user id. A
-  // missing identities array is treated the same way: never insert against
-  // an id we cannot confirm is a freshly created user.
+  // Detect that here before any inserts run against a fake user id (or a user
+  // missing identities): never insert unless we can confirm this is a new user.
   if (!signUpData.user.identities || signUpData.user.identities.length === 0) {
 
     return {
