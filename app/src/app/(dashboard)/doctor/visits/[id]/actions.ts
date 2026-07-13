@@ -254,3 +254,27 @@ export async function getVisitPrescriptions(visitId: string) {
 
   return prescriptions || [];
 }
+
+export async function assignDoctorToVisit(visitId: string) {
+  const supabase = await createClient();
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return { error: "Authentication required." };
+  }
+
+  const { error } = await supabase
+    .from("visits")
+    .update({ doctor_id: user.id, status: "with_doctor" })
+    .eq("id", visitId)
+    .is("doctor_id", null);
+
+  if (error) {
+    return { error: "Failed to assign doctor." };
+  }
+
+  revalidatePath(`/doctor/visits/${visitId}`);
+  revalidatePath("/my-queue");
+  revalidatePath("/consultations");
+  return { success: true };
+}

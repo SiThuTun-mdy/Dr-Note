@@ -3,16 +3,18 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { DiagnosisPicker } from "./diagnosis-picker";
 import { DiagnosisList } from "./diagnosis-list";
 import { DiagnosisNote } from "./diagnosis-note";
 import { PrescriptionForm } from "./prescription-form";
 import { PrescriptionList } from "./prescription-list";
 import { toast } from "sonner";
-import { addDiagnosis, removeDiagnosis, getVisitPrescriptions } from "@/app/(dashboard)/doctor/visits/[id]/actions";
+import { addDiagnosis, removeDiagnosis, getVisitPrescriptions, assignDoctorToVisit } from "@/app/(dashboard)/doctor/visits/[id]/actions";
 
 interface VisitData {
   id: string;
+  doctor_id: string | null;
   chief_complaint: string;
   visit_type: string;
   status: string;
@@ -135,12 +137,30 @@ export function ConsultView({ visit }: ConsultViewProps) {
             <CardTitle className="text-lg">
               {visit.patient?.name || "Unknown Patient"}
             </CardTitle>
-            <Badge
-              variant="secondary"
-              className={statusBadgeClasses[visit.status]}
-            >
-              {visit.status.replace("_", " ")}
-            </Badge>
+            <div className="flex items-center gap-2">
+              {!visit.doctor_id && (
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    const result = await assignDoctorToVisit(visit.id);
+                    if (result.error) {
+                      toast.error(result.error);
+                    } else {
+                      toast.success("You are now assigned to this visit");
+                      window.location.reload();
+                    }
+                  }}
+                >
+                  Assume care
+                </Button>
+              )}
+              <Badge
+                variant="secondary"
+                className={statusBadgeClasses[visit.status]}
+              >
+                {visit.status.replace("_", " ")}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
