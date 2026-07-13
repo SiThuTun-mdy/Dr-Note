@@ -109,16 +109,16 @@ export function ConsultView({ visit }: ConsultViewProps) {
         <CardContent>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-muted-foreground">Visit Type:</span>{" "}
-              {visit.visit_type}
+              <p className="text-xs font-semibold text-muted-foreground">Visit type</p>
+              <p>{visit.visit_type}</p>
             </div>
             <div>
-              <span className="text-muted-foreground">Date:</span>{" "}
-              {new Date(visit.created_at).toLocaleDateString()}
+              <p className="text-xs font-semibold text-muted-foreground">Date</p>
+              <p>{new Date(visit.created_at).toLocaleDateString()}</p>
             </div>
             <div className="col-span-2">
-              <span className="text-muted-foreground">Chief Complaint:</span>{" "}
-              {visit.chief_complaint}
+              <p className="text-xs font-semibold text-muted-foreground">Chief complaint</p>
+              <p>{visit.chief_complaint}</p>
             </div>
           </div>
         </CardContent>
@@ -133,29 +133,28 @@ export function ConsultView({ visit }: ConsultViewProps) {
           <CardContent>
             <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
               <div>
-                <span className="text-muted-foreground">Height:</span>{" "}
-                {visit.screening.height_cm} cm
+                <p className="text-xs font-semibold text-muted-foreground">Height</p>
+                <p>{visit.screening.height_cm} cm</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Weight:</span>{" "}
-                {visit.screening.weight_kg} kg
+                <p className="text-xs font-semibold text-muted-foreground">Weight</p>
+                <p>{visit.screening.weight_kg} kg</p>
               </div>
               <div>
-                <span className="text-muted-foreground">BP:</span>{" "}
-                {visit.screening.bp_systolic}/{visit.screening.bp_diastolic}{" "}
-                mmHg
+                <p className="text-xs font-semibold text-muted-foreground">Blood pressure</p>
+                <p>{visit.screening.bp_systolic}/{visit.screening.bp_diastolic} mmHg</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Heart Rate:</span>{" "}
-                {visit.screening.heart_rate} bpm
+                <p className="text-xs font-semibold text-muted-foreground">Heart rate</p>
+                <p>{visit.screening.heart_rate} bpm</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Temperature:</span>{" "}
-                {visit.screening.temperature_c}°C
+                <p className="text-xs font-semibold text-muted-foreground">Temperature</p>
+                <p>{visit.screening.temperature_c}°C</p>
               </div>
               <div>
-                <span className="text-muted-foreground">SpO2:</span>{" "}
-                {visit.screening.oxygen_saturation}%
+                <p className="text-xs font-semibold text-muted-foreground">SpO2</p>
+                <p>{visit.screening.oxygen_saturation}%</p>
               </div>
             </div>
           </CardContent>
