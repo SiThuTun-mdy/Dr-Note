@@ -27,16 +27,13 @@
 | Patient activation + set-password flow: patients now `is_active` on registration, confirm their email via `/auth/confirm`, and set their own password at `/set-password`. Note: patients still cannot log in through `/login` after this — no patient dashboard exists yet (see `docs/24-Security-Report.md`) | — |
 | Staff onboarding: admin creates doctor/nurse/receptionist/admin accounts at `/admin/staff/new`; temp password shown once; reviewer + QA passed (5/5 acceptance criteria) — merged via PR #54 | #21 |
 | Password generator entropy hardening: switched temp password index selection to `crypto.randomInt` to remove modulo bias; added unit tests and refreshed review/QA/security reports | — |
+| Visit status workflow + patient queue view — PR #64 | #25 |
 
 
 ### 🔄 In Progress
 
 | Task | Issue | Priority |
 |------|-------|----------|
-| Scaffold Next.js 14 app + repo structure + branch strategy | #11 | 🔴 demo-blocker |
-| Seed data: roles, permissions, diagnosis catalog, demo users | #15 | 🔴 demo-blocker |
-| Diagnosis entry: catalog picker + visit diagnoses | #33 | 🔴 demo-blocker |
-| Prescription + prescription items (doctor) | #34 | 🔴 demo-blocker |
 | Production release: prod env config, public URL, deployed smoke test | #40 | 🔴 demo-blocker |
 
 ### 📋 Backlog
@@ -44,15 +41,11 @@
 | Task | Issue | Epic |
 |------|-------|------|
 | Attachments: upload files to a visit (Supabase Storage) | #36 | Record Taking |
-| Patient profile page (view/edit) | #22 | User Registration |
-| Emergency contacts (add/edit/remove on patient profile) | #23 | User Registration |
-| Visit creation flow (receptionist) | — | Record Taking |
-| Visit status workflow + patient queue view | — | Record Taking |
-| Screening form: vitals (nurse) | — | Record Taking |
-| Role-based access to history | — | History Management |
-| Patient & visit search + filters | — | History Management |
-| Test plan + manual demo checklist | — | Testing |
-| E2E happy-path test | — | Testing |
+| Screening form: vitals (nurse) | #26 | Record Taking |
+| Role-based access to history | #27 | History Management |
+| Patient & visit search + filters | #28 | History Management |
+| Test plan + manual demo checklist | #29 | Testing |
+| E2E happy-path test | #30 | Testing |
 | Demo script + demo data walkthrough (15 Jul) | — | Testing |
 
 ---
@@ -73,6 +66,12 @@
 
 | PR | Title | Status |
 |----|-------|--------|
+| #64 | feat(queue): add visit status workflow and patient queue view (#25) | ✅ Open |
+| #63 | fix(next-task): spawn developer agent for implementation step | ✅ Open |
+| #62 | feat(visit): add visit creation flow for receptionist (#24) | ✅ Open |
+| #61 | feat(pages): implement list pages with pagination | ✅ Open |
+| #60 | feat(prescription): add prescription form with dynamic items (#34) | ✅ Open |
+| #59 | feat(consult): add diagnosis entry with catalog picker (#33) | ✅ Open |
 | #57 | chore(security): harden temp password entropy and refresh review/qa reports | ✅ Open |
 | #54 | feat(staff): staff onboarding — admin creates doctor/nurse/receptionist accounts (#21) | ✅ Merged |
 | #47 | chore(project-restructure): consolidate docs, remove legacy code | ✅ Open |
