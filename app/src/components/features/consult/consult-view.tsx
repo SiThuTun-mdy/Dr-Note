@@ -88,8 +88,20 @@ export function ConsultView({ visit }: ConsultViewProps) {
       toast.error(result.error);
     } else {
       toast.success(`Added ${diagnosis.code} as ${type} diagnosis`);
-      // Re-fetch to get the full diagnosis data
-      window.location.reload();
+      // Add to local state without page reload
+      setDiagnoses((prev) => [
+        ...prev,
+        {
+          id: result.visit_diagnosis_id || crypto.randomUUID(),
+          diagnosis_type: type as "primary" | "secondary" | "suspected",
+          notes: null,
+          diagnosis: {
+            id: diagnosis.id,
+            code: diagnosis.code,
+            title: diagnosis.title,
+          },
+        },
+      ]);
     }
   };
 

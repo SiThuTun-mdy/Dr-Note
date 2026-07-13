@@ -67,6 +67,7 @@ export function PrescriptionForm({
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<FormData>({
     resolver: zodResolver(prescriptionSchema) as Resolver<FormData>,
     defaultValues: {
@@ -118,11 +119,10 @@ export function PrescriptionForm({
           <div className="space-y-2">
             <Label htmlFor="diagnosis">Linked diagnosis (optional)</Label>
             <Select
-              onValueChange={(value) =>
-                value === "none"
-                  ? undefined
-                  : undefined
-              }
+              onValueChange={(value) => {
+                const selected = value as string | null;
+                setValue("diagnosis_id", selected === "none" ? null : selected);
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a diagnosis" />
