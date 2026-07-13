@@ -128,15 +128,27 @@ git checkout -b feat/<scope>-<short-description>
 - Read Architecture for technical patterns
 - Read Sprint Backlog for task details and dependencies
 
-### Step 4: Implement
-- Write code following architecture patterns
-- Use server actions, Supabase, shadcn/ui, Tailwind CSS
-- Follow `backend-skill` patterns (auth first, validate input, defense in depth)
-- Follow `supabase-skill` for client setup (getAll/setAll API)
-- Apply `ui-ux-pro-max` for UI components and layout patterns
-- Follow `react-best-practices` for React/Next.js performance
-- Handle errors properly with try/catch
-- Validate all inputs with Zod
+### Step 4: Implement with Developer Agent (MANDATORY — DO NOT SKIP)
+
+**Spawn the `developer` agent to implement the feature:**
+
+The developer agent will:
+1. Write code following architecture patterns
+2. Use server actions, Supabase, shadcn/ui, Tailwind CSS
+3. Follow `backend-skill` patterns (auth first, validate input, defense in depth)
+4. Follow `supabase-skill` for client setup (getAll/setAll API)
+5. Apply `ui-ux-pro-max` for UI components and layout patterns
+6. Follow `react-best-practices` for React/Next.js performance
+7. Handle errors properly with try/catch
+8. Validate all inputs with Zod
+
+The developer agent will return:
+- Files created/modified
+- Tests added
+- Any decisions made
+- Blockers encountered
+
+**Present implementation summary to user before proceeding to code review.**
 
 ### Step 5: Code Review with Reviewer Agent (MANDATORY — DO NOT SKIP)
 
