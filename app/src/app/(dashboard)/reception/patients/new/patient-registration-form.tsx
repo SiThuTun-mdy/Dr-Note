@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
@@ -31,12 +31,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { EmergencyContactsSection } from "@/components/features/patients/emergency-contacts"
 
 export function PatientRegistrationForm() {
+  const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [patientId, setPatientId] = useState<string | null>(null)
-  const registered = !!patientId
 
   const form = useForm<PatientRegistrationInput>({
     resolver: zodResolver(patientRegistrationSchema),
@@ -69,7 +67,9 @@ export function PatientRegistrationForm() {
       }
 
       toast.success("Patient registered")
-      setPatientId(result.patientId ?? null)
+      if (result.patientId) {
+        router.push(`/patients/${result.patientId}`)
+      }
     } catch (err) {
       if (isRedirectError(err)) throw err
       toast.error("Something went wrong. Please try again.")
@@ -91,7 +91,7 @@ export function PatientRegistrationForm() {
                 <FormControl>
                   <Input
                     placeholder="Aung Aung"
-                    disabled={isSubmitting || registered}
+                    disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
@@ -110,7 +110,7 @@ export function PatientRegistrationForm() {
                   <Input
                     type="email"
                     placeholder="patient@example.com"
-                    disabled={isSubmitting || registered}
+                    disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
@@ -128,7 +128,7 @@ export function PatientRegistrationForm() {
                 <FormControl>
                   <Input
                     placeholder="09xxxxxxxxx"
-                    disabled={isSubmitting || registered}
+                    disabled={isSubmitting}
                     {...field}
                   />
                 </FormControl>
@@ -145,7 +145,7 @@ export function PatientRegistrationForm() {
                 <FormItem>
                   <FormLabel>Date of birth *</FormLabel>
                   <FormControl>
-                    <Input type="date" disabled={isSubmitting || registered} {...field} />
+                    <Input type="date" disabled={isSubmitting} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -159,7 +159,7 @@ export function PatientRegistrationForm() {
                 <FormItem>
                   <FormLabel>Gender *</FormLabel>
                   <Select
-                    disabled={isSubmitting || registered}
+                    disabled={isSubmitting}
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
                   >
@@ -187,7 +187,7 @@ export function PatientRegistrationForm() {
               <FormItem>
                 <FormLabel>NRC (optional)</FormLabel>
                 <FormControl>
-                  <Input disabled={isSubmitting || registered} {...field} />
+                  <Input disabled={isSubmitting} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -202,7 +202,7 @@ export function PatientRegistrationForm() {
                 <FormItem>
                   <FormLabel>Religion (optional)</FormLabel>
                   <FormControl>
-                    <Input disabled={isSubmitting || registered} {...field} />
+                    <Input disabled={isSubmitting} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -216,7 +216,7 @@ export function PatientRegistrationForm() {
                 <FormItem>
                   <FormLabel>Ethnicity (optional)</FormLabel>
                   <FormControl>
-                    <Input disabled={isSubmitting || registered} {...field} />
+                    <Input disabled={isSubmitting} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -231,43 +231,27 @@ export function PatientRegistrationForm() {
               <FormItem>
                 <FormLabel>Address (optional)</FormLabel>
                 <FormControl>
-                  <Textarea rows={3} disabled={isSubmitting || registered} {...field} />
+                  <Textarea rows={3} disabled={isSubmitting} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {registered ? (
-            <p className="text-sm font-medium text-primary">✓ Patient registered</p>
-          ) : (
-            <div className="flex justify-left gap-4">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin" />
-                    Registering...
-                  </>
-                ) : (
-                  "Register Patient"
-                )}
-              </Button>
-            </div>
-          )}
+          <div className="flex justify-left gap-4">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Registering...
+                </>
+              ) : (
+                "Register Patient"
+              )}
+            </Button>
+          </div>
         </form>
       </Form>
-
-      <div className="my-8 border-t border-border" />
-
-      <EmergencyContactsSection patientId={patientId} />
-
-      {registered && (
-        <div className="mt-6 flex justify-left gap-4">
-          <Button variant="outline" render={<Link href="/reception" />}>
-            Done
-          </Button>
-        </div>
-      )}
     </div>
   )
 }
