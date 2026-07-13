@@ -134,6 +134,7 @@ git checkout -b feat/<scope>-<short-description>
 - Follow `backend-skill` patterns (auth first, validate input, defense in depth)
 - Follow `supabase-skill` for client setup (getAll/setAll API)
 - Apply `frontend-design` for UI components
+- Follow docs/ui-design-demo/ui-design-demo.pen Layout only and use shadcn/ui compoents
 - Handle errors properly with try/catch
 - Validate all inputs with Zod
 

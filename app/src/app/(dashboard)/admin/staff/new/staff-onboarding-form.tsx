@@ -27,18 +27,38 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 
-const roleLabels: Record<(typeof staffRoleOptions)[number], string> = {
-  doctor: "Doctor",
-  nurse: "Nurse",
-  receptionist: "Receptionist",
-  admin: "Admin",
+function getRoleLabel(role: (typeof staffRoleOptions)[number]) {
+  switch (role) {
+    case "doctor":
+      return "Doctor"
+    case "nurse":
+      return "Nurse"
+    case "receptionist":
+      return "Registrar"
+    case "admin":
+      return "Admin"
+  }
 }
+
+const departmentOptions = [
+  "General Medicine",
+  "Emergency",
+  "Pediatrics",
+  "Cardiology",
+  "Radiology",
+  "Laboratory",
+  "Administration",
+] as const
+
+const neutralFocusRingClass =
+  "focus-visible:border-primary focus-visible:ring-primary/40 aria-invalid:border-primary aria-invalid:ring-primary/40"
 
 const defaultValues = {
   name: "",
@@ -174,143 +194,182 @@ export function StaffOnboardingForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full name *</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Dr. Aung Aung"
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email *</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="staff@drnote.com"
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone (optional)</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="09xxxxxxxxx"
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="staff_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Staff code *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="DOC001"
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Role *</FormLabel>
-                <Select
-                  disabled={isSubmitting}
-                  value={field.value ?? ""}
-                  onValueChange={field.onChange}
-                >
+    <Card className="border-slate-200 bg-slate-50/80">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold text-slate-900">
+          Clinical staff registration
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="mx-auto max-w-lg space-y-5"
+            autoComplete="off"
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full legal name *</FormLabel>
                   <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
+                    <Input
+                      disabled={isSubmitting}
+                      autoComplete="off"
+                      className={neutralFocusRingClass}
+                      {...field}
+                    />
                   </FormControl>
-                  <SelectContent>
+                  <FormMessage aria-live="polite" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="staff_code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>National Provider Identifier / License Number *</FormLabel>
+                  <FormDescription>
+                    Enter exactly 10 digits.
+                  </FormDescription>
+                  <FormControl>
+                    <Input
+                      inputMode="numeric"
+                      maxLength={10}
+                      disabled={isSubmitting}
+                      autoComplete="off"
+                      className={neutralFocusRingClass}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage aria-live="polite" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="department"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Clinical department assignment *</FormLabel>
+                  <Select
+                    disabled={isSubmitting}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger className={`w-full ${neutralFocusRingClass}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {departmentOptions.map((department) => (
+                        <SelectItem key={department} value={department}>
+                          {department}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage aria-live="polite" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormLabel>Access role *</FormLabel>
+                  <div
+                    role="radiogroup"
+                    aria-label="Access role"
+                    aria-invalid={fieldState.invalid}
+                    aria-describedby={fieldState.error ? "role-error" : undefined}
+                    className="space-y-2"
+                  >
                     {staffRoleOptions.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {roleLabels[role]}
-                      </SelectItem>
+                      <label
+                        key={role}
+                        className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+                      >
+                        <input
+                          type="radio"
+                          name={field.name}
+                          value={role}
+                          checked={field.value === role}
+                          onChange={() => field.onChange(role)}
+                          onBlur={field.onBlur}
+                          disabled={isSubmitting}
+                          className="size-4 border-slate-400 accent-primary focus-visible:ring-primary/40"
+                        />
+                        <span>{getRoleLabel(role)}</span>
+                      </label>
                     ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  </div>
+                  <FormMessage id="role-error" aria-live="polite" />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="department"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Department *</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="General Medicine"
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      disabled={isSubmitting}
+                      autoComplete="off"
+                      className={neutralFocusRingClass}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage aria-live="polite" />
+                </FormItem>
+              )}
+            />
 
-        <div className="flex gap-4">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="animate-spin" />
-                Creating...
-              </>
-            ) : (
-              "Create staff account"
-            )}
-          </Button>
-        </div>
-      </form>
-    </Form>
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone (optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isSubmitting}
+                      autoComplete="off"
+                      className={neutralFocusRingClass}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage aria-live="polite" />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex gap-4">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Create staff account"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   )
 }

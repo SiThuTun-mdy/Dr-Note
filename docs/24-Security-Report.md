@@ -162,6 +162,25 @@ No Critical or High findings.
 
 ---
 
+## Issue #21 — Staff registration UX safety hardening (13 Jul 2026)
+
+Scope: `app/src/app/(dashboard)/admin/staff/new/staff-onboarding-form.tsx`, `app/src/lib/validators/staff.ts`.
+
+### Findings
+
+No new vulnerabilities identified in this scoped review.
+
+### Verified as sound
+- Authorization and role enforcement remain server-side in `onboardStaff` (`auth.getUser()` + admin role check) and are unchanged by the UI refactor.
+- License/NPI field now enforces server-side 10-digit validation via Zod before any write path executes.
+- Form inputs explicitly disable browser autocomplete (`autoComplete="off"`), reducing shared-terminal autofill leakage risk for clinical environments.
+- Error feedback remains field-scoped and non-sensitive; users receive human-safe messages while detailed operational data stays server-side only.
+
+### Gate status
+No Critical or High findings.
+
+---
+
 ## Password generator entropy refactor (13 Jul 2026)
 
 Scope: `app/src/lib/utils/password.ts` (commit `2dd0cc0`) and added test coverage in `app/src/lib/utils/password.test.ts`.

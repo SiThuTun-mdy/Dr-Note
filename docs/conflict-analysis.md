@@ -27,6 +27,7 @@ Tracks potential conflicts between skills, plugins, and tools. Use this to under
 | `design` | Design routing hub | `slides`, `banner-design`, `brand` | ✅ Resolved — `design` now routes to standalone skills |
 | `design-system` | Token architecture | `ui-styling` | ⚠️ Watch — complementary pipeline (tokens → code) |
 | `ui-styling` | shadcn/ui + Tailwind | `design-system` | ⚠️ Watch — complementary pipeline (tokens → code) |
+| `ui-implementation` | UI implementation + server-action wiring | `backend-skill`, `supabase-skill`, `frontend-design`, `ui-styling` | ✅ Resolved — orchestration skill that composes existing patterns without replacing them |
 
 ---
 
@@ -127,6 +128,7 @@ Tracks potential conflicts between skills, plugins, and tools. Use this to under
 
 | Date | Change | Resolution |
 |------|--------|------------|
+| 2026-07-13 | Created `ui-implementation` skill | No conflict — combines backend auth/validation + Supabase setup + shadcn/ui layout implementation guidance |
 | 2026-07-11 | Merged `server-actions-skill` into `backend-skill` | HIGH conflict resolved — Zod, try/catch, error sanitization patterns merged |
 | 2026-07-11 | Fixed Supabase API conflict | HIGH conflict resolved — `supabase-skill` updated to `getAll/setAll` API |
 | 2026-07-11 | Restructured `design/SKILL.md` as router | HIGH conflict resolved — delegated slides/banner to standalone skills |

@@ -16,12 +16,9 @@ export const staffOnboardingSchema = z.object({
   phone: z.string().max(30).optional().or(z.literal("")),
   staff_code: z
     .string()
-    .min(1, "Staff code is required")
-    .max(50)
-    .regex(
-      /^[A-Za-z0-9_-]+$/,
-      "Only letters, numbers, hyphens and underscores"
-    ),
+    .trim()
+    .min(1, "License number is required")
+    .regex(/^\d{10}$/, "License number must be exactly 10 digits"),
   department: z.string().trim().min(1, "Department is required").max(100),
   role: z.enum(staffRoleOptions, {
     message: "Please select a role",

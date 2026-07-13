@@ -97,7 +97,7 @@ These are part of the repo — no installation needed:
 
 | Tool | Location | Notes |
 |------|----------|-------|
-| Skills (16) | `.claude/skills/` | Auto-loaded from repo |
+| Skills (17) | `.claude/skills/` | Auto-loaded from repo |
 | Agents (10) | `.claude/agents/` | Auto-loaded from repo |
 | Commands (16) | `.claude/commands/` | Auto-loaded from repo |
 | Hooks (6) | `.claude/hooks/` | Auto-loaded from repo |
@@ -138,6 +138,7 @@ Reusable prompt templates for specific domains.
 | `banner-design` | Banner creation |
 | `slides` | Presentation slides |
 | `ui-styling` | UI styling patterns |
+| `ui-implementation` | Architecture-safe UI implementation with Server Actions + Supabase + shadcn/ui |
 
 ---
 
