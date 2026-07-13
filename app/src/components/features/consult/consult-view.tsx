@@ -11,6 +11,9 @@ import { PrescriptionForm } from "./prescription-form";
 import { PrescriptionList } from "./prescription-list";
 import { toast } from "sonner";
 import { addDiagnosis, removeDiagnosis, getVisitPrescriptions, assignDoctorToVisit } from "@/app/(dashboard)/doctor/visits/[id]/actions";
+import { getVisitAttachments } from "@/app/(dashboard)/doctor/visits/[id]/attachments/actions";
+import { Paperclip } from "lucide-react";
+import Link from "next/link";
 
 interface VisitData {
   id: string;
@@ -67,13 +70,19 @@ export function ConsultView({ visit }: ConsultViewProps) {
       quantity: number | null;
     }>;
   }>>([]);
+  const [attachmentCount, setAttachmentCount] = useState(0);
 
   useEffect(() => {
     const fetchPrescriptions = async () => {
       const data = await getVisitPrescriptions(visit.id);
       setPrescriptions(data);
     };
+    const fetchAttachmentCount = async () => {
+      const data = await getVisitAttachments(visit.id);
+      setAttachmentCount(data.length);
+    };
     fetchPrescriptions();
+    fetchAttachmentCount();
   }, [visit.id]);
 
   const handleAddDiagnosis = async (
@@ -252,6 +261,26 @@ export function ConsultView({ visit }: ConsultViewProps) {
             getVisitPrescriptions(visit.id).then(setPrescriptions);
           }}
         />
+      </div>
+
+      <div className="border-t" />
+
+      {/* Attachments */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Attachments</h2>
+          <Link href={`/doctor/visits/${visit.id}/attachments`}>
+            <Button variant="outline" size="sm">
+              <Paperclip className="mr-1.5 h-4 w-4" />
+              Manage files
+              {attachmentCount > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {attachmentCount}
+                </Badge>
+              )}
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

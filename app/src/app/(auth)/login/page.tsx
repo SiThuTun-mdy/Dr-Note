@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Activity, Shield, Users, Stethoscope } from "lucide-react"
-import { isRedirectError } from "next/dist/client/components/redirect-error"
-import { login } from "./actions"
-import { loginSchema, type LoginInput } from "@/lib/validators/auth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Activity, Shield, Users, Stethoscope } from "lucide-react";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { login } from "./actions";
+import { loginSchema, type LoginInput } from "@/lib/validators/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -25,24 +25,24 @@ export default function LoginPage() {
       email: "",
       password: "",
     },
-  })
+  });
 
   async function onSubmit(values: LoginInput) {
-    setError(null)
-    setIsLoading(true)
+    setError(null);
+    setIsLoading(true);
 
     try {
-      const result = await login(values)
+      const result = await login(values);
       if (result?.error) {
-        setError(result.error)
+        setError(result.error);
       }
     } catch (err) {
       if (isRedirectError(err)) {
-        throw err
+        throw err;
       }
-      setError("Something went wrong. Please try again.")
+      setError("Something went wrong. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -57,19 +57,23 @@ export default function LoginPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <Activity className="h-6 w-6 text-white" />
+              {/* <Activity className="h-6 w-6 text-white" /> */}
+              <Stethoscope className="w-5 h-5 text-primary-foreground" />
             </div>
+
             <span className="text-2xl font-bold text-white">Dr.Note</span>
           </div>
         </div>
 
         <div className="relative z-10 space-y-8">
           <h1 className="text-4xl font-bold text-white leading-tight">
-            Clinical notes,<br />
+            Clinical notes,
+            <br />
             simplified.
           </h1>
           <p className="text-lg text-white/80 max-w-md">
-            Streamline patient visits, prescriptions, and medical records in one secure platform.
+            Streamline patient visits, prescriptions, and medical records in one
+            secure platform.
           </p>
 
           <div className="grid grid-cols-2 gap-4 pt-4">
@@ -97,14 +101,18 @@ export default function LoginPage() {
               </div>
               <div>
                 <p className="font-medium text-sm">Clinical Workflow</p>
-                <p className="text-xs text-white/60">Screening to prescription</p>
+                <p className="text-xs text-white/60">
+                  Screening to prescription
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="relative z-10">
-          <p className="text-sm text-white/50">© 2026 Dr.Note. All rights reserved.</p>
+          <p className="text-sm text-white/50">
+            © 2026 Dr.Note. All rights reserved.
+          </p>
         </div>
       </div>
 
@@ -121,7 +129,9 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-foreground">Welcome back</h2>
-            <p className="text-muted-foreground">Sign in to your account to continue</p>
+            <p className="text-muted-foreground">
+              Sign in to your account to continue
+            </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -133,7 +143,9 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -150,7 +162,9 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -166,7 +180,11 @@ export default function LoginPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full h-11 text-base"
+              disabled={isLoading}
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -180,28 +198,55 @@ export default function LoginPage() {
 
           {/* Dev credentials */}
           <div className="rounded-lg bg-muted/50 border p-4">
-            <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wider">Demo Accounts</p>
+            <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wider">
+              Demo Accounts
+            </p>
             <div className="space-y-2 text-sm">
               {[
-                { role: "Admin", email: "admin@drnote.com", color: "bg-red-100 text-red-700" },
-                { role: "Doctor", email: "doctor@drnote.com", color: "bg-blue-100 text-blue-700" },
-                { role: "Nurse", email: "nurse@drnote.com", color: "bg-green-100 text-green-700" },
-                { role: "Receptionist", email: "receptionist@drnote.com", color: "bg-purple-100 text-purple-700" },
+                {
+                  role: "Admin",
+                  email: "admin@drnote.com",
+                  color: "bg-red-100 text-red-700",
+                },
+                {
+                  role: "Doctor",
+                  email: "doctor@drnote.com",
+                  color: "bg-blue-100 text-blue-700",
+                },
+                {
+                  role: "Nurse",
+                  email: "nurse@drnote.com",
+                  color: "bg-green-100 text-green-700",
+                },
+                {
+                  role: "Receptionist",
+                  email: "receptionist@drnote.com",
+                  color: "bg-purple-100 text-purple-700",
+                },
               ].map((account) => (
-                <div key={account.role} className="flex items-center justify-between">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${account.color}`}>
+                <div
+                  key={account.role}
+                  className="flex items-center justify-between"
+                >
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${account.color}`}
+                  >
                     {account.role}
                   </span>
-                  <span className="text-muted-foreground font-mono text-xs">{account.email}</span>
+                  <span className="text-muted-foreground font-mono text-xs">
+                    {account.email}
+                  </span>
                 </div>
               ))}
               <div className="pt-2 mt-2 border-t border-border">
-                <p className="text-xs text-muted-foreground text-center">Password: <span className="font-mono">Demo@1234</span></p>
+                <p className="text-xs text-muted-foreground text-center">
+                  Password: <span className="font-mono">testpass123</span>
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
