@@ -26,6 +26,8 @@
 | Patient registration form (demographics) — RLS applied + verified live end-to-end; see `docs/24-Security-Report.md` | #20 |
 | Patient activation + set-password flow: patients now `is_active` on registration, confirm their email via `/auth/confirm`, and set their own password at `/set-password`. Note: patients still cannot log in through `/login` after this — no patient dashboard exists yet (see `docs/24-Security-Report.md`) | — |
 | Staff onboarding: admin creates doctor/nurse/receptionist/admin accounts at `/admin/staff/new`; temp password shown once; reviewer + QA passed (5/5 acceptance criteria) — merged via PR #54 | #21 |
+| Patient profile page (view/edit): patient detail view now loads from Supabase, includes editable profile data, and shows a read-only visit history table with sorting, filtering, and pagination | #22 |
+| Emergency contacts on patient profile: add/edit/remove contact management is wired into the patient detail flow with server-side persistence and safe error handling | #23 |
 | Password generator entropy hardening: switched temp password index selection to `crypto.randomInt` to remove modulo bias; added unit tests and refreshed review/QA/security reports | — |
 
 
@@ -44,8 +46,6 @@
 | Task | Issue | Epic |
 |------|-------|------|
 | Attachments: upload files to a visit (Supabase Storage) | #36 | Record Taking |
-| Patient profile page (view/edit) | #22 | User Registration |
-| Emergency contacts (add/edit/remove on patient profile) | #23 | User Registration |
 | Visit creation flow (receptionist) | — | Record Taking |
 | Visit status workflow + patient queue view | — | Record Taking |
 | Screening form: vitals (nurse) | — | Record Taking |

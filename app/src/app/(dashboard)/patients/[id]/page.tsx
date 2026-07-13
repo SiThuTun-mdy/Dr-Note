@@ -122,7 +122,9 @@ export default async function PatientProfilePage({ params }: Props) {
       <section className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold">Visit history</h2>
-          
+          <p className="text-sm text-muted-foreground">
+            Read-only list of all visits for this patient.
+          </p>
         </div>
         {visitsError ? (
           <p className="text-sm text-muted-foreground">
