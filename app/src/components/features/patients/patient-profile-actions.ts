@@ -92,10 +92,13 @@ export async function updatePatientProfile(
     return { success: false, error: "Unable to update patient. Please try again." }
   }
 
+  // emergency_contacts.patient_id references patient_profiles.user_id, not
+  // users.id, so it can only be embedded via patient_profiles — PostgREST
+  // requires a direct FK for an embed.
   const { data, error } = await supabase
     .from("users")
     .select(
-      "id, name, email, phone, patient_profiles(nrc, dob, gender, religion, ethnicity, address), emergency_contacts(id, name, relationship, phone)"
+      "id, name, email, phone, patient_profiles(nrc, dob, gender, religion, ethnicity, address, emergency_contacts(id, name, relationship, phone))"
     )
     .eq("id", patientId)
     .maybeSingle()
@@ -120,7 +123,7 @@ export async function updatePatientProfile(
       religion: profile?.religion ?? null,
       ethnicity: profile?.ethnicity ?? null,
       address: profile?.address ?? null,
-      emergencyContacts: (data.emergency_contacts ?? []) as EmergencyContact[],
+      emergencyContacts: (profile?.emergency_contacts ?? []) as EmergencyContact[],
     },
   }
 }

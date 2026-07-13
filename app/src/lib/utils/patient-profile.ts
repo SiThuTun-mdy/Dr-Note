@@ -1,3 +1,10 @@
+interface EmergencyContactFields {
+  id: string
+  name: string
+  relationship: string | null
+  phone: string | null
+}
+
 export interface PatientProfileFields {
   nrc: string | null
   dob: string | null
@@ -5,6 +12,9 @@ export interface PatientProfileFields {
   religion: string | null
   ethnicity: string | null
   address: string | null
+  // emergency_contacts.patient_id references patient_profiles.user_id, not
+  // users.id directly — PostgREST can only embed it here, not off `users`.
+  emergency_contacts?: EmergencyContactFields[] | null
 }
 
 /**

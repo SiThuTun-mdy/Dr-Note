@@ -27,6 +27,8 @@ const refetchedRow = {
   name: 'Jane Doe',
   email: 'jane@example.com',
   phone: '0912345678',
+  // emergency_contacts.patient_id references patient_profiles.user_id, not
+  // users.id, so PostgREST only embeds it nested under patient_profiles.
   patient_profiles: {
     nrc: null,
     dob: '1990-01-01',
@@ -34,8 +36,8 @@ const refetchedRow = {
     religion: null,
     ethnicity: null,
     address: null,
+    emergency_contacts: [],
   },
-  emergency_contacts: [],
 }
 
 function mockRoleLookup(roleName: string) {
