@@ -12,9 +12,9 @@ const roleDashboard: Record<string, string> = {
 // Allowed route prefixes per role
 const roleRoutes: Record<string, string[]> = {
   admin: ['/admin'],
-  doctor: ['/doctor'],
-  nurse: ['/nurse'],
-  receptionist: ['/reception'],
+  doctor: ['/doctor', '/my-queue', '/patients', '/consultations', '/prescriptions'],
+  nurse: ['/nurse', '/screening', '/patients', '/vitals', '/notes'],
+  receptionist: ['/reception', '/queue', '/patients', '/appointments'],
 }
 
 export async function updateSession(request: NextRequest) {
