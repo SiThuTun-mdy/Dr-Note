@@ -101,19 +101,30 @@ export async function getVisitWithDetails(visitId: string) {
 
   const { data: visit, error: visitError } = await supabase
     .from("visits")
-    .select(
-      `
-      *,
-      patient:users!visits_patient_id_fkey(name, email),
-      doctor:users!visits_doctor_id_fkey(name, email),
-      receptionist:users!visits_receptionist_id_fkey(name, email)
-    `
-    )
+    .select("*")
     .eq("id", visitId)
     .single();
 
   if (visitError || !visit) {
     return null;
+  }
+
+  // Fetch patient name
+  const { data: patient } = await supabase
+    .from("users")
+    .select("name, email")
+    .eq("id", visit.patient_id)
+    .single();
+
+  // Fetch doctor name if assigned
+  let doctor = null;
+  if (visit.doctor_id) {
+    const { data } = await supabase
+      .from("users")
+      .select("name, email")
+      .eq("id", visit.doctor_id)
+      .single();
+    doctor = data;
   }
 
   const { data: screening } = await supabase
@@ -124,16 +135,13 @@ export async function getVisitWithDetails(visitId: string) {
 
   const { data: diagnoses } = await supabase
     .from("visit_diagnoses")
-    .select(
-      `
-      *,
-      diagnosis:diagnoses(id, code, title)
-    `
-    )
+    .select("*, diagnosis:diagnoses(id, code, title)")
     .eq("visit_id", visitId);
 
   return {
     ...visit,
+    patient,
+    doctor,
     screening,
     diagnoses: diagnoses || [],
   };
