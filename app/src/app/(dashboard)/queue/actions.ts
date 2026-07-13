@@ -2,13 +2,12 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import type { VisitStatus } from "@/components/features/shared/StatusBadge"
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export type { VisitStatus }
+export type VisitStatus = "waiting" | "screening" | "with_doctor" | "completed"
 
 export interface VisitRow {
   id: string
