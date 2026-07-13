@@ -159,3 +159,21 @@ The "Register patient" button stays at the bottom-right (that was a separate, al
 
 ### Gate status
 No Critical or High findings.
+
+---
+
+## Password generator entropy refactor (13 Jul 2026)
+
+Scope: `app/src/lib/utils/password.ts` (commit `2dd0cc0`) and added test coverage in `app/src/lib/utils/password.test.ts`.
+
+### Findings
+
+No new vulnerabilities identified in this scoped review.
+
+### Verified as sound
+- Random index generation now uses `crypto.randomInt(0, CHARSET.length)` instead of modulo-mapped bytes, removing modulo-bias risk in generated temporary passwords.
+- Temp password generation remains server-side utility logic only; no service-role key exposure, no token/password logging, and no client-side secret handling introduced.
+- New unit tests verify default length, custom length, and charset constraints for generated passwords.
+
+### Gate status
+No Critical or High findings.
