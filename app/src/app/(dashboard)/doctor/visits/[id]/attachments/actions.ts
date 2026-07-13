@@ -142,6 +142,36 @@ export async function getVisitAttachments(
   return data || [];
 }
 
+export async function getVisitAttachmentCount(
+  visitId: string
+): Promise<number> {
+  // Validate visit ID format
+  if (!visitId || !UUID_RE.test(visitId)) {
+    return 0;
+  }
+
+  const supabase = await createClient();
+
+  // Auth check
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return 0;
+  }
+
+  const { count, error } = await supabase
+    .from("attachments")
+    .select("id", { count: "exact", head: true })
+    .eq("visit_id", visitId);
+
+  if (error) {
+    return 0;
+  }
+
+  return count || 0;
+}
+
 export async function deleteAttachment(
   attachmentId: string,
   visitId: string
@@ -246,14 +276,15 @@ export async function getAttachmentDownloadUrl(
   }
 
   // Verify the user can read the associated visit
-  const { data: visit } = await supabase
+  // Use generic error message to avoid leaking visit existence information
+  const { error: visitError } = await supabase
     .from("visits")
     .select("id")
     .eq("id", attachment.visit_id)
     .single();
 
-  if (!visit) {
-    return { error: "Visit not found." };
+  if (visitError) {
+    return { error: "Attachment not found." };
   }
 
   // Generate signed URL

@@ -3,10 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, FileText, Image, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { uploadAttachment } from "@/app/(dashboard)/doctor/visits/[id]/attachments/actions";
 import { attachmentFileSchema } from "@/lib/validators/attachment";
+import { getFileIcon, formatFileSize } from "./utils";
 
 interface AttachmentUploadProps {
   visitId: string;
@@ -16,17 +17,7 @@ interface AttachmentUploadProps {
 interface PendingFile {
   file: File;
   preview?: string;
-}
-
-function getFileIcon(fileType: string) {
-  if (fileType.startsWith("image/")) return Image;
-  return FileText;
-}
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  id: string;
 }
 
 export function AttachmentUpload({
@@ -58,7 +49,7 @@ export function AttachmentUpload({
           const preview = file.type.startsWith("image/")
             ? URL.createObjectURL(file)
             : undefined;
-          newFiles.push({ file, preview });
+          newFiles.push({ file, preview, id: crypto.randomUUID() });
         } else {
           const msg = result.error.issues[0]?.message || "Invalid file";
           errors.push(`${file.name}: ${msg}`);
@@ -121,28 +112,40 @@ export function AttachmentUpload({
     let successCount = 0;
     let failCount = 0;
 
-    for (const { file } of pendingFiles) {
+    // Upload with concurrency limit of 3
+    const CONCURRENCY = 3;
+    const queue = [...pendingFiles];
+    const uploadNext = async (): Promise<void> => {
+      const item = queue.shift();
+      if (!item) return;
       try {
-        const buffer = await file.arrayBuffer();
+        const buffer = await item.file.arrayBuffer();
         const result = await uploadAttachment(
           visitId,
-          file.name,
-          file.type,
-          file.size,
+          item.file.name,
+          item.file.type,
+          item.file.size,
           buffer
         );
 
         if (result.error) {
           failCount++;
-          toast.error(`Failed to upload ${file.name}: ${result.error}`);
+          toast.error(`Failed to upload ${item.file.name}: ${result.error}`);
         } else {
           successCount++;
         }
       } catch {
         failCount++;
-        toast.error(`Failed to upload ${file.name}`);
+        toast.error(`Failed to upload ${item.file.name}`);
       }
-    }
+      return uploadNext();
+    };
+
+    const workers = Array.from(
+      { length: Math.min(CONCURRENCY, pendingFiles.length) },
+      () => uploadNext()
+    );
+    await Promise.all(workers);
 
     // Clean up previews
     pendingFiles.forEach((pf) => {
@@ -219,7 +222,7 @@ export function AttachmentUpload({
                 const Icon = getFileIcon(pf.file.type);
                 return (
                   <li
-                    key={`${pf.file.name}-${index}`}
+                    key={pf.id}
                     className="flex items-center justify-between rounded-md border p-2"
                   >
                     <div className="flex items-center gap-2 overflow-hidden">

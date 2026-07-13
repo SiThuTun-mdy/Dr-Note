@@ -11,7 +11,7 @@ import { PrescriptionForm } from "./prescription-form";
 import { PrescriptionList } from "./prescription-list";
 import { toast } from "sonner";
 import { addDiagnosis, removeDiagnosis, getVisitPrescriptions, assignDoctorToVisit } from "@/app/(dashboard)/doctor/visits/[id]/actions";
-import { getVisitAttachments } from "@/app/(dashboard)/doctor/visits/[id]/attachments/actions";
+import { getVisitAttachmentCount } from "@/app/(dashboard)/doctor/visits/[id]/attachments/actions";
 import { Paperclip } from "lucide-react";
 import Link from "next/link";
 
@@ -78,8 +78,8 @@ export function ConsultView({ visit }: ConsultViewProps) {
       setPrescriptions(data);
     };
     const fetchAttachmentCount = async () => {
-      const data = await getVisitAttachments(visit.id);
-      setAttachmentCount(data.length);
+      const count = await getVisitAttachmentCount(visit.id);
+      setAttachmentCount(count);
     };
     fetchPrescriptions();
     fetchAttachmentCount();

@@ -5,20 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AttachmentUpload } from "./attachment-upload";
 import { AttachmentList } from "./attachment-list";
-import { getVisitAttachments } from "@/app/(dashboard)/doctor/visits/[id]/attachments/actions";
-
-interface Attachment {
-  id: string;
-  visit_id: string;
-  file_path: string;
-  file_type: string | null;
-  uploaded_by: string | null;
-  created_at: string;
-}
+import {
+  getVisitAttachments,
+  type AttachmentRecord,
+} from "@/app/(dashboard)/doctor/visits/[id]/attachments/actions";
 
 interface AttachmentsViewProps {
   visitId: string;
-  initialAttachments: Attachment[];
+  initialAttachments: AttachmentRecord[];
 }
 
 export function AttachmentsView({

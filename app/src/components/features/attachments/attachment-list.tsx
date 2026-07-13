@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   FileText,
-  Image,
   Download,
   Trash2,
   Calendar,
@@ -26,45 +25,13 @@ import { toast } from "sonner";
 import {
   deleteAttachment,
   getAttachmentDownloadUrl,
+  type AttachmentRecord,
 } from "@/app/(dashboard)/doctor/visits/[id]/attachments/actions";
-
-interface Attachment {
-  id: string;
-  visit_id: string;
-  file_path: string;
-  file_type: string | null;
-  uploaded_by: string | null;
-  created_at: string;
-}
+import { getFileIcon, getFileName, fileTypeLabels } from "./utils";
 
 interface AttachmentListProps {
-  attachments: Attachment[];
+  attachments: AttachmentRecord[];
   onDelete?: (attachmentId: string) => void;
-}
-
-const fileTypeLabels: Record<string, string> = {
-  "image/jpeg": "JPEG",
-  "image/png": "PNG",
-  "image/gif": "GIF",
-  "image/webp": "WebP",
-  "application/pdf": "PDF",
-  "application/msword": "DOC",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "DOCX",
-};
-
-function getFileIcon(fileType: string | null) {
-  if (!fileType) return FileText;
-  if (fileType.startsWith("image/")) return Image;
-  return FileText;
-}
-
-function getFileName(filePath: string): string {
-  // Extract filename from path like "visits/uuid/1234567890-photo.jpg"
-  const parts = filePath.split("/");
-  const lastPart = parts[parts.length - 1] || "";
-  // Remove timestamp prefix (e.g., "1234567890-")
-  const match = lastPart.match(/^\d+-(.+)$/);
-  return match ? match[1] : lastPart;
 }
 
 function formatDate(dateString: string): string {
@@ -82,7 +49,7 @@ export function AttachmentList({ attachments, onDelete }: AttachmentListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  const handleDownload = async (attachment: Attachment) => {
+  const handleDownload = async (attachment: AttachmentRecord) => {
     const result = await getAttachmentDownloadUrl(attachment.id);
     if (result.error) {
       toast.error(result.error);
