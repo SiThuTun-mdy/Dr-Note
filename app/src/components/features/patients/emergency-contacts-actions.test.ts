@@ -14,13 +14,13 @@ vi.mock('@/lib/supabase/server', () => ({
 const validContact = { name: 'Jane Emergency', relationship: 'Sister', phone: '0912345678' }
 
 function mockRoleLookup(roleName: string) {
+  // getUserRoles() (src/lib/auth/roles.ts) queries `.select().eq()` with no
+  // `.limit()` call — mock the exact chain it awaits.
   mockFrom.mockReturnValueOnce({
     select: vi.fn().mockReturnValue({
-      eq: vi.fn().mockReturnValue({
-        limit: vi.fn().mockResolvedValue({
-          data: [{ roles: { name: roleName } }],
-          error: null,
-        }),
+      eq: vi.fn().mockResolvedValue({
+        data: [{ roles: { name: roleName } }],
+        error: null,
       }),
     }),
   })
