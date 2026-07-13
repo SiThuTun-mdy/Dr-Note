@@ -25,6 +25,20 @@ export const patientRegistrationSchema = z.object({
 
 export type PatientRegistrationInput = z.infer<typeof patientRegistrationSchema>
 
+export const patientProfileUpdateSchema = patientRegistrationSchema
+  .omit({ email: true })
+  .extend({
+    dob: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date")
+      .refine((value) => new Date(value) <= new Date(), "Date of birth cannot be in the future")
+      .optional()
+      .or(z.literal("")),
+    gender: z.enum(genderOptions, { message: "Please select a gender" }).optional().or(z.literal("")),
+  })
+
+export type PatientProfileUpdateInput = z.infer<typeof patientProfileUpdateSchema>
+
 export const emergencyContactSchema = z.object({
   name: z.string().min(1, "Name is required").max(200),
   relationship: z.string().max(100).optional().or(z.literal("")),

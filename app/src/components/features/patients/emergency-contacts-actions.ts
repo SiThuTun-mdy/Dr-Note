@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { getUserRoles } from "@/lib/auth/roles"
 import { emergencyContactSchema, type EmergencyContactInput } from "@/lib/validators/patient"
 
 // Same roles as patient registration (01-database-schema.md §6: insert needs
@@ -21,22 +22,6 @@ interface ActionResult<T = undefined> {
   error?: string
 }
 
-async function getCurrentRole(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string
-): Promise<string | null> {
-  const { data } = await supabase
-    .from("user_roles")
-    .select("roles(name)")
-    .eq("user_id", userId)
-    .limit(1)
-
-  return (
-    (data?.[0] as unknown as { roles: { name: string } | null } | undefined)
-      ?.roles?.name ?? null
-  )
-}
-
 export async function addEmergencyContact(
   patientId: string,
   values: EmergencyContactInput
@@ -53,8 +38,8 @@ export async function addEmergencyContact(
   } = await supabase.auth.getUser()
   if (!user) return { success: false, error: "Not authenticated" }
 
-  const role = await getCurrentRole(supabase, user.id)
-  if (!role || !ALLOWED_ROLES.has(role)) {
+  const roles = await getUserRoles(supabase, user.id)
+  if (!roles.some((role) => ALLOWED_ROLES.has(role))) {
     return { success: false, error: "Unauthorized" }
   }
 
@@ -86,8 +71,8 @@ export async function removeEmergencyContact(contactId: string): Promise<ActionR
   } = await supabase.auth.getUser()
   if (!user) return { success: false, error: "Not authenticated" }
 
-  const role = await getCurrentRole(supabase, user.id)
-  if (!role || !ALLOWED_ROLES.has(role)) {
+  const roles = await getUserRoles(supabase, user.id)
+  if (!roles.some((role) => ALLOWED_ROLES.has(role))) {
     return { success: false, error: "Unauthorized" }
   }
 
