@@ -1,55 +1,24 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
+import { PrescriptionsTable } from "./prescriptions-table";
 
-const PAGE_SIZE = 10;
-
-interface Diagnosis {
-  id: string;
-  code: string;
-  title: string;
-}
-
-interface PrescriptionItem {
-  medicine_name: string;
-  dosage: string;
-  frequency: string;
-  duration: string;
-  route: string;
-  quantity: number;
-}
-
-interface Prescription {
+export interface PrescriptionData {
   id: string;
   visit_id: string;
   doctor_id: string;
-  diagnosis_id: string;
+  diagnosis_id: string | null;
   instruction: string | null;
   created_at: string;
-  diagnosis?: Diagnosis | null;
-  items?: PrescriptionItem[] | null;
+  diagnosisCode: string | null;
+  diagnosisTitle: string | null;
+  itemCount: number;
+  patientName: string;
+  doctorName: string;
 }
 
-export default async function PrescriptionsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
-  const params = await searchParams;
-  const currentPage = Math.max(1, parseInt(params.page || "1", 10));
-  const offset = (currentPage - 1) * PAGE_SIZE;
-
+export default async function PrescriptionsPage() {
   const supabase = await createClient();
 
-  // Get total count
-  const { count } = await supabase
-    .from("prescriptions")
-    .select("id", { count: "exact", head: true });
-
-  const totalPages = Math.ceil((count || 0) / PAGE_SIZE);
-
-  // Fetch paginated prescriptions
+  // Fetch ALL prescriptions
   const { data: prescriptions, error } = await supabase
     .from("prescriptions")
     .select(`
@@ -59,11 +28,10 @@ export default async function PrescriptionsPage({
       diagnosis_id,
       instruction,
       created_at,
-      diagnosis:diagnoses(id, code, title),
-      items:prescription_items(medicine_name, dosage, frequency, duration, route, quantity)
+      diagnosis:diagnoses(code, title),
+      items:prescription_items(id)
     `)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1) as { data: Prescription[] | null; error: Error | null };
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching prescriptions:", error);
@@ -94,78 +62,27 @@ export default async function PrescriptionsPage({
     })
   );
 
+  const enrichedPrescriptions: PrescriptionData[] = (prescriptions || []).map(rx => ({
+    id: rx.id,
+    visit_id: rx.visit_id,
+    doctor_id: rx.doctor_id,
+    diagnosis_id: rx.diagnosis_id,
+    instruction: rx.instruction,
+    created_at: rx.created_at,
+    diagnosisCode: (rx.diagnosis as { code?: string } | null)?.code || null,
+    diagnosisTitle: (rx.diagnosis as { title?: string } | null)?.title || null,
+    itemCount: rx.items?.length || 0,
+    patientName: visitPatientMap.get(rx.visit_id) || "Unknown",
+    doctorName: doctorMap.get(rx.doctor_id) || "—",
+  }));
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground mb-2">Prescriptions</h1>
         <p className="text-muted-foreground">View all prescriptions</p>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">All prescriptions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {!prescriptions || prescriptions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No prescriptions found
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="emr-table-header">
-                      <th className="text-left px-4 py-3" scope="col">Patient</th>
-                      <th className="text-left px-4 py-3" scope="col">Doctor</th>
-                      <th className="text-left px-4 py-3" scope="col">Diagnosis</th>
-                      <th className="text-left px-4 py-3" scope="col">Medicines</th>
-                      <th className="text-left px-4 py-3" scope="col">Date</th>
-                      <th className="text-left px-4 py-3" scope="col">Visit</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {prescriptions.map((rx) => (
-                      <tr key={rx.id} className="hover:bg-muted/50 transition-colors">
-                        <td className="px-4 py-3 text-sm font-medium">
-                          {visitPatientMap.get(rx.visit_id) || "Unknown"}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {doctorMap.get(rx.doctor_id) || "—"}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {rx.diagnosis?.code
-                            ? `${rx.diagnosis.code} — ${rx.diagnosis.title}`
-                            : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {rx.items?.length || 0} item(s)
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {new Date(rx.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3">
-                          <Link
-                            href={`/doctor/visits/${rx.visit_id}`}
-                            className="text-sm text-primary hover:underline"
-                          >
-                            View
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                baseUrl="/prescriptions"
-              />
-            </>
-          )}
-        </CardContent>
-      </Card>
+      <PrescriptionsTable data={enrichedPrescriptions} />
     </div>
   );
 }
