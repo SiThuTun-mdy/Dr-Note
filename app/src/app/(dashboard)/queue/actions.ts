@@ -96,7 +96,7 @@ export async function getTodayVisits(): Promise<GetTodayVisitsResult> {
   const endOfDay = new Date(startOfDay)
   endOfDay.setDate(endOfDay.getDate() + 1)
 
-  // Fetch today's visits with patient and doctor names
+  // Fetch today's visits
   const { data: visits, error: visitsError } = await supabase
     .from("visits")
     .select(
@@ -109,9 +109,7 @@ export async function getTodayVisits(): Promise<GetTodayVisitsResult> {
         chief_complaint,
         status,
         visit_date,
-        created_at,
-        patient:users!visits_patient_id_fkey(name),
-        doctor:users!visits_doctor_id_fkey(name)
+        created_at
       `
     )
     .gte("visit_date", startOfDay.toISOString())
@@ -123,6 +121,22 @@ export async function getTodayVisits(): Promise<GetTodayVisitsResult> {
     return { data: null, error: "Failed to fetch queue", userRole }
   }
 
+  // Fetch patient and doctor names separately
+  const patientIds = [...new Set((visits || []).map(v => v.patient_id))]
+  const doctorIds = [...new Set((visits || []).filter(v => v.doctor_id).map(v => v.doctor_id))]
+
+  const [patientsResult, doctorsResult] = await Promise.all([
+    patientIds.length > 0
+      ? supabase.from("users").select("id, name").in("id", patientIds)
+      : { data: [] },
+    doctorIds.length > 0
+      ? supabase.from("users").select("id, name").in("id", doctorIds)
+      : { data: [] },
+  ])
+
+  const patientMap = new Map((patientsResult.data || []).map(p => [p.id, p.name]))
+  const doctorMap = new Map((doctorsResult.data || []).map(d => [d.id, d.name]))
+
   const rows: VisitRow[] = (visits || []).map((v) => ({
     id: v.id,
     patient_id: v.patient_id,
@@ -133,10 +147,8 @@ export async function getTodayVisits(): Promise<GetTodayVisitsResult> {
     status: v.status as VisitStatus,
     visit_date: v.visit_date,
     created_at: v.created_at,
-    patient_name:
-      (v.patient as unknown as { name: string } | null)?.name ?? "Unknown",
-    doctor_name:
-      (v.doctor as unknown as { name: string } | null)?.name ?? null,
+    patient_name: patientMap.get(v.patient_id) ?? "Unknown",
+    doctor_name: v.doctor_id ? doctorMap.get(v.doctor_id) ?? null : null,
   }))
 
   return { data: rows, error: null, userRole }
