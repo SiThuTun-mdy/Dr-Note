@@ -5,6 +5,32 @@ import { Pagination } from "@/components/ui/pagination";
 
 const PAGE_SIZE = 10;
 
+interface Diagnosis {
+  id: string;
+  code: string;
+  title: string;
+}
+
+interface PrescriptionItem {
+  medicine_name: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  route: string;
+  quantity: number;
+}
+
+interface Prescription {
+  id: string;
+  visit_id: string;
+  doctor_id: string;
+  diagnosis_id: string;
+  instruction: string | null;
+  created_at: string;
+  diagnosis?: Diagnosis | null;
+  items?: PrescriptionItem[] | null;
+}
+
 export default async function PrescriptionsPage({
   searchParams,
 }: {
@@ -37,7 +63,7 @@ export default async function PrescriptionsPage({
       items:prescription_items(medicine_name, dosage, frequency, duration, route, quantity)
     `)
     .order("created_at", { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1);
+    .range(offset, offset + PAGE_SIZE - 1) as { data: Prescription[] | null; error: Error | null };
 
   if (error) {
     console.error("Error fetching prescriptions:", error);
@@ -108,8 +134,8 @@ export default async function PrescriptionsPage({
                           {doctorMap.get(rx.doctor_id) || "—"}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {(rx.diagnosis as any)?.code
-                            ? `${(rx.diagnosis as any).code} — ${(rx.diagnosis as any).title}`
+                          {rx.diagnosis?.code
+                            ? `${rx.diagnosis.code} — ${rx.diagnosis.title}`
                             : "—"}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">

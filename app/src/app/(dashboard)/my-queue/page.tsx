@@ -6,6 +6,17 @@ import { Pagination } from "@/components/ui/pagination";
 
 const PAGE_SIZE = 10;
 
+interface EnrichedVisit {
+  id: string;
+  patient_id: string;
+  doctor_id: string | null;
+  visit_type: string | null;
+  status: "waiting" | "screening" | "with_doctor" | "completed";
+  chief_complaint: string | null;
+  visit_date: string;
+  patient?: { name: string; email: string } | null;
+}
+
 export default async function MyQueuePage({
   searchParams,
 }: {
@@ -34,7 +45,7 @@ export default async function MyQueuePage({
     .select("*")
     .eq("doctor_id", user?.id || "")
     .order("visit_date", { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1);
+    .range(offset, offset + PAGE_SIZE - 1) as { data: EnrichedVisit[] | null; error: Error | null };
 
   if (error) {
     console.error("Error fetching my queue:", error);
@@ -94,7 +105,7 @@ export default async function MyQueuePage({
                           href={`/doctor/visits/${visit.id}`}
                           className="text-sm font-medium text-foreground hover:underline"
                         >
-                          {(visit.patient as any)?.name || "Unknown"}
+                          {visit.patient?.name || "Unknown"}
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground capitalize">
@@ -143,7 +154,7 @@ export default async function MyQueuePage({
                           href={`/doctor/visits/${visit.id}`}
                           className="text-sm font-medium text-foreground hover:underline"
                         >
-                          {(visit.patient as any)?.name || "Unknown"}
+                          {visit.patient?.name || "Unknown"}
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground capitalize">
