@@ -13,8 +13,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--no-deprecation"
     defaults:
       run:
         working-directory: app
@@ -46,8 +44,6 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--no-deprecation"
     defaults:
       run:
         working-directory: app

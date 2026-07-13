@@ -24,3 +24,18 @@ smtp_port = 54324
 smtp_admin_email = "admin@example.com"
 sender_name = "Admin"
 sender_email = "admin@example.com"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/confirm"]
+
+# Match the hosted project's intended demo setup (issue #20: "Email
+# confirmation must be off"): accounts can log in immediately after signUp,
+# so onboarding temp passwords work without a confirmation email. NOTE:
+# this file only affects the LOCAL supabase CLI stack — the hosted project
+# is toggled in the dashboard (Authentication → Sign In / Providers →
+# Email → Confirm email).
+[auth.email]
+enable_signup = true
+enable_confirmations = false

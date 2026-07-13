@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -139,7 +141,13 @@ export default function AdminUsersPage() {
 
   return (
     <>
-      <h2 className="text-2xl font-bold mb-6">User Management</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">User Management</h2>
+        <Button render={<Link href="/admin/staff/new" />}>
+          <UserPlus />
+          Add staff
+        </Button>
+      </div>
 
       <Card>
         <CardHeader>
