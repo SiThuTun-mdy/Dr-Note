@@ -37,12 +37,20 @@ interface EmergencyContactsSectionProps {
   /** The patient these contacts belong to. Null until the patient exists —
    * fields stay enabled, but submitting shows an error until then. */
   patientId: string | null
+  /** Contacts already on record, e.g. when showing an existing patient's profile. */
+  initialContacts?: EmergencyContact[]
+  /** Hide the add form and remove buttons for viewers without `patients.update`. */
+  readOnly?: boolean
 }
 
 const emptyValues: EmergencyContactInput = { name: "", relationship: "", phone: "" }
 
-export function EmergencyContactsSection({ patientId }: EmergencyContactsSectionProps) {
-  const [contacts, setContacts] = useState<EmergencyContact[]>([])
+export function EmergencyContactsSection({
+  patientId,
+  initialContacts = [],
+  readOnly = false,
+}: EmergencyContactsSectionProps) {
+  const [contacts, setContacts] = useState<EmergencyContact[]>(initialContacts)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
   const [lastAttempt, setLastAttempt] = useState<EmergencyContactInput | null>(null)
@@ -127,14 +135,9 @@ export function EmergencyContactsSection({ patientId }: EmergencyContactsSection
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold text-foreground">Emergency contacts</h3>
-        {/* <p className="text-sm text-muted-foreground">
-          {patientId
-            ? "Add anyone the clinic should reach in an emergency."
-            : "You can fill this in now — it will be saved once the patient is registered above."}
-        </p> */}
       </div>
 
-      {contacts.length > 0 && (
+      {contacts.length > 0 ? (
         <ul className="divide-y divide-border rounded-lg border border-border">
           {contacts.map((contact) => (
             <li key={contact.id} className="flex items-center justify-between px-4 py-3">
@@ -144,22 +147,26 @@ export function EmergencyContactsSection({ patientId }: EmergencyContactsSection
                   {[contact.relationship, contact.phone].filter(Boolean).join(" · ") || "—"}
                 </p>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Remove ${contact.name}`}
-                disabled={isRemoving}
-                onClick={() => setRemoveTarget(contact)}
-              >
-                <Trash2 className="text-destructive" />
-              </Button>
+              {!readOnly && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Remove ${contact.name}`}
+                  disabled={isRemoving}
+                  onClick={() => setRemoveTarget(contact)}
+                >
+                  <Trash2 className="text-destructive" />
+                </Button>
+              )}
             </li>
           ))}
         </ul>
+      ) : (
+        readOnly && <p className="text-sm text-muted-foreground">No emergency contacts on record.</p>
       )}
 
-      {removeError && (
+      {!readOnly && removeError && (
         <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm text-destructive flex items-center justify-between gap-4">
           <span>
             Something went wrong removing {removeError.contact.name} — retry?
@@ -170,6 +177,7 @@ export function EmergencyContactsSection({ patientId }: EmergencyContactsSection
         </div>
       )}
 
+      {!readOnly && (
       <Form {...form}>
         <form onSubmit={form.handleSubmit(submitContact)} className="space-y-4">
           {addError && (
@@ -239,6 +247,7 @@ export function EmergencyContactsSection({ patientId }: EmergencyContactsSection
           </div>
         </form>
       </Form>
+      )}
 
       <AlertDialog open={!!removeTarget} onOpenChange={(open) => !open && setRemoveTarget(null)}>
         <AlertDialogContent>
