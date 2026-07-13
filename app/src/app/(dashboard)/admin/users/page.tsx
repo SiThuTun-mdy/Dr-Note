@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { DataTable } from "@/components/ui/data-table"
+import { TableRow, TableCell } from "@/components/ui/table"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,6 +48,8 @@ const roleBadgeColors: Record<string, string> = {
   receptionist: "bg-purple-100 text-purple-800",
   patient: "bg-gray-100 text-gray-800",
 }
+
+const COLUMNS = ["Name", "Email", "Roles", "Active", ""]
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserWithRoles[]>([])
@@ -155,20 +158,12 @@ export default function AdminUsersPage() {
             searchPlaceholder="Search by name or email..."
             pageSize={10}
             emptyMessage="No users found."
-            renderHeader={() => (
-              <>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Name</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Email</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Roles</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Active</th>
-                <th className="text-right px-4 py-3 font-medium text-muted-foreground w-12"></th>
-              </>
-            )}
+            columns={COLUMNS}
             renderRow={(user) => (
-              <tr key={user.id} className="hover:bg-muted/50 transition-colors">
-                <td className="px-4 py-3 font-medium">{user.name}</td>
-                <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
-                <td className="px-4 py-3">
+              <TableRow key={user.id}>
+                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {user.roles.map((role) => (
                       <Badge
@@ -186,8 +181,8 @@ export default function AdminUsersPage() {
                       </Badge>
                     ))}
                   </div>
-                </td>
-                <td className="px-4 py-3">
+                </TableCell>
+                <TableCell>
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={user.is_active}
@@ -205,8 +200,8 @@ export default function AdminUsersPage() {
                       {user.is_active ? "Active" : "Inactive"}
                     </span>
                   </div>
-                </td>
-                <td className="px-4 py-3 text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-muted cursor-pointer">
                       <MoreHorizontal className="h-4 w-4" />
@@ -247,8 +242,8 @@ export default function AdminUsersPage() {
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
           />
         </CardContent>

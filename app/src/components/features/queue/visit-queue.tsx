@@ -6,6 +6,7 @@ import { ClipboardList, RefreshCw } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
+import { TableRow, TableCell } from "@/components/ui/table"
 import {
   Select,
   SelectContent,
@@ -14,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { QueueRow } from "./queue-row"
-import { getTodayVisits, type VisitRow } from "@/app/(dashboard)/queue/actions"
+import { getTodayVisits } from "@/app/(dashboard)/queue/actions"
 import type { VisitStatus } from "@/components/features/shared/StatusBadge"
 
 /** Poll interval: 10 seconds as per requirements. */
@@ -35,6 +36,8 @@ const statusOrder: Record<string, number> = {
   with_doctor: 2,
   completed: 3,
 }
+
+const COLUMNS = ["Visit", "Patient", "Status", "Chief complaint", "Doctor", "Time", "Actions"]
 
 export function VisitQueue() {
   const queryClient = useQueryClient()
@@ -169,18 +172,8 @@ export function VisitQueue() {
       searchPlaceholder="Search by patient, complaint, or doctor..."
       pageSize={10}
       filters={filterSlot}
+      columns={COLUMNS}
       emptyMessage="No visits match your search."
-      renderHeader={() => (
-        <>
-          <th className="text-left px-4 py-3 font-medium text-muted-foreground" scope="col">Visit</th>
-          <th className="text-left px-4 py-3 font-medium text-muted-foreground" scope="col">Patient</th>
-          <th className="text-left px-4 py-3 font-medium text-muted-foreground" scope="col">Status</th>
-          <th className="text-left px-4 py-3 font-medium text-muted-foreground" scope="col">Chief complaint</th>
-          <th className="text-left px-4 py-3 font-medium text-muted-foreground" scope="col">Doctor</th>
-          <th className="text-left px-4 py-3 font-medium text-muted-foreground" scope="col">Time</th>
-          <th className="text-left px-4 py-3 font-medium text-muted-foreground" scope="col">Actions</th>
-        </>
-      )}
       renderRow={(visit) => (
         <QueueRow
           key={visit.id}

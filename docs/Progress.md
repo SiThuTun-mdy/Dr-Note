@@ -31,6 +31,11 @@
 | Prescription + prescription items (doctor) — PR #60 | #34 |
 | Visit creation flow (receptionist) — PR #62 | #24 |
 | Visit status workflow + patient queue view — PR #64 | #25 |
+| DataTable: reusable search + pagination component; applied to Queue & Admin Users tables | — |
+| RLS fix: widen users_select to allow patients.read (patient search in visit creation) | — |
+
+### 📐 Standard Requirements
+> **All tables must use `<DataTable>` with search and pagination.** New list/table pages must integrate the reusable `DataTable` component (`src/components/ui/data-table.tsx`) which provides client-side search and pagination out of the box. Pass `searchKeys` for columns to search, `pageSize` for rows per page, and `filters` slot for dropdowns.
 
 
 ### 🔄 In Progress

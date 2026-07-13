@@ -4,6 +4,7 @@ import { useTransition } from "react"
 import { toast } from "sonner"
 import { ClipboardCheck, Stethoscope, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { TableRow, TableCell } from "@/components/ui/table"
 import { StatusBadge } from "@/components/features/shared/StatusBadge"
 import type { VisitStatus } from "@/components/features/shared/StatusBadge"
 import {
@@ -97,24 +98,24 @@ export function QueueRow({
   }
 
   return (
-    <tr className="hover:bg-muted/50 transition-colors">
-      <td className="px-4 py-3 text-sm text-muted-foreground font-mono">
+    <TableRow>
+      <TableCell className="font-mono text-muted-foreground">
         {visit.id.slice(0, 8)}…
-      </td>
-      <td className="px-4 py-3 text-sm font-medium">{visit.patient_name}</td>
-      <td className="px-4 py-3">
+      </TableCell>
+      <TableCell className="font-medium">{visit.patient_name}</TableCell>
+      <TableCell>
         <StatusBadge status={visit.status} />
-      </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground">
+      </TableCell>
+      <TableCell className="text-muted-foreground">
         {visit.chief_complaint ?? "—"}
-      </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground">
+      </TableCell>
+      <TableCell className="text-muted-foreground">
         {visit.doctor_name ?? "—"}
-      </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground">
+      </TableCell>
+      <TableCell className="text-muted-foreground">
         {formatTime(visit.created_at)}
-      </td>
-      <td className="px-4 py-3">
+      </TableCell>
+      <TableCell>
         <div className="flex items-center gap-2">
           {actions.map((action) => (
             <Button
@@ -129,7 +130,7 @@ export function QueueRow({
             </Button>
           ))}
         </div>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   )
 }

@@ -4,6 +4,14 @@ import { useState, useMemo, useCallback } from "react"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { PaginationControls } from "@/components/ui/pagination-controls"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 interface DataTableProps<T> {
   /** Full dataset (already loaded) */
@@ -15,9 +23,9 @@ interface DataTableProps<T> {
   pageSize?: number
   /** Extra filter UI (e.g. status dropdown) */
   filters?: React.ReactNode
-  /** Render the table header row */
-  renderHeader: () => React.ReactNode
-  /** Render a single table row */
+  /** Column headers — use <TableHead> elements */
+  columns: React.ReactNode[]
+  /** Render a single table body row — must return <TableRow> with <TableCell> children */
   renderRow: (item: T, index: number) => React.ReactNode
   /** Shown when filtered data is empty */
   emptyMessage?: string
@@ -31,7 +39,7 @@ export function DataTable<T>({
   searchPlaceholder = "Search...",
   pageSize = 10,
   filters,
-  renderHeader,
+  columns,
   renderRow,
   emptyMessage = "No results found.",
   className,
@@ -90,29 +98,31 @@ export function DataTable<T>({
 
       {/* Table */}
       <div className="border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-muted/50 border-b">
-              {renderHeader()}
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              {columns.map((col, i) => (
+                <TableHead key={i}>{col}</TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {paginated.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={100}
-                  className="px-4 py-8 text-center text-muted-foreground"
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-muted-foreground"
                 >
                   {emptyMessage}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               paginated.map((item, idx) =>
                 renderRow(item, (safePage - 1) * pageSize + idx)
               )
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination */}
