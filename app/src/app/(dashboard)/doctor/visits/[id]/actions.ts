@@ -29,7 +29,6 @@ export async function addDiagnosis(input: AddDiagnosisInput) {
     visit_id: input.visit_id,
     diagnosis_id: input.diagnosis_id,
     diagnosis_type: input.diagnosis_type,
-    notes: input.notes || null,
   });
 
   if (error) {
