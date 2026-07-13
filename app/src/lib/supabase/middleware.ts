@@ -52,10 +52,15 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname
 
-  // Public paths that don't require auth
+  // Public paths that don't require auth. `/set-password` is reached right
+  // after /auth/confirm establishes a session for a role (patient) that has
+  // no dashboard yet — it must bypass the role-route allowlist below, same
+  // as /auth/* itself. The page's own server action still requires a valid
+  // session before it will change anything.
   const isPublicPath =
     pathname.startsWith('/login') ||
     pathname.startsWith('/auth') ||
+    pathname.startsWith('/set-password') ||
     pathname === '/'
 
   // Redirect unauthenticated users to login

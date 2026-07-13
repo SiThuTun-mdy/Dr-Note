@@ -38,7 +38,7 @@ const navigationByRole: Record<
     },
     {
       name: "Register patient",
-      href: "/patients/register",
+      href: "/reception/patients/new",
       icon: <UserPlus className="h-5 w-5" />,
     },
     {

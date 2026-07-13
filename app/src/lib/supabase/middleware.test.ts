@@ -129,4 +129,26 @@ describe('middleware - updateSession', () => {
 
     expect(response.headers.get('location')).toBeNull()
   })
+
+  it('allows an authenticated patient to reach /set-password', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'patient-1' } } })
+    mockLimit.mockResolvedValue({
+      data: [{ roles: { name: 'patient' } }],
+      error: null,
+    })
+
+    const request = createRequest('/set-password')
+    const response = await updateSession(request)
+
+    expect(response.headers.get('location')).toBeNull()
+  })
+
+  it('allows an unauthenticated visitor to reach /set-password', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } })
+
+    const request = createRequest('/set-password')
+    const response = await updateSession(request)
+
+    expect(response.headers.get('location')).toBeNull()
+  })
 })
