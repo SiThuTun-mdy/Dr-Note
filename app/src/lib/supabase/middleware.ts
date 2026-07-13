@@ -14,7 +14,7 @@ const roleRoutes: Record<string, string[]> = {
   admin: ['/admin', '/queue', '/patients', '/history'],
   doctor: ['/doctor', '/queue', '/patients', '/my-queue', '/consultation', '/consultations', '/prescriptions', '/history'],
   nurse: ['/nurse', '/queue', '/patients', '/screening', '/vitals', '/notes'],
-  receptionist: ['/reception', '/queue', '/patients', '/history'],
+  receptionist: ['/reception', '/queue', '/patients', '/appointments', '/history'],
 }
 
 export async function updateSession(request: NextRequest) {

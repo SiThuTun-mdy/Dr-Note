@@ -15,14 +15,14 @@ Find the next Pending task. If Sprint-Backlog doesn't exist, read tasks from Git
 
 **If `$ARGUMENTS` contains a number** (e.g., `/next-task 16`), treat it as a GitHub issue ID and skip to Step 1B below.
 
-## Mandatory Workflow (13 Steps)
+## Mandatory Workflow (14 Steps)
 
 **Complete ALL steps in order. Do NOT skip any step.**
-**Two mandatory approval gates: Step 5 (Code Review) and Step 9 (Pre-PR).**
+**Three mandatory approval gates: Step 6 (Code Review), Step 10 (Pre-PR), and Step 4B (UI Design Compliance).**
 
 ### Workflow Flow
 ```
-Implement → Code Review (reviewer agent) → WAIT → QA (qa agent) → WAIT → PR
+Developer Agent → ui-ux-pro-max Skill → Code Review → WAIT → QA → WAIT → PR
 ```
 
 ### Step 1A: Auto-pick Next Task (when no task ID provided)
@@ -128,29 +128,59 @@ git checkout -b feat/<scope>-<short-description>
 - Read Architecture for technical patterns
 - Read Sprint Backlog for task details and dependencies
 
-### Step 4: Implement with Developer Agent (MANDATORY — DO NOT SKIP)
+### Step 4A: Invoke Developer Agent (MANDATORY — DO NOT SKIP)
 
-**Spawn the `developer` agent to implement the feature:**
+**Use the `developer` agent for code implementation:**
 
-The developer agent will:
-1. Write code following architecture patterns
-2. Use server actions, Supabase, shadcn/ui, Tailwind CSS
-3. Follow `backend-skill` patterns (auth first, validate input, defense in depth)
-4. Follow `supabase-skill` for client setup (getAll/setAll API)
-5. Apply `ui-ux-pro-max` for UI components and layout patterns
-6. Follow `react-best-practices` for React/Next.js performance
-7. Handle errors properly with try/catch
-8. Validate all inputs with Zod
+The developer agent is a Senior Full-Stack Developer that will:
+- Implement one feature at a time
+- Follow architecture and folder structure
+- Use strict TypeScript where applicable
+- Add validation and proper error handling
+- Keep code modular and maintainable
+- Avoid unrelated refactoring
 
-The developer agent will return:
-- Files created/modified
-- Tests added
-- Any decisions made
-- Blockers encountered
+**When invoking the developer agent, provide:**
+1. The task description and acceptance criteria
+2. The architecture patterns to follow (from docs/12-Architecture.md)
+3. The file structure and naming conventions
+4. The tech stack: server actions, Supabase, shadcn/ui, Tailwind CSS
 
-**Present implementation summary to user before proceeding to code review.**
+### Step 4B: Invoke ui-ux-pro-max Skill (MANDATORY — DO NOT SKIP)
 
-### Step 5: Code Review with Reviewer Agent (MANDATORY — DO NOT SKIP)
+**Use the `ui-ux-pro-max` skill for UI/UX review and design compliance:**
+
+The ui-ux-pro-max skill will:
+- Review UI components for design system compliance
+- Verify accessibility (44×44px touch targets, WCAG AA contrast)
+- Check responsive design (mobile-first, 375px+ support)
+- Validate form patterns (labels, validation, error messages)
+- Ensure consistent styling with shadcn/ui and Tailwind
+
+**After UI review, verify against `docs/guide/03-design-system.md`:**
+- [ ] §1 Design principles (calm, clinical, no decoration)
+- [ ] §2 Color tokens (no hardcoded hex, use Tailwind semantic classes)
+- [ ] §3 Button text (verb phrases like "Save note", not "Save")
+- [ ] §5 Form patterns (labels above, error messages below, Zod validation)
+- [ ] §6 States (loading skeleton, empty state, error toast)
+- [ ] §7 Accessibility (44×44px touch targets, focus states, aria-labels)
+- [ ] §8 Sentence case, no exclamation marks, terse factual copy
+
+**If design system violations found:**
+1. Fix the issues identified
+2. Re-verify against §03-design-system.md
+3. Repeat until compliant
+
+### Step 5: Implement (Code Implementation)
+- Write code following architecture patterns
+- Use server actions, Supabase, shadcn/ui, Tailwind CSS
+- Follow `backend-skill` patterns (auth first, validate input, defense in depth)
+- Follow `supabase-skill` for client setup (getAll/setAll API)
+- Apply `frontend-design` for UI components
+- Handle errors properly with try/catch
+- Validate all inputs with Zod
+
+### Step 6: Code Review with Reviewer Agent (MANDATORY — DO NOT SKIP)
 
 **Spawn the `reviewer` agent to perform code review:**
 
@@ -191,13 +221,13 @@ Proceed to QA? (y/n)
 
 **WAIT FOR USER APPROVAL before proceeding.**
 
-### Step 6: Commit and Push
+### Step 7: Commit and Push
 ```
 git add -A && git commit -m "feat(<scope>): <description>"
 git push origin feat/<scope>-<short-description>
 ```
 
-### Step 7: QA with QA Agent (MANDATORY — DO NOT SKIP)
+### Step 8: QA with QA Agent (MANDATORY — DO NOT SKIP)
 
 **Spawn the `qa` agent to perform quality assurance:**
 
@@ -223,13 +253,13 @@ The QA agent will return:
 - Bug list (if any)
 - Ready for release: true/false
 
-### Step 8: Fix Issues (if needed)
+### Step 9: Fix Issues (if needed)
 If the QA agent found Critical/High bugs:
 1. Fix the issues identified
 2. Re-run QA agent
 3. Repeat until no Critical/High bugs remain
 
-### Step 9: Pre-PR Review Gate (MANDATORY — DO NOT SKIP)
+### Step 10: Pre-PR Review Gate (MANDATORY — DO NOT SKIP)
 
 **Present QA results and request user approval before creating PR:**
 
@@ -254,7 +284,7 @@ Ready to create PR? (y/n)
 
 **WAIT FOR USER APPROVAL before creating PR.**
 
-### Step 10: Create Pull Request
+### Step 11: Create Pull Request
 
 Create PR using `.github/PULL_REQUEST_TEMPLATE.md`:
 ```bash
@@ -263,18 +293,18 @@ gh pr create --title "<title>" --body "<filled PR template>"
 - Link to issue: `Closes #<issue-number>` (if applicable)
 - Pre-check items verified in Step 7 should be checked in the template
 
-### Step 11: Update Project Board (if issues exist)
+### Step 12: Update Project Board (if issues exist)
 Set issue to Done using the PROJECT_ID, FIELD_ID, and DONE_ID discovered in Step 1A:
 ```
 gh project item-edit --project-id <PROJECT_ID> --id <ITEM_ID> --field-id <FIELD_ID> --single-select-option-id <DONE_ID>
 ```
 
-### Step 12: Update docs/Progress.md
+### Step 13: Update docs/Progress.md
 - Mark the completed user story
 - Update current phase if needed
 - Add any new decisions to `docs/10-Decisions.md`
 
-### Step 13: Report
+### Step 14: Report
 Tell the user:
 - What was completed
 - What is next
@@ -282,7 +312,8 @@ Tell the user:
 ## Rules
 - Do not start more than one task
 - Do not skip any step
-- **Do not proceed past Step 5 without user approval**
-- **Do not proceed past Step 9 without user approval**
+- **Do not proceed past Step 4B without design system compliance**
+- **Do not proceed past Step 6 without user approval**
+- **Do not proceed past Step 10 without user approval**
 - Do not commit code that fails QA checks
 - Do not create PR without explicit user approval
