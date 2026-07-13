@@ -51,7 +51,10 @@ const VALID_TRANSITIONS: Record<VisitStatus, VisitStatus[]> = {
  * Nurses start screening; doctors start consult and complete.
  */
 const ROLE_TRANSITIONS: Record<string, Array<[VisitStatus, VisitStatus]>> = {
-  nurse: [["waiting", "screening"]],
+  nurse: [
+    ["waiting", "screening"],
+    ["screening", "with_doctor"], // screening form: record vitals + hand off
+  ],
   doctor: [
     ["screening", "with_doctor"],
     ["with_doctor", "completed"],
