@@ -133,7 +133,8 @@ git checkout -b feat/<scope>-<short-description>
 - Use server actions, Supabase, shadcn/ui, Tailwind CSS
 - Follow `backend-skill` patterns (auth first, validate input, defense in depth)
 - Follow `supabase-skill` for client setup (getAll/setAll API)
-- Apply `frontend-design` for UI components
+- Apply `ui-ux-pro-max` for UI components and layout patterns
+- Follow `react-best-practices` for React/Next.js performance
 - Handle errors properly with try/catch
 - Validate all inputs with Zod
 
