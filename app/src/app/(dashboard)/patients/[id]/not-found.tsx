@@ -8,7 +8,7 @@ export default function PatientNotFound() {
       <p className="mt-2 text-sm text-muted-foreground">
         This patient record doesn&apos;t exist or may have been removed.
       </p>
-      <Button className="mt-4" variant="outline" render={<Link href="/" />}>
+      <Button className="mt-4" variant="outline" nativeButton={false} render={<Link href="/" />}>
         Back to dashboard
       </Button>
     </div>

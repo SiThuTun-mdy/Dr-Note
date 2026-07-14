@@ -111,6 +111,11 @@ const navigationByRole: Record<
       href: "/prescriptions",
       icon: <FileText className="h-5 w-5" />,
     },
+    {
+      name: "History",
+      href: "/history",
+      icon: <History className="h-5 w-5" />,
+    },
   ],
   admin: [
     {
