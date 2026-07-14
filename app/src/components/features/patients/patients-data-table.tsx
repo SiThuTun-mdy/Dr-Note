@@ -114,6 +114,7 @@ export function PatientsDataTable({ data }: { data: PatientTableRow[] }) {
             <Button
               size="sm"
               variant="outline"
+              nativeButton={false}
               render={<Link href={`/patients/${patient.id}`} />}
             >
               View

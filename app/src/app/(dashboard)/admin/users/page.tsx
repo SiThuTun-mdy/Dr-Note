@@ -139,7 +139,7 @@ export default function AdminUsersPage() {
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">User Management</h2>
-        <Button render={<Link href="/admin/staff/new" />}>
+        <Button nativeButton={false} render={<Link href="/admin/staff/new" />}>
           <UserPlus />
           Add staff
         </Button>
