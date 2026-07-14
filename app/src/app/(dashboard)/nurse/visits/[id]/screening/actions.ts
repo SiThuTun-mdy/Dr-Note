@@ -9,6 +9,7 @@ interface ScreeningResult {
   success: boolean
   error?: string
   fieldErrors?: Partial<Record<keyof ScreeningInput, string>>
+  doctorAssigned?: boolean
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -92,15 +93,7 @@ export async function createScreening(
     }
   }
 
-  // 7. Doctor must be assigned before advancing to with_doctor
-  if (!visit.doctor_id) {
-    return {
-      success: false,
-      error: "No doctor has been assigned to this visit yet. Please assign a doctor first.",
-    }
-  }
-
-  // 8. Insert screening (bmi is auto-computed by the DB generated column)
+  // 7. Insert screening (bmi is auto-computed by the DB generated column)
   const { error: insertError } = await supabase.from("screenings").insert({
     visit_id: visitId,
     height_cm: data.height_cm,
@@ -124,14 +117,14 @@ export async function createScreening(
     return { success: false, error: "Failed to save screening. Please try again." }
   }
 
-  // 9. Advance visit status via centralized transition logic
+  // 8. Advance visit status via centralized transition logic
   //    If visit is 'waiting', two-step: waiting→screening→with_doctor
   //    If visit is 'screening', one-step: screening→with_doctor
+  //    If no doctor assigned, keep at 'screening' (doctor can be assigned later)
   if (visit.status === "waiting") {
     const r1 = await transitionVisitStatus(visitId, "screening")
     if (!r1.success) {
       console.error("[Screening] Failed to advance to screening", r1.error)
-      // Screening saved but status stuck — nurse can retry from queue
       return {
         success: true,
         error: "Screening saved, but failed to update visit status. Please refresh the queue.",
@@ -139,15 +132,19 @@ export async function createScreening(
     }
   }
 
-  const r2 = await transitionVisitStatus(visitId, "with_doctor")
-  if (!r2.success) {
-    console.error("[Screening] Failed to advance to with_doctor", r2.error)
-    return {
-      success: true,
-      error: "Screening saved, but failed to update visit status. Please refresh the queue.",
+  // Only advance to with_doctor if a doctor is assigned
+  if (visit.doctor_id) {
+    const r2 = await transitionVisitStatus(visitId, "with_doctor")
+    if (!r2.success) {
+      console.error("[Screening] Failed to advance to with_doctor", r2.error)
+      return {
+        success: true,
+        error: "Screening saved, but failed to update visit status. Please refresh the queue.",
+      }
     }
   }
 
+  revalidatePath("/screening")
   revalidatePath("/queue")
-  return { success: true }
+  return { success: true, doctorAssigned: !!visit.doctor_id }
 }
