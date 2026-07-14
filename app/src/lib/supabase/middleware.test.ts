@@ -130,6 +130,55 @@ describe('middleware - updateSession', () => {
     expect(response.headers.get('location')).toBeNull()
   })
 
+  it('redirects authenticated patient from /login to their own record', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'patient-1' } } })
+    mockLimit.mockResolvedValue({
+      data: [{ roles: { name: 'patient' } }],
+      error: null,
+    })
+
+    const request = createRequest('/login')
+    const response = await updateSession(request)
+
+    expect(response.headers.get('location')).toContain('/patients/patient-1')
+  })
+
+  it('redirects patient accessing a disallowed route to their own record, not /login', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'patient-1' } } })
+    mockLimit.mockResolvedValue({
+      data: [{ roles: { name: 'patient' } }],
+      error: null,
+    })
+
+    const request = createRequest('/admin')
+    const response = await updateSession(request)
+
+    expect(response.headers.get('location')).toContain('/patients/patient-1')
+  })
+
+  it('allows patient to access their own /patients/:id page', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'patient-1' } } })
+    mockLimit.mockResolvedValue({
+      data: [{ roles: { name: 'patient' } }],
+      error: null,
+    })
+
+    const request = createRequest('/patients/patient-1')
+    const response = await updateSession(request)
+
+    expect(response.headers.get('location')).toBeNull()
+  })
+
+  it('does not redirect-loop an authenticated user with no role on /login', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+    mockLimit.mockResolvedValue({ data: [], error: null })
+
+    const request = createRequest('/login')
+    const response = await updateSession(request)
+
+    expect(response.headers.get('location')).toBeNull()
+  })
+
   it('allows an authenticated patient to reach /set-password', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'patient-1' } } })
     mockLimit.mockResolvedValue({

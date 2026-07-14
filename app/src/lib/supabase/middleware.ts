@@ -9,6 +9,12 @@ const roleDashboard: Record<string, string> = {
   receptionist: '/reception',
 }
 
+// Patients have no shared dashboard; their landing page is their own record.
+function dashboardFor(roleName: string | undefined, userId: string): string {
+  if (roleName === 'patient') return `/patients/${userId}`
+  return roleDashboard[roleName || ''] || '/login'
+}
+
 // Allowed route prefixes per role
 const roleRoutes: Record<string, string[]> = {
   admin: ['/admin', '/queue', '/patients', '/history', '/api'],
@@ -80,12 +86,17 @@ export async function updateSession(request: NextRequest) {
 
     const roleName = (roles?.[0] as unknown as { roles: { name: string } | null })?.roles?.name
 
-    // Redirect authenticated users away from login/home to their dashboard
+    // Redirect authenticated users away from login/home to their dashboard.
+    // Guard against self-redirect: a user with no resolvable dashboard
+    // (e.g. no role yet) must be allowed to stay on /login rather than
+    // being redirected to /login in an infinite loop.
     if (pathname === '/login' || pathname === '/') {
-      const dashboard = roleDashboard[roleName || ''] || '/login'
-      const url = request.nextUrl.clone()
-      url.pathname = dashboard
-      return NextResponse.redirect(url)
+      const dashboard = dashboardFor(roleName, user.id)
+      if (dashboard !== pathname) {
+        const url = request.nextUrl.clone()
+        url.pathname = dashboard
+        return NextResponse.redirect(url)
+      }
     }
 
     // Role-based route protection for protected routes
@@ -107,7 +118,7 @@ export async function updateSession(request: NextRequest) {
       // If user tries to access another role's route, redirect to own dashboard
       if (!isAllowed) {
         const url = request.nextUrl.clone()
-        url.pathname = roleDashboard[roleName] || '/login'
+        url.pathname = dashboardFor(roleName, user.id)
         return NextResponse.redirect(url)
       }
     }

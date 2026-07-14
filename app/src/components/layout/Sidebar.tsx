@@ -153,6 +153,8 @@ const navigationByRole: Record<
       icon: <Activity className="h-5 w-5" />,
     },
   ],
+  // Patients only see their own record page — no staff navigation.
+  patient: [],
 };
 
 export function Sidebar({ isOpen, onClose, userRole }: SidebarProps) {

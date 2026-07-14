@@ -40,8 +40,10 @@ export default async function DashboardLayout({
   const roleName =
     (roles?.[0] as unknown as { roles: { name: string } | null })?.roles?.name || "unknown"
 
-  // Double-check role access (defense in depth — middleware also guards)
-  const allowedPrefix = roleDashboard[roleName]
+  // Double-check role access (defense in depth — middleware also guards).
+  // Patients have no shared dashboard; their landing page is their own record.
+  const allowedPrefix =
+    roleName === "patient" ? `/patients/${user.id}` : roleDashboard[roleName]
   if (!allowedPrefix) {
     redirect("/login")
   }
