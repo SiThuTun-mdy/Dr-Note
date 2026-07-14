@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Activity, Calendar, Settings, FileText, Shield, BarChart3, ClipboardList } from "lucide-react"
+import { TodayVisitCountCard } from "@/components/features/patients/today-visit-count-card"
+import { TodayVisitWaitingCountCard } from "@/components/features/patients/today-visit-waiting-count-card"
 
 export default function AdminPage() {
   return (
@@ -21,19 +23,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Today&apos;s visits</p>
-                <p className="text-3xl font-semibold text-foreground mt-1">—</p>
-              </div>
-              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Calendar className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <TodayVisitCountCard />
 
         <Card>
           <CardContent className="p-6">
@@ -49,19 +39,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                <p className="text-3xl font-semibold text-foreground mt-1">—</p>
-              </div>
-              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <FileText className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <TodayVisitWaitingCountCard />
       </div>
 
       {/* Quick actions — Bento Grid style, design system §4 */}
