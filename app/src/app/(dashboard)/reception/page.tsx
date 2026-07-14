@@ -29,7 +29,11 @@ export default function ReceptionPage() {
           >
             Patient Registration
           </Button>
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button
+            className="w-full sm:w-auto"
+            nativeButton={false}
+            render={<Link href="/queue" />}
+          >
             View queue
           </Button>
         </CardContent>
