@@ -46,7 +46,7 @@ export function VisitQueue() {
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["queue", "today"],
-    queryFn: getTodayVisits,
+    queryFn: () => getTodayVisits(),
     refetchInterval: POLL_INTERVAL_MS,
   })
 
