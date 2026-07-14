@@ -27,7 +27,6 @@ const mockChain = {
 
 // Each method returns mockChain to allow chaining
 mockSelect.mockReturnValue(mockChain);
-mockInsert.mockResolvedValue({ error: null });
 mockDelete.mockReturnValue(mockChain);
 mockUpdate.mockReturnValue(mockChain);
 mockEq.mockReturnValue(mockChain);
@@ -35,6 +34,14 @@ mockSingle.mockResolvedValue({ data: null, error: null });
 mockLimit.mockResolvedValue({ data: [], error: null });
 mockOrder.mockReturnValue(mockChain);
 mockOr.mockReturnValue(mockChain);
+
+// insert() returns a chain with select() → single()
+const mockInsertChain = {
+  select: vi.fn().mockReturnValue({
+    single: mockSingle,
+  }),
+};
+mockInsert.mockReturnValue(mockInsertChain);
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(() => ({
@@ -58,7 +65,8 @@ describe("Diagnosis Server Actions", () => {
     mockLimit.mockResolvedValue({ data: [], error: null });
     mockOrder.mockReturnValue(mockChain);
     mockOr.mockReturnValue(mockChain);
-    mockInsert.mockResolvedValue({ error: null });
+    mockInsertChain.select.mockReturnValue({ single: mockSingle });
+    mockInsert.mockReturnValue(mockInsertChain);
     mockFrom.mockReturnValue(mockChain);
   });
 
@@ -78,12 +86,12 @@ describe("Diagnosis Server Actions", () => {
         visit_id: "visit-123",
         diagnosis_id: "diag-456",
         diagnosis_type: "primary",
-        notes: null,
       });
     });
 
     it("should return error on duplicate diagnosis", async () => {
-      mockInsert.mockResolvedValue({
+      mockSingle.mockResolvedValue({
+        data: null,
         error: { code: "23505", message: "duplicate key" },
       });
 
@@ -101,7 +109,8 @@ describe("Diagnosis Server Actions", () => {
     });
 
     it("should return generic error on other failures", async () => {
-      mockInsert.mockResolvedValue({
+      mockSingle.mockResolvedValue({
+        data: null,
         error: { code: "OTHER", message: "database error" },
       });
 

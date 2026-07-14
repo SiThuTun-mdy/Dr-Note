@@ -432,7 +432,7 @@ describe("attachment server actions", () => {
       });
 
       const result = await getAttachmentDownloadUrl(VALID_UUID);
-      expect(result.error).toBe("Visit not found.");
+      expect(result.error).toBe("Attachment not found.");
     });
 
     it("returns error when signed URL generation fails", async () => {

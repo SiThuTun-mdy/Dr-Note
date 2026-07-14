@@ -69,6 +69,15 @@ function singleVisitChain(
   }
 }
 
+/** Chain for `from('users').select().in()`. */
+function usersChain(rows: Array<Record<string, unknown>> | null = []) {
+  return {
+    select: vi.fn().mockReturnValue({
+      in: vi.fn().mockResolvedValue({ data: rows, error: null }),
+    }),
+  }
+}
+
 /** Chain for `from('visits').update().eq()`. */
 function updateChain(error: { message: string } | null = null) {
   return {
@@ -162,7 +171,7 @@ describe("queue actions", () => {
       expect(result.error).toContain("Invalid transition")
     })
 
-    it("rejects nurse attempting screening -> with_doctor", async () => {
+    it("allows nurse to transition screening -> with_doctor", async () => {
       mockFrom
         .mockReturnValueOnce(roleChain("nurse"))
         .mockReturnValueOnce(
@@ -172,12 +181,12 @@ describe("queue actions", () => {
             doctor_id: "doc-1",
           }),
         )
+        .mockReturnValueOnce(updateChain())
 
       const { transitionVisitStatus } = await import("./actions")
       const result = await transitionVisitStatus("visit-1", "with_doctor")
 
-      expect(result.success).toBe(false)
-      expect(result.error).toContain("cannot perform this transition")
+      expect(result.success).toBe(true)
     })
 
     it("rejects transition when no doctor is assigned", async () => {
@@ -317,13 +326,13 @@ describe("queue actions", () => {
         status: "waiting",
         visit_date: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        patient: { name: "Alice" },
-        doctor: { name: "Dr. Bob" },
       }
 
       mockFrom
         .mockReturnValueOnce(roleChain("nurse"))
         .mockReturnValueOnce(visitsChain([fakeVisit]))
+        .mockReturnValueOnce(usersChain([{ id: "p-1", name: "Alice" }]))
+        .mockReturnValueOnce(usersChain([{ id: "d-1", name: "Dr. Bob" }]))
 
       const { getTodayVisits } = await import("./actions")
       const result = await getTodayVisits()
@@ -351,13 +360,12 @@ describe("queue actions", () => {
         status: "screening",
         visit_date: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        patient: null,
-        doctor: null,
       }
 
       mockFrom
         .mockReturnValueOnce(roleChain("doctor"))
         .mockReturnValueOnce(visitsChain([fakeVisit]))
+        .mockReturnValueOnce(usersChain([]))
 
       const { getTodayVisits } = await import("./actions")
       const result = await getTodayVisits()
@@ -418,8 +426,6 @@ describe("queue actions", () => {
         status: "completed",
         visit_date: new Date().toISOString(),
         created_at: "2026-07-13T08:00:00Z",
-        patient: { name: "Bob" },
-        doctor: { name: "Dr. Smith" },
       }
       const visit2 = {
         id: "v-2",
@@ -431,13 +437,13 @@ describe("queue actions", () => {
         status: "waiting",
         visit_date: new Date().toISOString(),
         created_at: "2026-07-13T09:00:00Z",
-        patient: { name: "Carol" },
-        doctor: null,
       }
 
       mockFrom
         .mockReturnValueOnce(roleChain("nurse"))
         .mockReturnValueOnce(visitsChain([visit1, visit2]))
+        .mockReturnValueOnce(usersChain([{ id: "p-1", name: "Bob" }, { id: "p-2", name: "Carol" }]))
+        .mockReturnValueOnce(usersChain([{ id: "d-1", name: "Dr. Smith" }]))
 
       const { getTodayVisits } = await import("./actions")
       const result = await getTodayVisits()

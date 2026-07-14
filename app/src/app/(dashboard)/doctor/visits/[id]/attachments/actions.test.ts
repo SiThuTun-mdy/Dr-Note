@@ -237,10 +237,19 @@ describe("Attachment Server Actions", () => {
 
   describe("deleteAttachment", () => {
     it("should delete an attachment successfully", async () => {
-      // Mock fetch attachment
+      // Mock fetch attachment — must include visit_id and uploaded_by
       mockSingle.mockResolvedValueOnce({
-        data: { id: VALID_ATTACHMENT_ID, file_path: "visits/visit-123/12345-photo.jpg" },
+        data: {
+          id: VALID_ATTACHMENT_ID,
+          file_path: "visits/visit-123/12345-photo.jpg",
+          uploaded_by: "user-123",
+          visit_id: VALID_VISIT_ID,
+        },
         error: null,
+      });
+      // Mock DB delete chain: from().delete().eq()
+      mockDelete.mockReturnValueOnce({
+        eq: vi.fn().mockResolvedValue({ error: null }),
       });
 
       const { deleteAttachment } = await import("./actions");
@@ -267,24 +276,37 @@ describe("Attachment Server Actions", () => {
 
   describe("getAttachmentDownloadUrl", () => {
     it("should generate a signed URL", async () => {
+      // Mock fetch attachment
+      mockSingle
+        .mockResolvedValueOnce({
+          data: { id: VALID_ATTACHMENT_ID, file_path: "visits/visit-123/12345-photo.jpg", visit_id: VALID_VISIT_ID },
+          error: null,
+        })
+        // Mock visit check
+        .mockResolvedValueOnce({ data: { id: VALID_VISIT_ID }, error: null });
+
       const { getAttachmentDownloadUrl } = await import("./actions");
-      const result = await getAttachmentDownloadUrl(
-        "visits/visit-123/12345-photo.jpg"
-      );
+      const result = await getAttachmentDownloadUrl(VALID_ATTACHMENT_ID);
 
       expect(result.url).toBe("https://example.com/signed-url");
     });
 
     it("should handle URL generation errors", async () => {
+      // Mock fetch attachment
+      mockSingle
+        .mockResolvedValueOnce({
+          data: { id: VALID_ATTACHMENT_ID, file_path: "visits/visit-123/12345-photo.jpg", visit_id: VALID_VISIT_ID },
+          error: null,
+        })
+        // Mock visit check
+        .mockResolvedValueOnce({ data: { id: VALID_VISIT_ID }, error: null });
       mockCreateSignedUrl.mockResolvedValueOnce({
         data: null,
         error: { message: "storage error" },
       });
 
       const { getAttachmentDownloadUrl } = await import("./actions");
-      const result = await getAttachmentDownloadUrl(
-        "visits/visit-123/12345-photo.jpg"
-      );
+      const result = await getAttachmentDownloadUrl(VALID_ATTACHMENT_ID);
 
       expect(result.error).toContain("Failed to generate download link");
     });
