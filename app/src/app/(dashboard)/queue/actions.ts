@@ -70,7 +70,9 @@ const ROLE_TRANSITIONS: Record<string, Array<[VisitStatus, VisitStatus]>> = {
 // Fetch today's visits
 // ---------------------------------------------------------------------------
 
-export async function getTodayVisits(): Promise<GetTodayVisitsResult> {
+export async function getTodayVisits(
+  status?: VisitStatus
+): Promise<GetTodayVisitsResult> {
   const supabase = await createClient()
 
   const {
@@ -98,8 +100,8 @@ export async function getTodayVisits(): Promise<GetTodayVisitsResult> {
   const endOfDay = new Date(startOfDay)
   endOfDay.setDate(endOfDay.getDate() + 1)
 
-  // Fetch today's visits
-  const { data: visits, error: visitsError } = await supabase
+  // Fetch today's visits (optionally narrowed to a single status)
+  let visitsQuery = supabase
     .from("visits")
     .select(
       `
@@ -117,6 +119,12 @@ export async function getTodayVisits(): Promise<GetTodayVisitsResult> {
     .gte("visit_date", startOfDay.toISOString())
     .lt("visit_date", endOfDay.toISOString())
     .order("created_at", { ascending: true })
+
+  if (status) {
+    visitsQuery = visitsQuery.eq("status", status)
+  }
+
+  const { data: visits, error: visitsError } = await visitsQuery
 
   if (visitsError) {
     console.error("[Queue] Failed to fetch visits", visitsError)
