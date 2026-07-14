@@ -20,7 +20,7 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { StatusBadge } from "@/components/features/shared/StatusBadge"
 
 /** Poll interval: keep in sync with the main queue view. */
-const POLL_INTERVAL_MS = 10_000
+const POLL_INTERVAL_MS = 1_800_000
 
 const STATUS_OPTIONS: { value: VisitStatus | "all"; label: string }[] = [
   { value: "all", label: "All statuses" },
