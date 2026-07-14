@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { StatusBadge } from "@/components/features/shared/StatusBadge"
+import { SameDayVisitDataTable } from "@/components/features/patients/same-day-visit-data-table"
 
 export default function ReceptionPage() {
   return (
@@ -59,38 +59,13 @@ export default function ReceptionPage() {
         </CardContent>
       </Card>
 
-      {/* Recent patients — design system §3: compact rows, muted header */}
+      {/* Today's visits — design system §3: compact rows, muted header */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Recent patients</CardTitle>
+          <CardTitle className="text-lg font-semibold">Recent Visits</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="emr-table-header">
-                  <th className="text-left px-4 py-3" scope="col">ID</th>
-                  <th className="text-left px-4 py-3" scope="col">Patient</th>
-                  <th className="text-left px-4 py-3" scope="col">Status</th>
-                  <th className="text-left px-4 py-3" scope="col">Time</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                <tr className="hover:bg-muted/50 transition-colors cursor-pointer">
-                  <td className="px-4 py-3 text-sm text-muted-foreground">P001</td>
-                  <td className="px-4 py-3 text-sm font-medium">John Doe</td>
-                  <td className="px-4 py-3"><StatusBadge status="waiting" /></td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">10:30 AM</td>
-                </tr>
-                <tr className="hover:bg-muted/50 transition-colors cursor-pointer">
-                  <td className="px-4 py-3 text-sm text-muted-foreground">P002</td>
-                  <td className="px-4 py-3 text-sm font-medium">Jane Smith</td>
-                  <td className="px-4 py-3"><StatusBadge status="screening" /></td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">10:15 AM</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <SameDayVisitDataTable />
         </CardContent>
       </Card>
     </div>
