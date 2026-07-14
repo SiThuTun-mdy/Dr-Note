@@ -19,7 +19,7 @@ import { getTodayVisits } from "@/app/(dashboard)/queue/actions"
 import type { VisitStatus } from "@/components/features/shared/StatusBadge"
 
 /** Poll interval: 10 seconds as per requirements. */
-const POLL_INTERVAL_MS = 10_000
+const POLL_INTERVAL_MS = 1_800_000
 
 const STATUS_OPTIONS: { value: VisitStatus | "all"; label: string }[] = [
   { value: "all", label: "All statuses" },
