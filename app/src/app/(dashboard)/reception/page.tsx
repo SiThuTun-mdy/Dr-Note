@@ -51,7 +51,7 @@ export default function ReceptionPage() {
             nativeButton={false}
             render={<Link href="/reception/patients/new" />}
           >
-            Register patient
+            Patient Registration
           </Button>
           <Button variant="outline" className="w-full sm:w-auto">
             View queue

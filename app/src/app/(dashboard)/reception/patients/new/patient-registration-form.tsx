@@ -31,6 +31,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { Card, CardContent } from "@/components/ui/card"
 
 export function PatientRegistrationForm() {
   const router = useRouter()
@@ -79,73 +80,22 @@ export function PatientRegistrationForm() {
   }
 
   return (
-    <div>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full name *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Aung Aung"
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email *</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="patient@example.com"
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone (optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="09xxxxxxxxx"
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid grid-cols-2 gap-4">
+    <Card>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
-              name="dob"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date of birth *</FormLabel>
+                  <FormLabel>Full name *</FormLabel>
                   <FormControl>
-                    <Input type="date" disabled={isSubmitting} {...field} />
+                    <Input
+                      placeholder="Aung Aung"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,53 +104,90 @@ export function PatientRegistrationForm() {
 
             <FormField
               control={form.control}
-              name="gender"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gender *</FormLabel>
-                  <Select
-                    disabled={isSubmitting}
-                    value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                  >
+                  <FormLabel>Email *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="patient@example.com"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone (optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="09xxxxxxxxx"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="dob"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date of birth *</FormLabel>
                     <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
+                      <Input type="date" disabled={isSubmitting} {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <FormField
-            control={form.control}
-            name="nrc"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>NRC (optional)</FormLabel>
-                <FormControl>
-                  <Input disabled={isSubmitting} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gender *</FormLabel>
+                    <Select
+                      disabled={isSubmitting}
+                      value={field.value ?? ""}
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="religion"
+              name="nrc"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Religion (optional)</FormLabel>
+                  <FormLabel>NRC (optional)</FormLabel>
                   <FormControl>
                     <Input disabled={isSubmitting} {...field} />
                   </FormControl>
@@ -209,49 +196,65 @@ export function PatientRegistrationForm() {
               )}
             />
 
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="religion"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Religion (optional)</FormLabel>
+                    <FormControl>
+                      <Input disabled={isSubmitting} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ethnicity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ethnicity (optional)</FormLabel>
+                    <FormControl>
+                      <Input disabled={isSubmitting} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="ethnicity"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ethnicity (optional)</FormLabel>
+                  <FormLabel>Address (optional)</FormLabel>
                   <FormControl>
-                    <Input disabled={isSubmitting} {...field} />
+                    <Textarea rows={3} disabled={isSubmitting} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
 
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Address (optional)</FormLabel>
-                <FormControl>
-                  <Textarea rows={3} disabled={isSubmitting} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="flex justify-left gap-4">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Registering...
-                </>
-              ) : (
-                "Register Patient"
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
+            <div className="flex justify-left gap-4">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin" />
+                    Registering...
+                  </>
+                ) : (
+                  "Register Patient"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   )
 }
