@@ -33,6 +33,9 @@
 | Visit status workflow + patient queue view — PR #64 | #25 |
 | DataTable: reusable search + pagination component; applied to Queue & Admin Users tables | — |
 | RLS fix: widen users_select to allow patients.read (patient search in visit creation) | — |
+| File attachments: upload/download/delete for visits (Supabase Storage) — PR #65 | #36 |
+| Screening form: vitals (nurse) — PR #65 | #26 |
+| Visit summary: printable view with vitals, diagnoses, prescriptions — PR #65 | #35 |
 
 ### 📐 Standard Requirements
 > **All tables must use `<DataTable>` with search and pagination.** New list/table pages must integrate the reusable `DataTable` component (`src/components/ui/data-table.tsx`) which provides client-side search and pagination out of the box. Pass `searchKeys` for columns to search, `pageSize` for rows per page, and `filters` slot for dropdowns.
@@ -48,8 +51,6 @@
 
 | Task | Issue | Epic |
 |------|-------|------|
-| Attachments: upload files to a visit (Supabase Storage) | #36 | Record Taking |
-| Screening form: vitals (nurse) | #26 | Record Taking |
 | Role-based access to history | #27 | History Management |
 | Patient & visit search + filters | #28 | History Management |
 | Test plan + manual demo checklist | #29 | Testing |
