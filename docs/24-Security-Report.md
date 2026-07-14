@@ -177,3 +177,143 @@ No new vulnerabilities identified in this scoped review.
 
 ### Gate status
 No Critical or High findings.
+
+---
+
+## Full codebase security scan (14 Jul 2026)
+
+Scope: all server actions, middleware, validators, auth flows, and Supabase helpers across the entire codebase.
+
+### Findings
+
+**[FIND-022-01] Severity: Critical — Secrets / Sensitive Data**
+Category: Secrets
+File: `app/.env.local`
+Description: Real production credentials in plaintext including Supabase service role keys, GitHub PAT, and database passwords.
+Impact: If accidentally committed, full admin access to Supabase projects and GitHub account.
+Recommendation: Rotate ALL exposed credentials immediately. Use secrets manager.
+
+**[FIND-022-02] Severity: High — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/admin/users/actions.ts:81-101` (assignRole)
+Description: `assignRole()` checks auth but NOT admin role. Any authenticated user can assign any role.
+Impact: Privilege escalation — nurse/doctor/receptionist could assign themselves admin role.
+Recommendation: Add admin role check.
+
+**[FIND-022-03] Severity: High — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/admin/users/actions.ts:104-123` (removeRole)
+Description: `removeRole()` checks auth but NOT admin role.
+Impact: Attacker could demote administrators.
+Recommendation: Add admin role check.
+
+**[FIND-022-04] Severity: High — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/admin/users/actions.ts:126-149` (toggleUserActive)
+Description: `toggleUserActive()` checks auth but NOT admin role.
+Impact: Attacker could deactivate all admin accounts.
+Recommendation: Add admin role check.
+
+**[FIND-022-05] Severity: High — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/doctor/visits/[id]/actions.ts:26-44` (addDiagnosis)
+Description: Zero auth/authz checks. Relies entirely on RLS.
+Impact: If RLS misconfigured, any user could add diagnoses to any visit.
+Recommendation: Add auth check and verify caller is assigned doctor.
+
+**[FIND-022-06] Severity: High — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/doctor/visits/[id]/actions.ts:46-60` (removeDiagnosis)
+Description: Zero auth/authz checks.
+Impact: Unauthorized deletion of diagnoses if RLS fails.
+Recommendation: Add auth check and verify caller is assigned doctor.
+
+**[FIND-022-07] Severity: High — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/doctor/visits/[id]/actions.ts:62-76` (saveDiagnosisNote)
+Description: Zero auth/authz checks.
+Impact: Any user could overwrite diagnosis notes.
+Recommendation: Add auth check and verify caller is assigned doctor.
+
+**[FIND-022-08] Severity: Medium — Authentication**
+Category: Authentication
+File: `app/src/app/(auth)/login/actions.ts:8`
+Description: In-memory rate limiting resets on restart, doesn't work across serverless instances.
+Impact: Brute-force passwords by waiting for restart.
+Recommendation: Use persistent store for rate limiting.
+
+**[FIND-022-09] Severity: Medium — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/doctor/visits/[id]/actions.ts:78-97` (searchDiagnoses)
+Description: No auth check. Allows unauthenticated search of diagnosis codes.
+Impact: Information disclosure.
+Recommendation: Add auth check.
+
+**[FIND-022-10] Severity: Medium — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/doctor/visits/[id]/actions.ts:99-148` (getVisitWithDetails)
+Description: No auth check. Fetches full visit details.
+Impact: Exposure of patient medical records if RLS misconfigured.
+Recommendation: Add auth check.
+
+**[FIND-022-11] Severity: Medium — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/doctor/visits/[id]/actions.ts:236-256` (getVisitPrescriptions)
+Description: No auth check. Returns all prescriptions.
+Impact: Exposure of prescription data.
+Recommendation: Add auth check.
+
+**[FIND-022-12] Severity: Medium — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/doctor/actions.ts:18-94` (getDoctorDashboardStats)
+Description: Checks auth but not doctor role.
+Impact: Non-doctors can access doctor-specific data.
+Recommendation: Add role check.
+
+**[FIND-022-13] Severity: Medium — Validation**
+Category: Validation
+File: `app/src/app/(dashboard)/doctor/visits/[id]/actions.ts:87` (searchDiagnoses)
+Description: Query passed to `.or()` without escaping LIKE wildcards.
+Impact: Pattern-based data extraction.
+Recommendation: Apply safeQuery escaping.
+
+**[FIND-022-14] Severity: Low — Sensitive Data**
+Category: Sensitive Data
+File: Multiple files
+Description: `console.error()` logs internal user IDs and error objects.
+Impact: Internal details visible in production logs.
+Recommendation: Use structured logging with PII redaction.
+
+**[FIND-022-15] Severity: Low — Authentication**
+Category: Authentication
+File: All server actions except login
+Description: No rate limiting on write operations.
+Impact: Authenticated attacker could flood system.
+Recommendation: Add rate limiting for sensitive operations.
+
+**[FIND-022-16] Severity: Low — Authorization**
+Category: Authorization
+File: `app/src/app/(dashboard)/admin/users/actions.ts:68-78` (getRoles)
+Description: No auth check. Returns all roles.
+Impact: Unauthenticated role enumeration.
+Recommendation: Add auth check.
+
+### Verified as sound
+- Open redirect prevention validated
+- No XSS patterns found
+- No hardcoded secrets in code
+- Zod validation on all server actions
+- Generic error messages throughout
+- Secure password generation (crypto.randomInt)
+- File upload validation (MIME type, size, filename sanitization)
+- Forward-only status transitions with role enforcement
+- Middleware route protection with role-based prefixes
+
+### Gate status
+| Rule | Status |
+|------|--------|
+| Critical = 0 | ❌ FAIL (1 Critical) |
+| High = 0 | ❌ FAIL (6 High) |
+| Medium remediation plan | ❌ Required |
+
+**Release Status: BLOCKED**

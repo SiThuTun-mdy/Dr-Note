@@ -42,6 +42,11 @@ const navigationByRole: Record<
       icon: <UserPlus className="h-5 w-5" />,
     },
     {
+      name: "New visit",
+      href: "/reception/visits/new",
+      icon: <FileText className="h-5 w-5" />,
+    },
+    {
       name: "Today's queue",
       href: "/queue",
       icon: <ClipboardList className="h-5 w-5" />,

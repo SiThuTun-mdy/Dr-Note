@@ -20,6 +20,7 @@ const getPageTitle = (pathname: string): string => {
   if (pathname.includes("/admin/audit")) return "Audit log"
   if (pathname.includes("/admin")) return "Admin dashboard"
   if (pathname.includes("/doctor")) return "Doctor dashboard"
+  if (pathname.includes("/screening")) return "Screening queue"
   if (pathname.includes("/nurse")) return "Nurse dashboard"
   if (pathname.includes("/reception")) return "Reception dashboard"
   return "Dashboard"

@@ -1,8 +1,10 @@
 // Status badge component — design system §2, §3
 // Same status = same badge everywhere in the app
 
+export type VisitStatus = "waiting" | "screening" | "with_doctor" | "completed"
+
 interface StatusBadgeProps {
-  status: "waiting" | "screening" | "with_doctor" | "completed"
+  status: VisitStatus
 }
 
 const statusStyles: Record<string, string> = {
