@@ -106,7 +106,7 @@ export function VisitCreationForm() {
 
   const selectPatient = (patient: Patient) => {
     setSelectedPatient(patient)
-    form.setValue("patientId", patient.id)
+    form.setValue("patientId", patient.id, { shouldValidate: true })
     setPatientResults([])
     setPatientQuery("")
   }
