@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { SameDayVisitDataTable } from "@/components/features/patients/same-day-visit-data-table"
 import { TodayVisitCountCard } from "@/components/features/patients/today-visit-count-card"
 import { TodayVisitWaitingCountCard } from "@/components/features/patients/today-visit-waiting-count-card"
+import { TodayPatientRegistrationCountCard } from "@/components/features/patients/today-patient-registration-count-card"
 
 export default function ReceptionPage() {
   return (
@@ -12,16 +13,7 @@ export default function ReceptionPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <TodayVisitCountCard />
         <TodayVisitWaitingCountCard />
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              New registrations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-semibold text-foreground">—</p>
-          </CardContent>
-        </Card>
+        <TodayPatientRegistrationCountCard />
       </div>
 
       {/* Quick actions — design system §4 */}
