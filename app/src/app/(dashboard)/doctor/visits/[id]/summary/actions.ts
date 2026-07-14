@@ -3,8 +3,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { VisitSummaryData } from "@/types/visit-summary";
 
-export type { VisitSummaryData };
-
 /**
  * Fetch complete visit summary data including screening, diagnoses,
  * and prescriptions. Returns null if visit not found or user lacks access.
