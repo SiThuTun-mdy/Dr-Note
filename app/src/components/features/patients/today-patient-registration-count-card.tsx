@@ -8,14 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { NotebookPenIcon } from "lucide-react"
 
 /** Poll interval: keep in sync with the other reception stat cards. */
-const POLL_INTERVAL_MS = 10_000
+//const POLL_INTERVAL_MS = 10_000
 
 /** Reusable stat card — number of patients registered today. */
 export function TodayPatientRegistrationCountCard() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["patient-registrations", "today"],
     queryFn: () => getPatientRegistrationCount(),
-    refetchInterval: POLL_INTERVAL_MS,
+    // refetchInterval: POLL_INTERVAL_MS,
   })
 
   const count = data?.count ?? 0
