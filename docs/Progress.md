@@ -26,6 +26,8 @@
 | Patient registration form (demographics) — RLS applied + verified live end-to-end; see `docs/24-Security-Report.md` | #20 |
 | Patient activation + set-password flow: patients now `is_active` on registration, confirm their email via `/auth/confirm`, and set their own password at `/set-password`. Note: patients still cannot log in through `/login` after this — no patient dashboard exists yet (see `docs/24-Security-Report.md`) | — |
 | Staff onboarding: admin creates doctor/nurse/receptionist/admin accounts at `/admin/staff/new`; temp password shown once; reviewer + QA passed (5/5 acceptance criteria) — merged via PR #54 | #21 |
+| Patient profile page (view/edit): patient detail view now loads from Supabase, includes editable profile data, and shows a read-only visit history table with sorting, filtering, and pagination | #22 |
+| Emergency contacts on patient profile: add/edit/remove contact management is wired into the patient detail flow with server-side persistence and safe error handling | #23 |
 | Password generator entropy hardening: switched temp password index selection to `crypto.randomInt` to remove modulo bias; added unit tests and refreshed review/QA/security reports | — |
 | Diagnosis entry: catalog picker + visit diagnoses — PR #59 | #33 |
 | Prescription + prescription items (doctor) — PR #60 | #34 |
@@ -75,11 +77,6 @@
 
 | PR | Title | Status |
 |----|-------|--------|
-<<<<<<< HEAD
-=======
-| #64 | feat(queue): add visit status workflow and patient queue view (#25) | ✅ Open |
-| #63 | fix(next-task): spawn developer agent for implementation step | ✅ Open |
->>>>>>> feat/visit-status-queue
 | #62 | feat(visit): add visit creation flow for receptionist (#24) | ✅ Open |
 | #61 | feat(pages): implement list pages with pagination | ✅ Open |
 | #60 | feat(prescription): add prescription form with dynamic items (#34) | ✅ Open |

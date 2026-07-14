@@ -1,53 +1,108 @@
-import { createClient } from "@/lib/supabase/server";
-import { PatientsTable } from "./patients-table";
+import { PatientsDataTable, type PatientTableRow } from "@/components/features/patients/patients-data-table"
+import { createClient } from "@/lib/supabase/server"
 
-export interface PatientData {
-  userId: string;
-  name: string;
-  email: string;
-  nrc: string | null;
-  dob: string | null;
-  gender: string | null;
-  isActive: boolean;
+interface PatientProfileSummary {
+  dob: string | null
+  gender: string | null
+}
+
+function normalizePatientSummary(
+  value: PatientProfileSummary | PatientProfileSummary[] | null | undefined
+): PatientProfileSummary | null {
+  if (!value) return null
+  return Array.isArray(value) ? (value[0] ?? null) : value
 }
 
 export default async function PatientsPage() {
-  const supabase = await createClient();
+  const supabase = await createClient()
 
-  // Fetch ALL patient profiles
-  const { data: profiles, error: profilesError } = await supabase
-    .from("patient_profiles")
-    .select("user_id, nrc, dob, gender");
+  const { data: patientRole, error: roleError } = await supabase
+    .from("roles")
+    .select("id")
+    .eq("name", "patient")
+    .maybeSingle()
 
-  if (profilesError) {
-    console.error("Error fetching profiles:", profilesError);
-  }
-
-  // Fetch user data for these patients
-  const userIds = profiles?.map(p => p.user_id) || [];
-  const { data: users } = userIds.length > 0
-    ? await supabase.from("users").select("id, name, email, is_active").in("id", userIds)
-    : { data: [] };
-
-  const userMap = new Map(users?.map(u => [u.id, u]) || []);
-
-  const patients: PatientData[] = (profiles || []).map(p => ({
-    userId: p.user_id,
-    name: userMap.get(p.user_id)?.name || "Unknown",
-    email: userMap.get(p.user_id)?.email || "—",
-    nrc: p.nrc,
-    dob: p.dob,
-    gender: p.gender,
-    isActive: userMap.get(p.user_id)?.is_active ?? false,
-  }));
-
-  return (
-    <div className="space-y-6">
+  if (roleError) {
+    console.error("[PatientsPage] failed to load patient role", roleError)
+    return (
       <div>
         <h1 className="text-2xl font-bold text-foreground mb-2">Patients</h1>
-        <p className="text-muted-foreground">Manage patient records</p>
+        <p className="text-muted-foreground">Unable to load patients right now. Please try again.</p>
       </div>
-      <PatientsTable data={patients} />
+    )
+  }
+
+  if (!patientRole) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Patients</h1>
+        <p className="text-muted-foreground">No patients found.</p>
+      </div>
+    )
+  }
+
+  const { data: patientAssignments, error: assignmentError } = await supabase
+    .from("user_roles")
+    .select("user_id")
+    .eq("role_id", patientRole.id)
+
+  if (assignmentError) {
+    console.error("[PatientsPage] failed to load patient assignments", assignmentError)
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Patients</h1>
+        <p className="text-muted-foreground">Unable to load patients right now. Please try again.</p>
+      </div>
+    )
+  }
+
+  const patientIds = [...new Set((patientAssignments ?? []).map((row) => row.user_id))]
+
+  if (patientIds.length === 0) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Patients</h1>
+        <p className="text-muted-foreground">No patients found.</p>
+      </div>
+    )
+  }
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, name, email, phone, patient_profiles(dob, gender)")
+    .in("id", patientIds)
+    .order("name", { ascending: true })
+
+  if (error) {
+    console.error("[PatientsPage] failed to fetch patients", error)
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Patients</h1>
+        <p className="text-muted-foreground">Unable to load patients right now. Please try again.</p>
+      </div>
+    )
+  }
+
+  const patients: PatientTableRow[] = (data ?? []).map((patient) => {
+    const profile = normalizePatientSummary(patient.patient_profiles)
+
+    return {
+      id: patient.id,
+      name: patient.name,
+      email: patient.email,
+      phone: patient.phone,
+      dob: profile?.dob ?? null,
+      gender: profile?.gender ?? null,
+    }
+  })
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Patients</h1>
+        <p className="text-muted-foreground">Browse and open patient profiles.</p>
+      </div>
+      <PatientsDataTable data={patients} />
     </div>
-  );
+  )
 }

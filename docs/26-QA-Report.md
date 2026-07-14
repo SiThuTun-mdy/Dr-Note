@@ -2,16 +2,16 @@
 
 | Field | Value |
 |---|---|
-| **Date** | 2026-07-13 |
+| **Date** | 2026-07-14 |
 | **Phase** | Phase 6: QA |
-| **Scope** | Branch `feat/staff-onboarding`, commit `2dd0cc0` |
+| **Scope** | Branch `feat/patient-profile-view-edit`, commit `e174758` |
 | **Tester** | Copilot CLI |
 
 ---
 
 ## Executive Summary
 
-QA was executed for the password randomness refactor and accompanying unit test additions. No Critical or High defects were found.
+QA was executed for the patient list and patient visit-history data-table updates. No Critical or High defects were found.
 
 | Metric | Value |
 |---|---|
@@ -31,12 +31,7 @@ QA was executed for the password randomness refactor and accompanying unit test 
 | TypeScript (`npx tsc --noEmit`) | ✅ Pass |
 | Build (`npm run build`) | ✅ Pass |
 | Unit tests (`npm run test`) | ✅ Pass |
-
-### Added/Updated Tests
-
-| File | Purpose |
-|---|---|
-| `app/src/lib/utils/password.test.ts` | Verifies default length, custom length, and charset constraints for generated temp passwords. |
+| Security scan (`bash scripts/safe-code-check.sh`) | ⚪ Not present in this repo |
 
 ---
 
@@ -48,10 +43,10 @@ No defects recorded for this QA cycle.
 
 ## Risk Assessment
 
-Low risk. The change is isolated to temp password generation and increases cryptographic quality by using `crypto.randomInt`.
+Low risk. The change is read-only, uses existing Supabase helpers, and keeps visit rendering in isolated table components.
 
 ---
 
 ## QA Decision
 
-**PASS** — Approved to commit/push and open PR.
+**PASS** — Approved to continue to review/merge flow.
