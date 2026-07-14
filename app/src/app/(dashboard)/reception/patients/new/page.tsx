@@ -36,7 +36,7 @@ export default async function NewPatientPage() {
 
   return (
     <div className="max-w-lg">
-      <h2 className="text-2xl font-bold mb-6">Register patient</h2>
+      <h2 className="text-2xl font-bold mb-6">Patient Registration</h2>
       <PatientRegistrationForm />
     </div>
   )
