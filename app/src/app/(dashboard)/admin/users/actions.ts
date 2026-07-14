@@ -34,32 +34,30 @@ export async function getUsers(): Promise<{ data: UserWithRoles[] | null; error:
   const roleName = (userRoles?.[0] as unknown as { roles: { name: string } | null })?.roles?.name
   if (roleName !== "admin") return { data: null, error: "Unauthorized" }
 
-  // Fetch all users
+  // Fetch all users with their roles in a single joined query, excluding patients
   const { data: users, error: usersError } = await supabase
     .from("users")
-    .select("id, name, email, is_active, created_at")
+    .select("id, name, email, is_active, created_at, user_roles!inner(roles!inner(id, name))")
+    .neq("user_roles.roles.name", "patient")
     .order("created_at", { ascending: false })
 
   if (usersError) return { data: null, error: "Failed to fetch users" }
 
-  // Fetch all roles for each user
-  const { data: allUserRoles } = await supabase
-    .from("user_roles")
-    .select("user_id, roles(id, name)")
-
-  // Group roles by user
-  const rolesByUser = new Map<string, { id: number; name: string }[]>()
-  for (const ur of allUserRoles || []) {
-    const roles = rolesByUser.get(ur.user_id) || []
-    const role = (ur as unknown as { roles: { id: number; name: string } | null }).roles
-    if (role) roles.push(role)
-    rolesByUser.set(ur.user_id, roles)
+  // Dedupe by user id — supabase-js has no distinct modifier
+  const usersById = new Map<string, UserWithRoles>()
+  for (const u of users || []) {
+    const { user_roles, ...rest } = u as unknown as UserWithRoles & {
+      user_roles: { roles: { id: number; name: string } | null }[]
+    }
+    if (usersById.has(rest.id)) continue
+    usersById.set(rest.id, {
+      ...rest,
+      roles: (user_roles || [])
+        .map((ur) => ur.roles)
+        .filter((r): r is { id: number; name: string } => r !== null),
+    })
   }
-
-  const result: UserWithRoles[] = (users || []).map((u) => ({
-    ...u,
-    roles: rolesByUser.get(u.id) || [],
-  }))
+  const result: UserWithRoles[] = Array.from(usersById.values())
 
   return { data: result, error: null }
 }
