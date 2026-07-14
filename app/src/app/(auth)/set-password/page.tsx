@@ -82,7 +82,7 @@ export default function SetPasswordPage() {
                 : "Your password has been set. Please contact the clinic to complete your account setup."}
             </div>
             {canLogin && (
-              <Button className="w-full" render={<Link href="/login" />}>
+              <Button className="w-full" nativeButton={false} render={<Link href="/login" />}>
                 Go to login
               </Button>
             )}

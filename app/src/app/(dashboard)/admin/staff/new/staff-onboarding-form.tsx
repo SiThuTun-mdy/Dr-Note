@@ -165,7 +165,7 @@ export function StaffOnboardingForm() {
           <Button type="button" onClick={addAnother}>
             Add another staff member
           </Button>
-          <Button variant="outline" render={<Link href="/admin/users" />}>
+          <Button variant="outline" nativeButton={false} render={<Link href="/admin/users" />}>
             Back to user management
           </Button>
         </div>

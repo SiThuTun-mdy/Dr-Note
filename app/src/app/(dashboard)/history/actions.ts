@@ -1,19 +1,17 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import type { VisitStatus, DiagnosisBadge } from "@/types/visit"
+import type { DiagnosisBadge } from "@/types/visit"
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export type { VisitStatus, DiagnosisBadge }
-
 export interface VisitHistoryRow {
   id: string
   patient_id: string
   doctor_id: string | null
-  status: VisitStatus
+  status: string
   chief_complaint: string | null
   diagnosis_note: string | null
   visit_date: string
@@ -134,7 +132,7 @@ export async function getPatientHistory(
     id: v.id,
     patient_id: v.patient_id,
     doctor_id: v.doctor_id,
-    status: v.status as VisitStatus,
+    status: v.status,
     chief_complaint: v.chief_complaint,
     diagnosis_note: v.diagnosis_note,
     visit_date: v.visit_date,

@@ -89,7 +89,7 @@ function VisitTimelineRow({
           {formatDate(visit.visit_date)}
         </div>
 
-        <StatusBadge status={visit.status} />
+        <StatusBadge status={visit.status as VisitStatus} />
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-[140px]">
           <User className="h-4 w-4" />
