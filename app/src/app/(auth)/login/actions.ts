@@ -133,7 +133,9 @@ export async function login(values: LoginInput): Promise<LoginResult> {
     doctor: "/doctor",
     nurse: "/nurse",
     receptionist: "/reception",
-    patient: "/patient",
+    // Patients have no shared dashboard — their landing page is their own
+    // record, the only path the middleware allowlist grants them.
+    patient: `/patients/${data.user.id}`,
   }
 
   // Redirect to role-specific dashboard or error if invalid role

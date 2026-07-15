@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Menu, Bell, LogOut, User, Settings } from "lucide-react";
 import {
   DropdownMenu,
@@ -82,7 +83,7 @@ export function Topbar({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/profile" />}>
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
