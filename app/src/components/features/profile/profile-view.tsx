@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import {
   updateStaffProfile,
   type StaffProfileData,
-} from "@/components/features/staff/staff-profile-actions"
+} from "@/components/features/profile/profile-actions"
 import {
   staffProfileUpdateSchema,
   type StaffProfileUpdateInput,

@@ -31,7 +31,7 @@ describe('staff profile actions', () => {
     it('rejects unauthenticated users', async () => {
       mockGetUser.mockResolvedValue({ data: { user: null } })
 
-      const { getStaffProfile } = await import('./staff-profile-actions')
+      const { getStaffProfile } = await import('./profile-actions')
       const result = await getStaffProfile('someone-else')
 
       expect(result.success).toBe(false)
@@ -42,7 +42,7 @@ describe('staff profile actions', () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'doctor-1' } } })
       mockFrom.mockReturnValueOnce(mockRoles(['doctor']))
 
-      const { getStaffProfile } = await import('./staff-profile-actions')
+      const { getStaffProfile } = await import('./profile-actions')
       const result = await getStaffProfile('someone-else')
 
       expect(result.success).toBe(false)
@@ -55,7 +55,7 @@ describe('staff profile actions', () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'nurse-1' } } })
       mockFrom.mockReturnValueOnce(mockRoles(['nurse']))
 
-      const { updateStaffProfile } = await import('./staff-profile-actions')
+      const { updateStaffProfile } = await import('./profile-actions')
       const result = await updateStaffProfile('someone-else', {
         name: 'New Name',
         phone: '',
@@ -66,7 +66,7 @@ describe('staff profile actions', () => {
     })
 
     it('rejects invalid input', async () => {
-      const { updateStaffProfile } = await import('./staff-profile-actions')
+      const { updateStaffProfile } = await import('./profile-actions')
       const result = await updateStaffProfile('user-1', { name: '', phone: '' })
 
       expect(result.success).toBe(false)
@@ -112,7 +112,7 @@ describe('staff profile actions', () => {
         throw new Error(`unexpected table ${table}`)
       })
 
-      const { updateStaffProfile } = await import('./staff-profile-actions')
+      const { updateStaffProfile } = await import('./profile-actions')
       const result = await updateStaffProfile('doctor-1', {
         name: 'New Name',
         phone: '',

@@ -3,8 +3,8 @@ import { notFound } from "next/navigation"
 
 import { createClient } from "@/lib/supabase/server"
 import { userHasRole } from "@/lib/auth/roles"
-import { getStaffProfile } from "@/components/features/staff/staff-profile-actions"
-import { StaffProfileView } from "@/components/features/staff/staff-profile-view"
+import { getStaffProfile } from "@/components/features/profile/profile-actions"
+import { StaffProfileView } from "@/components/features/profile/profile-view"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 

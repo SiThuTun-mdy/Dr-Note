@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { getUserRoles } from "@/lib/auth/roles"
-import { getStaffProfile } from "@/components/features/staff/staff-profile-actions"
-import { StaffProfileView } from "@/components/features/staff/staff-profile-view"
+import { getStaffProfile } from "@/components/features/profile/profile-actions"
+import { StaffProfileView } from "@/components/features/profile/profile-view"
 
 export default async function MyProfilePage() {
   const supabase = await createClient()
