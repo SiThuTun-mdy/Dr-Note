@@ -14,6 +14,7 @@ import {
   staffProfileUpdateSchema,
   type StaffProfileUpdateInput,
 } from "@/lib/validators/profile"
+import { DepartmentSelect } from "@/components/features/shared/department-select"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -129,9 +130,11 @@ export function ProfileEditForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Department (optional)</FormLabel>
-                <FormControl>
-                  <Input disabled={isSubmitting} {...field} />
-                </FormControl>
+                <DepartmentSelect
+                  disabled={isSubmitting}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                />
                 <FormMessage />
               </FormItem>
             )}

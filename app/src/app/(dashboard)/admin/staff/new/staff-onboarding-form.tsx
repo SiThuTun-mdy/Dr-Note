@@ -14,6 +14,7 @@ import {
   staffRoleOptions,
   type StaffOnboardingInput,
 } from "@/lib/validators/staff"
+import { DepartmentSelect } from "@/components/features/shared/department-select"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -286,13 +287,11 @@ export function StaffOnboardingForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Department *</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="General Medicine"
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
+              <DepartmentSelect
+                disabled={isSubmitting}
+                value={field.value}
+                onValueChange={field.onChange}
+              />
               <FormMessage />
             </FormItem>
           )}
