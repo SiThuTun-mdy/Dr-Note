@@ -86,9 +86,11 @@ export default function ScreeningPage() {
       const result = await createScreening(visitId, values)
       if (result.success) {
         toast.success("Screening recorded", {
-          description: "Visit advanced to doctor consultation.",
+          description: result.doctorAssigned
+            ? "Visit advanced to doctor consultation."
+            : "Vitals saved. Assign a doctor to proceed.",
         })
-        router.push("/queue")
+        router.push("/screening")
       } else {
         toast.error(result.error || "Failed to save screening")
       }

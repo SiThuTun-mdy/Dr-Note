@@ -106,9 +106,9 @@ export function VisitCreationForm() {
 
   const selectPatient = (patient: Patient) => {
     setSelectedPatient(patient)
-    form.setValue("patientId", patient.id)
     setPatientResults([])
     setPatientQuery("")
+    form.setValue("patientId", patient.id)
   }
 
   const clearPatient = () => {
@@ -118,9 +118,9 @@ export function VisitCreationForm() {
 
   const selectDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor)
-    form.setValue("doctorId", doctor.id)
     setDoctorResults([])
     setDoctorQuery("")
+    form.setValue("doctorId", doctor.id)
   }
 
   const clearDoctor = () => {
