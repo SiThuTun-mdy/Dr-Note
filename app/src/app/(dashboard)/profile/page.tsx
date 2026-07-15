@@ -1,0 +1,51 @@
+import { createClient } from "@/lib/supabase/server"
+import { getUserRoles } from "@/lib/auth/roles"
+import { getStaffProfile } from "@/components/features/staff/staff-profile-actions"
+import { StaffProfileView } from "@/components/features/staff/staff-profile-view"
+
+export default async function MyProfilePage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Access denied</h1>
+        <p className="mt-2">You must be logged in to view your profile.</p>
+      </div>
+    )
+  }
+
+  const result = await getStaffProfile(user.id)
+
+  if (!result.success || !result.data) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Something went wrong</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          We couldn&apos;t load your profile right now. Please try again.
+        </p>
+      </div>
+    )
+  }
+
+  const roles = await getUserRoles(supabase, user.id)
+
+  return (
+    <div className="p-4 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">My profile</h1>
+        <p className="text-sm text-muted-foreground">
+          View and update your personal details.
+        </p>
+      </div>
+      <StaffProfileView
+        userId={user.id}
+        initialData={result.data}
+        canEditWorkInfo={roles.includes("admin")}
+      />
+    </div>
+  )
+}

@@ -61,6 +61,11 @@ const navigationByRole: Record<
       href: "/appointments",
       icon: <Calendar className="h-5 w-5" />,
     },
+    {
+      name: "My profile",
+      href: "/profile",
+      icon: <User className="h-5 w-5" />,
+    },
   ],
   nurse: [
     {
@@ -84,6 +89,11 @@ const navigationByRole: Record<
       icon: <Stethoscope className="h-5 w-5" />,
     },
     { name: "Notes", href: "/notes", icon: <FileText className="h-5 w-5" /> },
+    {
+      name: "My profile",
+      href: "/profile",
+      icon: <User className="h-5 w-5" />,
+    },
   ],
   doctor: [
     {
@@ -115,6 +125,11 @@ const navigationByRole: Record<
       name: "History",
       href: "/history",
       icon: <History className="h-5 w-5" />,
+    },
+    {
+      name: "My profile",
+      href: "/profile",
+      icon: <User className="h-5 w-5" />,
     },
   ],
   admin: [
@@ -151,6 +166,11 @@ const navigationByRole: Record<
       name: "Audit log",
       href: "/admin/audit",
       icon: <Activity className="h-5 w-5" />,
+    },
+    {
+      name: "My profile",
+      href: "/profile",
+      icon: <User className="h-5 w-5" />,
     },
   ],
   // Patients only see their own record page — no staff navigation.

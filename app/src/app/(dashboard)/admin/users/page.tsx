@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
-import { MoreHorizontal, UserPlus, UserMinus } from "lucide-react"
+import { MoreHorizontal, UserPlus, UserMinus, User as UserIcon } from "lucide-react"
 import {
   getUsers,
   getRoles,
@@ -161,7 +161,14 @@ export default function AdminUsersPage() {
             columns={COLUMNS}
             renderRow={(user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Link
+                    href={`/admin/users/${user.id}`}
+                    className="hover:underline"
+                  >
+                    {user.name}
+                  </Link>
+                </TableCell>
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
@@ -207,6 +214,13 @@ export default function AdminUsersPage() {
                       <MoreHorizontal className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        render={<Link href={`/admin/users/${user.id}`} />}
+                      >
+                        <UserIcon className="mr-2 h-4 w-4" />
+                        View profile
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       {getAvailableRoles(user.id).length > 0 && (
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>

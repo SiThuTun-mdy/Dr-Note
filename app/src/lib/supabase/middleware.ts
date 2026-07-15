@@ -17,10 +17,10 @@ function dashboardFor(roleName: string | undefined, userId: string): string {
 
 // Allowed route prefixes per role
 const roleRoutes: Record<string, string[]> = {
-  admin: ['/admin', '/queue', '/patients', '/history', '/api'],
-  doctor: ['/doctor', '/queue', '/patients', '/my-queue', '/consultation', '/consultations', '/prescriptions', '/history', '/api'],
-  nurse: ['/nurse', '/queue', '/patients', '/screening', '/vitals', '/notes', '/api'],
-  receptionist: ['/reception', '/queue', '/patients', '/appointments', '/history', '/api'],
+  admin: ['/admin', '/queue', '/patients', '/history', '/profile', '/api'],
+  doctor: ['/doctor', '/queue', '/patients', '/my-queue', '/consultation', '/consultations', '/prescriptions', '/history', '/profile', '/api'],
+  nurse: ['/nurse', '/queue', '/patients', '/screening', '/vitals', '/notes', '/profile', '/api'],
+  receptionist: ['/reception', '/queue', '/patients', '/appointments', '/history', '/profile', '/api'],
 }
 
 export async function updateSession(request: NextRequest) {

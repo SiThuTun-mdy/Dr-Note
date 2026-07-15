@@ -2,16 +2,16 @@
 
 | Field | Value |
 |---|---|
-| **Date** | 2026-07-14 |
+| **Date** | 2026-07-15 |
 | **Phase** | Phase 5: Code Review |
-| **Scope** | Branch `feat/patient-profile-view-edit`, commit `e174758` |
+| **Scope** | Branch `feat/user-profile-view-edit` (staff-profile feature, working tree) |
 | **Reviewer** | Copilot CLI |
 
 ---
 
 ## Executive Summary
 
-The patient profile and visit-history changes follow the existing server-component + Supabase pattern, keep visit data read-only, and use shadcn/TanStack tables consistently with the rest of the app. No Critical or High findings were identified.
+The staff-profile implementation follows the project architecture (server actions + zod validation + feature-scoped components), but one **High** security finding blocks approval: the current RLS update policy on `staff_profiles` allows non-admin users to update their own staff work fields directly.
 
 ---
 
@@ -23,7 +23,11 @@ None.
 
 ### High
 
-None.
+1. **RLS authorization bypass for staff work fields**
+   - **What:** The app logic intends `staff_code` and `department` to be admin-managed (`users.manage`) only, but the DB policy still allows self-updates.
+   - **Where:** `supabase/migrations/00001_initial_schema.sql` → `create policy staff_profiles_update ... using (user_id = auth.uid() or has_permission('users.manage'));`
+   - **Impact:** Any authenticated staff user can bypass the server action restriction and update their own `staff_profiles` row through direct Supabase calls.
+   - **Recommendation:** Tighten policy to admin-only updates (and enforce with `with check`), aligned with the feature rule in `src/components/features/staff/staff-profile-actions.ts`.
 
 ### Medium
 
@@ -39,19 +43,19 @@ None.
 
 | Area | Result | Notes |
 |---|---|---|
-| Architecture consistency | ✅ Pass | Server Components fetch Supabase data; client tables are presentation-only. |
-| TypeScript quality | ✅ Pass | New table row types are explicit and compile cleanly. |
-| Framework best practices | ✅ Pass | Uses App Router conventions and shadcn primitives. |
-| Database usage | ✅ Pass | Reads are scoped to `users` and `visits` via Supabase queries. |
-| Auth/RBAC | ✅ Pass | Existing patient read guard remains in place before visit lookup. |
-| RLS/data access policies | ✅ Pass | No service-role usage or client-side write path introduced. |
-| Input validation | ✅ N/A | No new user-input mutation path added. |
-| Error handling | ✅ Pass | Query failures return safe fallback UI and log server-side context. |
-| Security risks | ✅ Pass | No new sensitive data exposure or unsafe HTML rendering. |
-| Maintainability | ✅ Pass | Reusable data-table components keep the feature split cleanly. |
+| Architecture consistency | ✅ Pass | Uses feature modules, server actions for writes, and server components for reads. |
+| TypeScript quality | ✅ Pass | Strong typed action results and validation input types. |
+| Framework best practices | ✅ Pass | App Router + server/client split is appropriate. |
+| Database usage | ✅ Pass | Uses Supabase server client and relation selects correctly. |
+| Auth/RBAC | ⚠️ Issue found | App-level admin guard exists, but DB-level policy is too permissive. |
+| RLS/data access policies | ❌ Fail | `staff_profiles_update` permits self-update and conflicts with admin-only work-field intent. |
+| Input validation | ✅ Pass | `staffProfileUpdateSchema` validates all submitted form fields. |
+| Error handling | ✅ Pass | Action paths return user-safe errors and log server-side context. |
+| Security risks | ❌ Fail | High-severity authorization bypass at RLS layer. |
+| Maintainability | ✅ Pass | Clear separation between data action and form/view component. |
 
 ---
 
 ## Decision
 
-**Approved for QA (Phase 6).** No blocking defects found.
+**Not approved for QA sign-off / merge** until the High RLS finding is resolved.

@@ -48,6 +48,7 @@
 | Task | Issue | Priority |
 |------|-------|----------|
 | Production release: prod env config, public URL, deployed smoke test | #40 | 🔴 demo-blocker |
+| Staff profile feature: review + QA completed, blocked by High RLS defect (`staff_profiles_update` self-update bypass) | — | 🔴 security-blocker |
 
 ### 📋 Backlog
 
