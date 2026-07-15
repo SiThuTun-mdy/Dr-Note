@@ -73,12 +73,19 @@ describe('staff profile actions', () => {
       expect(result.fieldErrors?.name).toBeTruthy()
     })
 
-    it('does not touch staff_profiles when a non-admin updates their own profile', async () => {
+    it('updates own department but never staff_code when a non-admin edits their own profile', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'doctor-1' } } })
-      const touchedTables: string[] = []
+      const staffProfileUpdates: Record<string, unknown>[] = []
       mockFrom.mockImplementation((table: string) => {
-        touchedTables.push(table)
         if (table === 'user_roles') return mockRoles(['doctor'])
+        if (table === 'staff_profiles') {
+          return {
+            update: vi.fn().mockImplementation((payload: Record<string, unknown>) => {
+              staffProfileUpdates.push(payload)
+              return { eq: vi.fn().mockResolvedValue({ error: null }) }
+            }),
+          }
+        }
         if (table === 'users') {
           return {
             update: vi.fn().mockReturnValue({
@@ -100,7 +107,8 @@ describe('staff profile actions', () => {
                     email: 'doctor@drnote.com',
                     phone: null,
                     is_active: true,
-                    staff_profiles: { staff_code: 'DOC001', department: 'GP' },
+                    created_at: '2026-01-01T00:00:00Z',
+                    staff_profiles: { staff_code: 'DOC001', department: 'Cardiology' },
                     user_roles: [{ roles: { name: 'doctor' } }],
                   },
                   error: null,
@@ -117,11 +125,11 @@ describe('staff profile actions', () => {
         name: 'New Name',
         phone: '',
         staff_code: 'HACKED',
-        department: 'HACKED',
+        department: 'Cardiology',
       })
 
       expect(result.success).toBe(true)
-      expect(touchedTables).not.toContain('staff_profiles')
+      expect(staffProfileUpdates).toEqual([{ department: 'Cardiology' }])
       expect(result.data?.staffCode).toBe('DOC001')
     })
   })

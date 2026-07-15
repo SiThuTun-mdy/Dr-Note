@@ -5,7 +5,7 @@ import { getUserRoles } from "@/lib/auth/roles"
 import {
   staffProfileUpdateSchema,
   type StaffProfileUpdateInput,
-} from "@/lib/validators/staff-profile"
+} from "@/lib/validators/profile"
 
 export interface StaffProfileData {
   id: string
@@ -16,6 +16,7 @@ export interface StaffProfileData {
   department: string | null
   isActive: boolean
   roles: string[]
+  memberSince: string
 }
 
 interface ActionResult<T = undefined> {
@@ -31,6 +32,7 @@ interface StaffProfileRow {
   email: string
   phone: string | null
   is_active: boolean
+  created_at: string
   staff_profiles:
     | { staff_code: string; department: string | null }
     | { staff_code: string; department: string | null }[]
@@ -56,6 +58,7 @@ function normalizeStaffProfile(row: StaffProfileRow): StaffProfileData {
     roles: (row.user_roles ?? [])
       .map((ur) => ur.roles?.name)
       .filter((name): name is string => !!name),
+    memberSince: row.created_at,
   }
 }
 
@@ -66,7 +69,7 @@ async function fetchStaffProfile(
   const { data, error } = await supabase
     .from("users")
     .select(
-      "id, name, email, phone, is_active, staff_profiles(staff_code, department), user_roles(roles(name))"
+      "id, name, email, phone, is_active, created_at, staff_profiles(staff_code, department), user_roles(roles(name))"
     )
     .eq("id", userId)
     .maybeSingle()
@@ -152,8 +155,8 @@ export async function updateStaffProfile(
     return { success: false, error: "Unable to save changes. Please try again." }
   }
 
-  // Work fields are admin-managed (users.manage). Non-admin submissions
-  // never touch staff_profiles, even for their own row.
+  // Staff code is admin-managed (users.manage); department is self-service
+  // per issue #73. Non-admin submissions never change staff_code.
   if (isAdmin && staff_code) {
     const { error: profileError } = await supabase
       .from("staff_profiles")
@@ -171,6 +174,16 @@ export async function updateStaffProfile(
         }
       }
       console.error("[StaffProfile] staff_profiles upsert failed", profileError)
+      return { success: false, error: "Unable to save changes. Please try again." }
+    }
+  } else {
+    const { error: profileError } = await supabase
+      .from("staff_profiles")
+      .update({ department: department || null })
+      .eq("user_id", userId)
+
+    if (profileError) {
+      console.error("[StaffProfile] staff_profiles update failed", profileError)
       return { success: false, error: "Unable to save changes. Please try again." }
     }
   }
