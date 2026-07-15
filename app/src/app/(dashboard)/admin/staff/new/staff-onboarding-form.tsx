@@ -175,6 +175,8 @@ export function StaffOnboardingForm() {
   }
 
   return (
+    <Card>
+      <CardContent>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
@@ -311,5 +313,7 @@ export function StaffOnboardingForm() {
         </div>
       </form>
     </Form>
+    </CardContent>
+    </Card>
   )
 }
