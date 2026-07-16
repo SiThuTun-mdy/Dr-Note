@@ -104,18 +104,18 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
     }
 
     let cancelled = false
-    setIsSearchingDoctor(true)
-
-    searchDoctors(debouncedDoctorQuery)
-      .then((results) => {
+    const search = async () => {
+      setIsSearchingDoctor(true)
+      try {
+        const results = await searchDoctors(debouncedDoctorQuery)
         if (!cancelled) setDoctorResults(results)
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) setDoctorResults([])
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setIsSearchingDoctor(false)
-      })
+      }
+    }
+    search()
 
     return () => { cancelled = true }
   }, [debouncedDoctorQuery])
