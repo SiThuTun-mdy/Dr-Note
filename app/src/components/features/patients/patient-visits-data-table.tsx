@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useTransition } from "react"
+import * as React from "react";
+import { useTransition } from "react";
 import {
   ArrowUpDown,
   ChevronDown,
@@ -11,39 +11,42 @@ import {
   CheckCircle2,
   Pill,
   Activity,
-} from "lucide-react"
-import { toast } from "sonner"
+} from "lucide-react";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/ui/data-table"
-import { TableCell, TableRow } from "@/components/ui/table"
-import { StatusBadge } from "@/components/features/shared/StatusBadge"
-import type { VisitStatus } from "@/components/features/shared/StatusBadge"
-import type { DiagnosisBadge } from "@/types/visit"
-import { transitionVisitStatus } from "@/app/(dashboard)/queue/actions"
-import { getAvailableActions } from "@/lib/utils/visit-actions"
-import { getVisitDetail, type VisitDetail } from "@/app/(dashboard)/patients/[id]/actions"
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/ui/data-table";
+import { TableCell, TableRow } from "@/components/ui/table";
+import { StatusBadge } from "@/components/features/shared/StatusBadge";
+import type { VisitStatus } from "@/components/features/shared/StatusBadge";
+import type { DiagnosisBadge } from "@/types/visit";
+import { transitionVisitStatus } from "@/app/(dashboard)/queue/actions";
+import { getAvailableActions } from "@/lib/utils/visit-actions";
+import {
+  getVisitDetail,
+  type VisitDetail,
+} from "@/app/(dashboard)/patients/[id]/actions";
 
 export interface PatientVisitRow {
-  id: string
-  patientId: string
-  visitDate: string
-  status: string
-  visitType: string | null
-  chiefComplaint: string | null
+  id: string;
+  patientId: string;
+  visitDate: string;
+  status: string;
+  visitType: string | null;
+  chiefComplaint: string | null;
 }
 
-type SortKey = "visitDate" | "status"
-type SortDirection = "asc" | "desc"
+type SortKey = "visitDate" | "status";
+type SortDirection = "asc" | "desc";
 
 function formatVisitDate(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
-  })
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -54,7 +57,7 @@ const diagnosisTypeStyles: Record<string, string> = {
   primary: "bg-blue-100 text-blue-800",
   secondary: "bg-gray-100 text-gray-800",
   suspected: "bg-amber-100 text-amber-800",
-}
+};
 
 function DiagnosisBadgeComponent({ d }: { d: DiagnosisBadge }) {
   return (
@@ -62,9 +65,9 @@ function DiagnosisBadgeComponent({ d }: { d: DiagnosisBadge }) {
       className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${diagnosisTypeStyles[d.type] ?? diagnosisTypeStyles.secondary}`}
       title={`${d.type}: ${d.title}`}
     >
-      {d.code}
+      {d.code} - {d.title}
     </span>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -72,18 +75,28 @@ function DiagnosisBadgeComponent({ d }: { d: DiagnosisBadge }) {
 // ---------------------------------------------------------------------------
 
 function ExpandedVisitDetail({ detail }: { detail: VisitDetail }) {
-  const s = detail.screening
+  const s = detail.screening;
   const vitals = s
-    ? [
-        s.bp_systolic != null && s.bp_diastolic != null && { label: "BP", value: `${s.bp_systolic}/${s.bp_diastolic}` },
+    ? ([
+        s.bp_systolic != null &&
+          s.bp_diastolic != null && {
+            label: "BP",
+            value: `${s.bp_systolic}/${s.bp_diastolic}`,
+          },
         s.heart_rate != null && { label: "HR", value: `${s.heart_rate} bpm` },
-        s.temperature_c != null && { label: "Temp", value: `${s.temperature_c}°C` },
-        s.oxygen_saturation != null && { label: "SpO₂", value: `${s.oxygen_saturation}%` },
+        s.temperature_c != null && {
+          label: "Temp",
+          value: `${s.temperature_c}°C`,
+        },
+        s.oxygen_saturation != null && {
+          label: "SpO₂",
+          value: `${s.oxygen_saturation}%`,
+        },
         s.weight_kg != null && { label: "Weight", value: `${s.weight_kg} kg` },
         s.height_cm != null && { label: "Height", value: `${s.height_cm} cm` },
         s.bmi != null && { label: "BMI", value: Math.round(s.bmi).toString() },
-      ].filter(Boolean) as Array<{ label: string; value: string }>
-    : []
+      ].filter(Boolean) as Array<{ label: string; value: string }>)
+    : [];
 
   return (
     <TableRow>
@@ -94,11 +107,15 @@ function ExpandedVisitDetail({ detail }: { detail: VisitDetail }) {
             <h4 className="font-semibold text-foreground">Visit Details</h4>
             <div>
               <span className="text-muted-foreground">Chief complaint: </span>
-              <span className="text-foreground">{detail.chief_complaint || "—"}</span>
+              <span className="text-foreground">
+                {detail.chief_complaint || "—"}
+              </span>
             </div>
             {detail.diagnosis_note && (
               <div>
-                <span className="text-muted-foreground">Doctor&apos;s note: </span>
+                <span className="text-muted-foreground">
+                  Doctor&apos;s note:{" "}
+                </span>
                 <span className="text-foreground">{detail.diagnosis_note}</span>
               </div>
             )}
@@ -146,7 +163,7 @@ function ExpandedVisitDetail({ detail }: { detail: VisitDetail }) {
         </div>
       </TableCell>
     </TableRow>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -161,33 +178,36 @@ function VisitRow({
   onToggle,
   detail,
 }: {
-  visit: PatientVisitRow
-  userRole?: string | null
-  onStatusUpdate?: () => void
-  isExpanded: boolean
-  onToggle: () => void
-  detail: VisitDetail | null
+  visit: PatientVisitRow;
+  userRole?: string | null;
+  onStatusUpdate?: () => void;
+  isExpanded: boolean;
+  onToggle: () => void;
+  detail: VisitDetail | null;
 }) {
-  const [isPending, startTransition] = useTransition()
-  const actions = getAvailableActions(visit.status as VisitStatus, userRole ?? null)
+  const [isPending, startTransition] = useTransition();
+  const actions = getAvailableActions(
+    visit.status as VisitStatus,
+    userRole ?? null,
+  );
 
   function handleAction(targetStatus: VisitStatus) {
     startTransition(async () => {
-      const result = await transitionVisitStatus(visit.id, targetStatus)
+      const result = await transitionVisitStatus(visit.id, targetStatus);
       if (result.success) {
-        toast.success("Visit status updated")
-        onStatusUpdate?.()
+        toast.success("Visit status updated");
+        onStatusUpdate?.();
       } else {
-        toast.error(result.error ?? "Failed to update status")
+        toast.error(result.error ?? "Failed to update status");
       }
-    })
+    });
   }
 
   const actionIcons: Record<string, React.ReactNode> = {
     waiting_screening: <ClipboardCheck className="h-4 w-4" />,
     screening_with_doctor: <Stethoscope className="h-4 w-4" />,
     with_doctor_completed: <CheckCircle2 className="h-4 w-4" />,
-  }
+  };
 
   return (
     <>
@@ -215,7 +235,7 @@ function VisitRow({
         <TableCell onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-2">
             {actions.map((action) => {
-              const key = `${visit.status}_${action.target}`
+              const key = `${visit.status}_${action.target}`;
               return (
                 <Button
                   key={action.target}
@@ -227,24 +247,26 @@ function VisitRow({
                   {actionIcons[key]}
                   {action.label}
                 </Button>
-              )
+              );
             })}
           </div>
         </TableCell>
       </TableRow>
-      {isExpanded && (
-        detail ? (
+      {isExpanded &&
+        (detail ? (
           <ExpandedVisitDetail detail={detail} />
         ) : (
           <TableRow>
-            <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-4">
+            <TableCell
+              colSpan={5}
+              className="text-center text-sm text-muted-foreground py-4"
+            >
               Loading visit details…
             </TableCell>
           </TableRow>
-        )
-      )}
+        ))}
     </>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -258,11 +280,11 @@ function SortableHeader({
   direction,
   onSort,
 }: {
-  label: string
-  sortKey: SortKey
-  activeKey: SortKey | null
-  direction: SortDirection
-  onSort: (key: SortKey) => void
+  label: string;
+  sortKey: SortKey;
+  activeKey: SortKey | null;
+  direction: SortDirection;
+  onSort: (key: SortKey) => void;
 }) {
   return (
     <Button variant="ghost" onClick={() => onSort(sortKey)}>
@@ -277,7 +299,7 @@ function SortableHeader({
         }
       />
     </Button>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -285,62 +307,67 @@ function SortableHeader({
 // ---------------------------------------------------------------------------
 
 interface PatientVisitsDataTableProps {
-  data: PatientVisitRow[]
-  userRole?: string | null
-  onStatusUpdate?: () => void
+  data: PatientVisitRow[];
+  userRole?: string | null;
+  onStatusUpdate?: () => void;
 }
 
-export function PatientVisitsDataTable({ data, userRole, onStatusUpdate }: PatientVisitsDataTableProps) {
-  const [sortKey, setSortKey] = React.useState<SortKey | null>("visitDate")
-  const [sortDirection, setSortDirection] = React.useState<SortDirection>("desc")
-  const [expandedId, setExpandedId] = React.useState<string | null>(null)
-  const [details, setDetails] = React.useState<Record<string, VisitDetail>>({})
-  const [loadingId, setLoadingId] = React.useState<string | null>(null)
+export function PatientVisitsDataTable({
+  data,
+  userRole,
+  onStatusUpdate,
+}: PatientVisitsDataTableProps) {
+  const [sortKey, setSortKey] = React.useState<SortKey | null>("visitDate");
+  const [sortDirection, setSortDirection] =
+    React.useState<SortDirection>("desc");
+  const [expandedId, setExpandedId] = React.useState<string | null>(null);
+  const [details, setDetails] = React.useState<Record<string, VisitDetail>>({});
+  const [loadingId, setLoadingId] = React.useState<string | null>(null);
 
   const handleSort = React.useCallback(
     (key: SortKey) => {
       if (sortKey === key) {
-        setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
+        setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
       } else {
-        setSortKey(key)
-        setSortDirection("asc")
+        setSortKey(key);
+        setSortDirection("asc");
       }
     },
-    [sortKey]
-  )
+    [sortKey],
+  );
 
   const sortedData = React.useMemo(() => {
-    if (!sortKey) return data
+    if (!sortKey) return data;
     const sorted = [...data].sort((a, b) => {
       const [valueA, valueB] =
         sortKey === "visitDate"
           ? [a.visitDate, b.visitDate]
-          : [a.status, b.status]
-      return valueA.localeCompare(valueB)
-    })
-    return sortDirection === "asc" ? sorted : sorted.reverse()
-  }, [data, sortKey, sortDirection])
+          : [a.status, b.status];
+      return valueA.localeCompare(valueB);
+    });
+    return sortDirection === "asc" ? sorted : sorted.reverse();
+  }, [data, sortKey, sortDirection]);
 
   async function handleToggle(visitId: string) {
     if (expandedId === visitId) {
-      setExpandedId(null)
-      return
+      setExpandedId(null);
+      return;
     }
-    setExpandedId(visitId)
+    setExpandedId(visitId);
     // Fetch detail if not cached
     if (!details[visitId]) {
-      setLoadingId(visitId)
+      setLoadingId(visitId);
       try {
-        const detail = await getVisitDetail(visitId)
+        const detail = await getVisitDetail(visitId);
         if (detail) {
-          setDetails((prev) => ({ ...prev, [visitId]: detail }))
+          setDetails((prev) => ({ ...prev, [visitId]: detail }));
         } else {
-          toast.error("Could not load visit details")
+          toast.error("Could not load visit details");
         }
       } catch (e) {
-        toast.error("Failed to load visit details")
+        toast.error("Failed to load visit details");
       } finally {
-        setLoadingId(null)
+        setLoadingId(null);
       }
     }
   }
@@ -385,5 +412,5 @@ export function PatientVisitsDataTable({ data, userRole, onStatusUpdate }: Patie
       )}
       emptyMessage="No visits found."
     />
-  )
+  );
 }

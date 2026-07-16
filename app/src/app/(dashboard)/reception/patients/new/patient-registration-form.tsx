@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -51,6 +51,23 @@ export function PatientRegistrationForm() {
       address: "",
     },
   })
+
+  const dobValue = form.watch("dob")
+  const calculatedAge = useMemo(() => {
+    if (!dobValue) return null
+    const birth = new Date(dobValue)
+    if (Number.isNaN(birth.getTime())) return null
+    const now = new Date()
+    let age = now.getFullYear() - birth.getFullYear()
+    const monthDiff = now.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+      age--
+    }
+    return age >= 0 ? age : null
+  }, [dobValue])
+
+  // Max date for DOB input (today)
+  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], [])
 
   async function onSubmit(values: PatientRegistrationInput) {
     setIsSubmitting(true)
@@ -147,8 +164,18 @@ export function PatientRegistrationForm() {
                   <FormItem>
                     <FormLabel>Date of birth *</FormLabel>
                     <FormControl>
-                      <Input type="date" disabled={isSubmitting} {...field} />
+                      <Input
+                        type="date"
+                        max={todayStr}
+                        disabled={isSubmitting}
+                        {...field}
+                      />
                     </FormControl>
+                    {calculatedAge !== null && (
+                      <p className="text-xs text-muted-foreground">
+                        Age: {calculatedAge} year{calculatedAge !== 1 ? "s" : ""}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
