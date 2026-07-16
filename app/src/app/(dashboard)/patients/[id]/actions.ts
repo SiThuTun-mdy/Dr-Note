@@ -50,16 +50,7 @@ export async function getVisitDetail(visitId: string): Promise<VisitDetail | nul
   // 1. Visit core data
   const { data: visit, error: visitErr } = await supabase
     .from("visits")
-    .select(
-      `
-        id,
-        chief_complaint,
-        diagnosis_note,
-        doctor_id,
-        has_prescription,
-        doctors:users!visits_doctor_id_fkey(name)
-      `,
-    )
+    .select("id, chief_complaint, diagnosis_note, doctor_id")
     .eq("id", visitId)
     .single()
 
@@ -68,13 +59,16 @@ export async function getVisitDetail(visitId: string): Promise<VisitDetail | nul
     return null
   }
 
-  const doctorsRaw = visit.doctors as unknown as
-    | { name: string }
-    | { name: string }[]
-    | null
-  const doctorName = Array.isArray(doctorsRaw)
-    ? doctorsRaw[0]?.name ?? null
-    : doctorsRaw?.name ?? null
+  // Doctor name (separate query — RLS on users table may block joins)
+  let doctorName: string | null = null
+  if (visit.doctor_id) {
+    const { data: doctor } = await supabase
+      .from("users")
+      .select("name")
+      .eq("id", visit.doctor_id)
+      .single()
+    doctorName = doctor?.name ?? null
+  }
 
   // 2. Diagnoses
   const { data: diagRows } = await supabase
@@ -91,15 +85,19 @@ export async function getVisitDetail(visitId: string): Promise<VisitDetail | nul
     }
   })
 
-  // 3. Screening vitals
+  // 3. Prescription flag
+  const { count } = await supabase
+    .from("prescriptions")
+    .select("visit_id", { count: "exact", head: true })
+    .eq("visit_id", visitId)
+
+  // 4. Screening vitals
   const { data: screening } = await supabase
     .from("screenings")
     .select(
       "bp_systolic, bp_diastolic, heart_rate, temperature_c, oxygen_saturation, height_cm, weight_kg, bmi",
     )
     .eq("visit_id", visitId)
-    .order("created_at", { ascending: false })
-    .limit(1)
     .maybeSingle()
 
   return {
@@ -108,7 +106,7 @@ export async function getVisitDetail(visitId: string): Promise<VisitDetail | nul
     diagnosis_note: visit.diagnosis_note,
     doctor_name: doctorName,
     diagnoses,
-    has_prescription: visit.has_prescription ?? false,
+    has_prescription: (count ?? 0) > 0,
     screening: screening ?? null,
   }
 }
