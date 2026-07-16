@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import { isRedirectError } from "next/dist/client/components/redirect-error"
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-import { registerPatient } from "./actions"
+import { registerPatient } from "./actions";
 import {
   patientRegistrationSchema,
   type PatientRegistrationInput,
-} from "@/lib/validators/patient"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/lib/validators/patient";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -30,12 +30,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Card, CardContent } from "@/components/ui/card"
+} from "@/components/ui/form";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function PatientRegistrationForm() {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<PatientRegistrationInput>({
     resolver: zodResolver(patientRegistrationSchema),
@@ -50,51 +50,54 @@ export function PatientRegistrationForm() {
       ethnicity: "",
       address: "",
     },
-  })
+  });
 
-  const dobValue = form.watch("dob")
+  const dobValue = form.watch("dob");
   const calculatedAge = useMemo(() => {
-    if (!dobValue) return null
-    const birth = new Date(dobValue)
-    if (Number.isNaN(birth.getTime())) return null
-    const now = new Date()
-    const diffMs = now.getTime() - birth.getTime()
-    if (diffMs < 0) return null
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    if (diffDays < 30) return `${diffDays} day${diffDays !== 1 ? "s" : ""}`
-    const diffMonths = Math.floor(diffDays / 30)
-    if (diffMonths < 12) return `${diffMonths} month${diffMonths !== 1 ? "s" : ""}`
-    const diffYears = Math.floor(diffMonths / 12)
-    return `${diffYears} year${diffYears !== 1 ? "s" : ""}`
-  }, [dobValue])
+    if (!dobValue) return null;
+    const birth = new Date(dobValue);
+    if (Number.isNaN(birth.getTime())) return null;
+    const now = new Date();
+    const diffMs = now.getTime() - birth.getTime();
+    if (diffMs < 0) return null;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays < 30) return `${diffDays} day${diffDays !== 1 ? "s" : ""}`;
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths < 12)
+      return `${diffMonths} month${diffMonths !== 1 ? "s" : ""}`;
+    const diffYears = Math.floor(diffMonths / 12);
+    return `${diffYears} year${diffYears !== 1 ? "s" : ""}`;
+  }, [dobValue]);
 
   // Max date for DOB input (today)
-  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], [])
+  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
 
   async function onSubmit(values: PatientRegistrationInput) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const result = await registerPatient(values)
+      const result = await registerPatient(values);
 
       if (!result.success) {
         if (result.fieldErrors) {
           for (const [field, message] of Object.entries(result.fieldErrors)) {
-            form.setError(field as keyof PatientRegistrationInput, { message })
+            form.setError(field as keyof PatientRegistrationInput, { message });
           }
         }
-        toast.error(result.error || "Unable to register patient. Please try again.")
-        return
+        toast.error(
+          result.error || "Unable to register patient. Please try again.",
+        );
+        return;
       }
 
-      toast.success("Patient registered")
+      toast.success("Patient registered");
       if (result.patientId) {
-        router.push(`/patients/${result.patientId}`)
+        router.push(`/patients/${result.patientId}`);
       }
     } catch (err) {
-      if (isRedirectError(err)) throw err
-      toast.error("Something went wrong. Please try again.")
+      if (isRedirectError(err)) throw err;
+      toast.error("Something went wrong. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -269,7 +272,7 @@ export function PatientRegistrationForm() {
               )}
             />
 
-            <div className="flex justify-left gap-4">
+            <div className="flex justify-right gap-4">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
@@ -285,5 +288,5 @@ export function PatientRegistrationForm() {
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }

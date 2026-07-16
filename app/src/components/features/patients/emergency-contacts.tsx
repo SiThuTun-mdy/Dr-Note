@@ -171,7 +171,7 @@ export function EmergencyContactsSection({
           <span>
             Something went wrong removing {removeError.contact.name} — retry?
           </span>
-          <Button type="button" variant="outline" size="sm" onClick={handleRetryRemove} disabled={isRemoving}>
+          <Button type="button" size="sm" onClick={handleRetryRemove} disabled={isRemoving}>
             {isRemoving ? <Loader2 className="animate-spin" /> : "Retry"}
           </Button>
         </div>
@@ -183,7 +183,7 @@ export function EmergencyContactsSection({
           {addError && (
             <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm text-destructive flex items-center justify-between gap-4">
               <span>Something went wrong — retry?</span>
-              <Button type="button" variant="outline" size="sm" onClick={handleRetryAdd} disabled={isSubmitting}>
+              <Button type="button" size="sm" onClick={handleRetryAdd} disabled={isSubmitting}>
                 {isSubmitting ? <Loader2 className="animate-spin" /> : "Retry"}
               </Button>
             </div>

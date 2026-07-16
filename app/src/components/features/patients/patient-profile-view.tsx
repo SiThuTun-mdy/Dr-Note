@@ -103,7 +103,7 @@ export function PatientProfileView({
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Demographics</CardTitle>
             {canEdit && !isEditing && (
-              <Button type="button" variant="outline" size="sm" onClick={startEditing}>
+              <Button type="button" size="sm" onClick={startEditing}>
                 <Pencil />
                 Edit
               </Button>
@@ -279,7 +279,6 @@ export function PatientProfileView({
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
                     disabled={isSubmitting}
                     onClick={() => setIsEditing(false)}
                   >

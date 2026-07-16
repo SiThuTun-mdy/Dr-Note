@@ -79,7 +79,7 @@ export function SameDayVisitDataTable() {
         <p className="text-sm text-destructive mb-4">
           Failed to load today&apos;s visits. Please try again.
         </p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <Button onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4 mr-2" />
           Retry
         </Button>

@@ -371,7 +371,6 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
             <div className="flex justify-end gap-4 pt-4">
               <Button
                 type="button"
-                variant="outline"
                 onClick={() => router.back()}
                 disabled={isSubmitting}
               >

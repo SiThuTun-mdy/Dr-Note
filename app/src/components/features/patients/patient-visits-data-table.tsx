@@ -239,7 +239,6 @@ function VisitRow({
               return (
                 <Button
                   key={action.target}
-                  variant="outline"
                   size="sm"
                   disabled={isPending}
                   onClick={() => handleAction(action.target)}
