@@ -73,14 +73,14 @@ export async function getVisitDetail(visitId: string): Promise<VisitDetail | nul
   // 2. Diagnoses
   const { data: diagRows } = await supabase
     .from("visit_diagnoses")
-    .select("diagnoses(code, name), diagnosis_type")
+    .select("diagnoses(code, title), diagnosis_type")
     .eq("visit_id", visitId)
 
   const diagnoses: DiagnosisBadge[] = (diagRows ?? []).map((row) => {
-    const diag = row.diagnoses as unknown as { code: string; name: string } | null
+    const diag = row.diagnoses as unknown as { code: string; title: string } | null
     return {
       code: diag?.code ?? "—",
-      title: diag?.name ?? "—",
+      title: diag?.title ?? "—",
       type: (row.diagnosis_type as DiagnosisBadge["type"]) ?? "secondary",
     }
   })
