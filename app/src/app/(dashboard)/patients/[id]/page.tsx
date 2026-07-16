@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button"
 
 // 01-database-schema.md §6: patients.read → admin/doctor/nurse/receptionist
 // (+ the patient themselves, own record only). patients.update → admin/receptionist.
-const READ_ROLES = new Set(["admin", "doctor", "nurse", "receptionist"])
-const UPDATE_ROLES = new Set(["admin", "receptionist"])
-const CREATE_VISIT_ROLES = new Set(["admin", "receptionist"])
+const READ_ROLES = new Set(["doctor", "nurse", "receptionist"])
+const UPDATE_ROLES = new Set(["receptionist"])
+const CREATE_VISIT_ROLES = new Set(["receptionist"])
 
 type Props = {
   params: Promise<{ id: string }>

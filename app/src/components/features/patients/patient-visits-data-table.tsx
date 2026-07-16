@@ -232,7 +232,17 @@ function VisitRow({
           </div>
         </TableCell>
       </TableRow>
-      {isExpanded && detail && <ExpandedVisitDetail detail={detail} />}
+      {isExpanded && (
+        detail ? (
+          <ExpandedVisitDetail detail={detail} />
+        ) : (
+          <TableRow>
+            <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-4">
+              Loading visit details…
+            </TableCell>
+          </TableRow>
+        )
+      )}
     </>
   )
 }
@@ -320,11 +330,18 @@ export function PatientVisitsDataTable({ data, userRole, onStatusUpdate }: Patie
     // Fetch detail if not cached
     if (!details[visitId]) {
       setLoadingId(visitId)
-      const detail = await getVisitDetail(visitId)
-      if (detail) {
-        setDetails((prev) => ({ ...prev, [visitId]: detail }))
+      try {
+        const detail = await getVisitDetail(visitId)
+        if (detail) {
+          setDetails((prev) => ({ ...prev, [visitId]: detail }))
+        } else {
+          toast.error("Could not load visit details")
+        }
+      } catch (e) {
+        toast.error("Failed to load visit details")
+      } finally {
+        setLoadingId(null)
       }
-      setLoadingId(null)
     }
   }
 

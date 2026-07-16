@@ -40,7 +40,10 @@ export interface VisitDetail {
 const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export async function getVisitDetail(visitId: string): Promise<VisitDetail | null> {
-  if (!uuidRegex.test(visitId)) return null
+  if (!uuidRegex.test(visitId)) {
+    console.error("[getVisitDetail] invalid UUID", visitId)
+    return null
+  }
 
   const supabase = await createClient()
 
@@ -60,7 +63,10 @@ export async function getVisitDetail(visitId: string): Promise<VisitDetail | nul
     .eq("id", visitId)
     .single()
 
-  if (visitErr || !visit) return null
+  if (visitErr || !visit) {
+    console.error("[getVisitDetail] visit query failed", { visitId, error: visitErr })
+    return null
+  }
 
   const doctorsRaw = visit.doctors as unknown as
     | { name: string }
