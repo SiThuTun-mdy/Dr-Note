@@ -140,7 +140,7 @@ export function PatientsDataTable({ data }: { data: PatientTableRow[] }) {
           <TableCell className="text-right">
             <Button
               size="sm"
-              variant="outline"
+              variant="secondary"
               nativeButton={false}
               render={<Link href={`/patients/${patient.id}`} />}
             >
