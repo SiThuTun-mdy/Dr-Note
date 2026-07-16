@@ -272,7 +272,7 @@ export function PatientRegistrationForm() {
               )}
             />
 
-            <div className="flex justify-right gap-4">
+            <div className="flex justify-end gap-4">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>

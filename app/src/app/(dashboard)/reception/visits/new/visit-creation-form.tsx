@@ -100,7 +100,6 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
   // Trigger doctor search when debounced query changes
   useEffect(() => {
     if (debouncedDoctorQuery.length < 2) {
-      setDoctorResults([])
       return
     }
 

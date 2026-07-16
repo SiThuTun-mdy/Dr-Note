@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Pencil } from "lucide-react"
+import { useState } from "react";
+import { Pencil } from "lucide-react";
 
-import { type StaffProfileData } from "@/components/features/profile/profile-actions"
-import { ProfileEditForm } from "@/components/features/profile/profile-edit-form"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { type StaffProfileData } from "@/components/features/profile/profile-actions";
+import { ProfileEditForm } from "@/components/features/profile/profile-edit-form";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function formatMemberSince(iso: string): string {
-  const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) return "—"
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  })
+  });
 }
 
 export function StaffProfileView({
@@ -24,13 +24,13 @@ export function StaffProfileView({
   initialData,
   canEditWorkInfo,
 }: {
-  userId: string
-  initialData: StaffProfileData
+  userId: string;
+  initialData: StaffProfileData;
   /** Admins may edit the staff code; everyone edits own name/phone/department. */
-  canEditWorkInfo: boolean
+  canEditWorkInfo: boolean;
 }) {
-  const [data, setData] = useState(initialData)
-  const [isEditing, setIsEditing] = useState(false)
+  const [data, setData] = useState(initialData);
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
     <Card>
@@ -40,7 +40,7 @@ export function StaffProfileView({
           {!isEditing && (
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={() => setIsEditing(true)}
             >
@@ -57,8 +57,8 @@ export function StaffProfileView({
             data={data}
             canEditWorkInfo={canEditWorkInfo}
             onSaved={(updated) => {
-              setData(updated)
-              setIsEditing(false)
+              setData(updated);
+              setIsEditing(false);
             }}
             onCancel={() => setIsEditing(false)}
           />
@@ -74,7 +74,11 @@ export function StaffProfileView({
               <dd className="flex flex-wrap gap-1 mt-1">
                 {data.roles.length > 0 ? (
                   data.roles.map((role) => (
-                    <Badge key={role} variant="secondary" className="capitalize">
+                    <Badge
+                      key={role}
+                      variant="secondary"
+                      className="capitalize"
+                    >
                       {role}
                     </Badge>
                   ))
@@ -99,20 +103,20 @@ export function StaffProfileView({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function ProfileField({
   label,
   value,
 }: {
-  label: string
-  value: string | null
+  label: string;
+  value: string | null;
 }) {
   return (
     <div>
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="text-sm font-medium text-foreground">{value || "—"}</dd>
     </div>
-  )
+  );
 }
