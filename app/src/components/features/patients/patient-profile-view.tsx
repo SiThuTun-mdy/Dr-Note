@@ -146,15 +146,36 @@ export function PatientProfileView({
                   <FormField
                     control={form.control}
                     name="dob"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date of birth *</FormLabel>
-                        <FormControl>
-                          <Input type="date" disabled={isSubmitting} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const todayStr = new Date().toISOString().split("T")[0]
+                      const ageLabel = field.value ? (() => {
+                        const birth = new Date(field.value)
+                        if (Number.isNaN(birth.getTime())) return null
+                        const now = new Date()
+                        const diffMs = now.getTime() - birth.getTime()
+                        if (diffMs < 0) return null
+                        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+                        if (diffDays < 30) return `${diffDays} day${diffDays !== 1 ? "s" : ""}`
+                        const diffMonths = Math.floor(diffDays / 30)
+                        if (diffMonths < 12) return `${diffMonths} month${diffMonths !== 1 ? "s" : ""}`
+                        const diffYears = Math.floor(diffMonths / 12)
+                        return `${diffYears} year${diffYears !== 1 ? "s" : ""}`
+                      })() : null
+                      return (
+                        <FormItem>
+                          <FormLabel>Date of birth *</FormLabel>
+                          <FormControl>
+                            <Input type="date" max={todayStr} disabled={isSubmitting} {...field} />
+                          </FormControl>
+                          {ageLabel && (
+                            <p className="text-xs text-muted-foreground">
+                              Age: {ageLabel}
+                            </p>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
                   />
 
                   <FormField
@@ -272,7 +293,32 @@ export function PatientProfileView({
               <ProfileField label="Full name" value={data.name} />
               <ProfileField label="Email" value={data.email} />
               <ProfileField label="Phone" value={data.phone} />
-              <ProfileField label="Date of birth" value={data.dob} />
+              <div>
+                <dt className="text-xs text-muted-foreground">Date of birth</dt>
+                <dd className="text-sm font-medium text-foreground">
+                  {data.dob || "—"}
+                  {data.dob && (() => {
+                    const birth = new Date(data.dob)
+                    if (Number.isNaN(birth.getTime())) return null
+                    const now = new Date()
+                    const diffMs = now.getTime() - birth.getTime()
+                    if (diffMs < 0) return null
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+                    let label: string
+                    if (diffDays < 30) {
+                      label = `${diffDays}d`
+                    } else {
+                      const diffMonths = Math.floor(diffDays / 30)
+                      if (diffMonths < 12) {
+                        label = `${diffMonths}mo`
+                      } else {
+                        label = `${Math.floor(diffMonths / 12)}y`
+                      }
+                    }
+                    return <span className="text-xs text-muted-foreground ml-1">({label})</span>
+                  })()}
+                </dd>
+              </div>
               <ProfileField label="Gender" value={data.gender ? genderLabels[data.gender] ?? data.gender : null} />
               <ProfileField label="NRC" value={data.nrc} />
               <ProfileField label="Religion" value={data.religion} />

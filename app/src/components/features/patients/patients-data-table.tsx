@@ -17,6 +17,22 @@ export interface PatientTableRow {
   gender: string | null
 }
 
+/** Format age from DOB: years, months, or days depending on how young. */
+function formatAge(dob: string | null): string | null {
+  if (!dob) return null
+  const birth = new Date(dob)
+  if (Number.isNaN(birth.getTime())) return null
+  const now = new Date()
+  const diffMs = now.getTime() - birth.getTime()
+  if (diffMs < 0) return null
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  if (diffDays < 30) return `${diffDays}d`
+  const diffMonths = Math.floor(diffDays / 30)
+  if (diffMonths < 12) return `${diffMonths}mo`
+  const diffYears = Math.floor(diffMonths / 12)
+  return `${diffYears}y`
+}
+
 type SortKey = "name" | "email"
 type SortDirection = "asc" | "desc"
 
@@ -108,7 +124,18 @@ export function PatientsDataTable({ data }: { data: PatientTableRow[] }) {
           <TableCell>{patient.name}</TableCell>
           <TableCell>{patient.email}</TableCell>
           <TableCell>{patient.phone ?? "—"}</TableCell>
-          <TableCell>{patient.dob ?? "—"}</TableCell>
+          <TableCell>
+            {patient.dob ? (
+              <div>
+                <span>{patient.dob}</span>
+                {formatAge(patient.dob) && (
+                  <span className="text-xs text-muted-foreground ml-1">
+                    ({formatAge(patient.dob)})
+                  </span>
+                )}
+              </div>
+            ) : "—"}
+          </TableCell>
           <TableCell>{patient.gender ?? "—"}</TableCell>
           <TableCell className="text-right">
             <Button

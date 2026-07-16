@@ -58,12 +58,14 @@ export function PatientRegistrationForm() {
     const birth = new Date(dobValue)
     if (Number.isNaN(birth.getTime())) return null
     const now = new Date()
-    let age = now.getFullYear() - birth.getFullYear()
-    const monthDiff = now.getMonth() - birth.getMonth()
-    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-      age--
-    }
-    return age >= 0 ? age : null
+    const diffMs = now.getTime() - birth.getTime()
+    if (diffMs < 0) return null
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    if (diffDays < 30) return `${diffDays} day${diffDays !== 1 ? "s" : ""}`
+    const diffMonths = Math.floor(diffDays / 30)
+    if (diffMonths < 12) return `${diffMonths} month${diffMonths !== 1 ? "s" : ""}`
+    const diffYears = Math.floor(diffMonths / 12)
+    return `${diffYears} year${diffYears !== 1 ? "s" : ""}`
   }, [dobValue])
 
   // Max date for DOB input (today)
@@ -173,7 +175,7 @@ export function PatientRegistrationForm() {
                     </FormControl>
                     {calculatedAge !== null && (
                       <p className="text-xs text-muted-foreground">
-                        Age: {calculatedAge} year{calculatedAge !== 1 ? "s" : ""}
+                        Age: {calculatedAge}
                       </p>
                     )}
                     <FormMessage />
