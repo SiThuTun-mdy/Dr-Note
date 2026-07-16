@@ -22,7 +22,7 @@ import type { VisitStatus } from "@/components/features/shared/StatusBadge"
 import type { DiagnosisBadge } from "@/types/visit"
 import { transitionVisitStatus } from "@/app/(dashboard)/queue/actions"
 import { getAvailableActions } from "@/lib/utils/visit-actions"
-import { getVisitDetail, type VisitDetail } from "./visit-detail-actions"
+import { getVisitDetail, type VisitDetail } from "@/app/(dashboard)/patients/[id]/actions"
 
 export interface PatientVisitRow {
   id: string

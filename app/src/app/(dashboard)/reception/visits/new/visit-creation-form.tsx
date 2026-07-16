@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -32,6 +32,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useDebounce } from "@/hooks/use-debounce"
 
 interface Patient {
   id: string
@@ -61,6 +62,7 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
   const [isSearchingPatient, setIsSearchingPatient] = useState(false)
   const [isSearchingDoctor, setIsSearchingDoctor] = useState(false)
+  const debouncedDoctorQuery = useDebounce(doctorQuery, 300)
 
   const form = useForm<VisitCreationInput>({
     resolver: zodResolver(visitCreationSchema),
@@ -93,21 +95,31 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
 
   const handleDoctorSearch = useCallback(async (query: string) => {
     setDoctorQuery(query)
-    if (query.length < 2) {
+  }, [])
+
+  // Trigger doctor search when debounced query changes
+  useEffect(() => {
+    if (debouncedDoctorQuery.length < 2) {
       setDoctorResults([])
       return
     }
 
+    let cancelled = false
     setIsSearchingDoctor(true)
-    try {
-      const results = await searchDoctors(query)
-      setDoctorResults(results)
-    } catch {
-      setDoctorResults([])
-    } finally {
-      setIsSearchingDoctor(false)
-    }
-  }, [])
+
+    searchDoctors(debouncedDoctorQuery)
+      .then((results) => {
+        if (!cancelled) setDoctorResults(results)
+      })
+      .catch(() => {
+        if (!cancelled) setDoctorResults([])
+      })
+      .finally(() => {
+        if (!cancelled) setIsSearchingDoctor(false)
+      })
+
+    return () => { cancelled = true }
+  }, [debouncedDoctorQuery])
 
   const selectDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor)
