@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Search, User, X } from "lucide-react"
 import { toast } from "sonner"
@@ -46,12 +46,16 @@ interface Doctor {
   email: string
 }
 
-export function VisitCreationForm() {
+interface VisitCreationFormProps {
+  prefillPatient?: Patient | null
+}
+
+export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [patientQuery, setPatientQuery] = useState("")
   const [patientResults, setPatientResults] = useState<Patient[]>([])
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(prefillPatient ?? null)
   const [doctorQuery, setDoctorQuery] = useState("")
   const [doctorResults, setDoctorResults] = useState<Doctor[]>([])
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
@@ -61,12 +65,13 @@ export function VisitCreationForm() {
   const form = useForm<VisitCreationInput>({
     resolver: zodResolver(visitCreationSchema),
     defaultValues: {
-      patientId: "",
+      patientId: prefillPatient?.id ?? "",
       visitType: undefined,
       chiefComplaint: "",
       doctorId: null,
     },
   })
+
 
   const handlePatientSearch = useCallback(async (query: string) => {
     setPatientQuery(query)
@@ -103,18 +108,6 @@ export function VisitCreationForm() {
       setIsSearchingDoctor(false)
     }
   }, [])
-
-  const selectPatient = (patient: Patient) => {
-    setSelectedPatient(patient)
-    setPatientResults([])
-    setPatientQuery("")
-    form.setValue("patientId", patient.id)
-  }
-
-  const clearPatient = () => {
-    setSelectedPatient(null)
-    form.setValue("patientId", "")
-  }
 
   const selectDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor)
@@ -161,74 +154,85 @@ export function VisitCreationForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             {/* Patient Search */}
-            <FormField
+            <Controller
               control={form.control}
               name="patientId"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Patient *</FormLabel>
-                  <FormControl>
-                    {selectedPatient ? (
-                      <div className="flex items-center justify-between p-3 border rounded-md bg-muted/50">
-                        <div className="flex items-center gap-3">
-                          <User className="h-5 w-5 text-muted-foreground" />
-                          <div>
-                            <p className="text-sm font-medium">{selectedPatient.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {selectedPatient.email}
-                              {selectedPatient.nrc && ` · NRC: ${selectedPatient.nrc}`}
-                            </p>
-                          </div>
+              render={({ field, fieldState }) => (
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Patient *</label>
+                  {/* Hidden input keeps the registered field in the DOM for native form submit */}
+                  <input type="hidden" {...field} />
+                  {selectedPatient ? (
+                    <div className="flex items-center justify-between p-3 border rounded-md bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{selectedPatient.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {selectedPatient.email}
+                            {selectedPatient.nrc && ` · NRC: ${selectedPatient.nrc}`}
+                          </p>
                         </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={clearPatient}
-                          disabled={isSubmitting}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
                       </div>
-                    ) : (
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search by name, email, or NRC..."
-                          value={patientQuery}
-                          onChange={(e) => handlePatientSearch(e.target.value)}
-                          className="pl-9"
-                          disabled={isSubmitting}
-                        />
-                        {isSearchingPatient && (
-                          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-                        )}
-                        {patientResults.length > 0 && (
-                          <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-auto">
-                            {patientResults.map((patient) => (
-                              <button
-                                key={patient.id}
-                                type="button"
-                                className="w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-3"
-                                onClick={() => selectPatient(patient)}
-                              >
-                                <User className="h-4 w-4 text-muted-foreground" />
-                                <div>
-                                  <p className="text-sm font-medium">{patient.name}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {patient.email}
-                                    {patient.nrc && ` · NRC: ${patient.nrc}`}
-                                  </p>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedPatient(null)
+                          field.onChange("")
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search by name, email, or NRC..."
+                        value={patientQuery}
+                        onChange={(e) => handlePatientSearch(e.target.value)}
+                        className="pl-9"
+                        disabled={isSubmitting}
+                      />
+                      {isSearchingPatient && (
+                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                      )}
+                      {patientResults.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-auto">
+                          {patientResults.map((patient) => (
+                            <button
+                              key={patient.id}
+                              type="button"
+                              className="w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-3"
+                              onClick={() => {
+                                setSelectedPatient(patient)
+                                setPatientResults([])
+                                setPatientQuery("")
+                                field.onChange(patient.id)
+                              }}
+                            >
+                              <User className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-sm font-medium">{patient.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {patient.email}
+                                  {patient.nrc && ` · NRC: ${patient.nrc}`}
+                                </p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {fieldState.error && (
+                    <p className="text-sm text-destructive">{fieldState.error.message}</p>
+                  )}
+                </div>
               )}
             />
 

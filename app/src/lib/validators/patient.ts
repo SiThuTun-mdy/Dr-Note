@@ -20,7 +20,7 @@ export const patientRegistrationSchema = z.object({
   nrc: z.string().max(50).optional().or(z.literal("")),
   religion: z.string().max(100).optional().or(z.literal("")),
   ethnicity: z.string().max(100).optional().or(z.literal("")),
-  address: z.string().max(500).optional().or(z.literal("")),
+  address: z.string().min(1, "Address is required").max(500),
 })
 
 export type PatientRegistrationInput = z.infer<typeof patientRegistrationSchema>
@@ -35,6 +35,7 @@ export const patientProfileUpdateSchema = patientRegistrationSchema
       .optional()
       .or(z.literal("")),
     gender: z.enum(genderOptions, { message: "Please select a gender" }).optional().or(z.literal("")),
+    address: z.string().max(500).optional().or(z.literal("")),
   })
 
 export type PatientProfileUpdateInput = z.infer<typeof patientProfileUpdateSchema>

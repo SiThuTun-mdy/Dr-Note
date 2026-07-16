@@ -27,7 +27,7 @@ const validInput = {
   nrc: '',
   religion: '',
   ethnicity: '',
-  address: '',
+  address: '123 Main Street',
 }
 
 function mockRoleLookup(roleName: string) {

@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query"
 import { getTodayVisits } from "@/app/(dashboard)/queue/actions"
 import type { VisitStatus } from "@/app/(dashboard)/queue/actions"
 
-/** Poll interval: keep in sync with the main queue view. */
-const POLL_INTERVAL_MS = 1_800_000
+/** Poll interval: keep in sync with the main queue view (10 seconds). */
+const POLL_INTERVAL_MS = 10_000
 
 /**
  * Shared query for today's visit count, optionally narrowed to a single

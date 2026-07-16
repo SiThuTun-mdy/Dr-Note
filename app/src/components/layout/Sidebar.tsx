@@ -57,11 +57,6 @@ const navigationByRole: Record<
       icon: <Users className="h-5 w-5" />,
     },
     {
-      name: "Appointments",
-      href: "/appointments",
-      icon: <Calendar className="h-5 w-5" />,
-    },
-    {
       name: "My profile",
       href: "/profile",
       icon: <User className="h-5 w-5" />,
@@ -83,12 +78,12 @@ const navigationByRole: Record<
       href: "/patients",
       icon: <Users className="h-5 w-5" />,
     },
-    {
-      name: "Vitals",
-      href: "/vitals",
-      icon: <Stethoscope className="h-5 w-5" />,
-    },
-    { name: "Notes", href: "/notes", icon: <FileText className="h-5 w-5" /> },
+    // {
+    //   name: "Vitals",
+    //   href: "/vitals",
+    //   icon: <Stethoscope className="h-5 w-5" />,
+    // },
+    // { name: "Notes", href: "/notes", icon: <FileText className="h-5 w-5" /> },
     {
       name: "My profile",
       href: "/profile",
@@ -152,21 +147,21 @@ const navigationByRole: Record<
       href: "/admin/staff/new",
       icon: <UserPlus className="h-5 w-5" />,
     },
-    {
-      name: "Settings",
-      href: "/admin/settings",
-      icon: <Settings className="h-5 w-5" />,
-    },
-    {
-      name: "Reports",
-      href: "/admin/reports",
-      icon: <FileText className="h-5 w-5" />,
-    },
-    {
-      name: "Audit log",
-      href: "/admin/audit",
-      icon: <Activity className="h-5 w-5" />,
-    },
+    // {
+    //   name: "Settings",
+    //   href: "/admin/settings",
+    //   icon: <Settings className="h-5 w-5" />,
+    // },
+    // {
+    //   name: "Reports",
+    //   href: "/admin/reports",
+    //   icon: <FileText className="h-5 w-5" />,
+    // },
+    // {
+    //   name: "Audit log",
+    //   href: "/admin/audit",
+    //   icon: <Activity className="h-5 w-5" />,
+    // },
     {
       name: "My profile",
       href: "/profile",

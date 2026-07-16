@@ -7,8 +7,8 @@ import { getPatientRegistrationCount } from "@/app/(dashboard)/reception/actions
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { NotebookPenIcon } from "lucide-react"
 
-/** Poll interval: keep in sync with the other reception stat cards. */
-const POLL_INTERVAL_MS = 1_800_000
+/** Poll interval: keep in sync with the other reception stat cards (10 seconds). */
+const POLL_INTERVAL_MS = 10_000
 
 /** Reusable stat card — number of patients registered today. */
 export function TodayPatientRegistrationCountCard() {

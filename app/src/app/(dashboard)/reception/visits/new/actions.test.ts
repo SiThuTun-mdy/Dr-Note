@@ -369,27 +369,26 @@ describe("searchDoctors", () => {
 
   it("returns only doctor-role users", async () => {
     mockRoleLookup("receptionist")
+
+    // Mock the first query: get all user-role mappings
     mockFrom.mockReturnValueOnce({
-      select: vi.fn().mockReturnValue({
-        or: vi.fn().mockReturnValue({
-          limit: vi.fn().mockResolvedValue({
-            data: [
-              {
-                id: "d1",
-                name: "Dr. Smith",
-                email: "smith@clinic.com",
-                user_roles: [{ roles: { name: "doctor" } }],
-              },
-              {
-                id: "d2",
-                name: "Nurse Jones",
-                email: "jones@clinic.com",
-                user_roles: [{ roles: { name: "nurse" } }],
-              },
-            ],
-            error: null,
-          }),
-        }),
+      select: vi.fn().mockResolvedValue({
+        data: [
+          { user_id: "d1", roles: { name: "doctor" } },
+          { user_id: "d2", roles: { name: "nurse" } },
+        ],
+        error: null,
+      }),
+    })
+
+    // Mock the second query: get all users
+    mockFrom.mockReturnValueOnce({
+      select: vi.fn().mockResolvedValue({
+        data: [
+          { id: "d1", name: "Dr. Smith", email: "smith@clinic.com" },
+          { id: "d2", name: "Nurse Jones", email: "jones@clinic.com" },
+        ],
+        error: null,
       }),
     })
 

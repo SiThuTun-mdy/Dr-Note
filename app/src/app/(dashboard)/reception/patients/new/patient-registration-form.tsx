@@ -231,7 +231,7 @@ export function PatientRegistrationForm() {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address (optional)</FormLabel>
+                  <FormLabel>Address *</FormLabel>
                   <FormControl>
                     <Textarea rows={3} disabled={isSubmitting} {...field} />
                   </FormControl>
