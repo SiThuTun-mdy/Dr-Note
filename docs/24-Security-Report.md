@@ -346,3 +346,29 @@ No new findings.
   their own password and is signed out (`set-password/actions.ts`) —
   intended provisioning behavior; temp password remains random and never
   surfaced.
+
+## Change Password dialog (17 Jul 2026)
+
+Scope: new `changePassword` server action + dialog
+(`components/features/shared/change-password-{actions.ts,dialog.tsx}`),
+`changePasswordSchema` validator, and a "Change password" item in the Topbar
+avatar menu (available to all roles — Topbar renders in the `(dashboard)`
+shell, which includes patients' `/patients/[id]` landing page).
+
+### Findings
+
+No new findings.
+
+### Verified as sound
+- Requires an authenticated session (`auth.getUser`) before any work.
+- Current password is re-verified via `signInWithPassword` on the non-cookie
+  service client (anon key) before `updateUser` — Supabase alone would let a
+  hijacked session rotate the password without knowing it. The throwaway
+  sign-in cannot clobber the caller's real session, and Supabase's auth rate
+  limiting throttles brute-force attempts against the current password.
+- Server-side Zod validation (min 8 chars, confirmation match, must differ
+  from current password); wrong current password surfaces as a field error
+  with no detail leakage; `updateUser` failures log server-side and return a
+  generic message.
+- No passwords logged; dialog inputs use `type="password"` with proper
+  `autocomplete` hints.
