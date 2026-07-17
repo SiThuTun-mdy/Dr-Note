@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Bell, LogOut, User, Settings } from "lucide-react";
+import { Menu, Bell, LogOut, User, Settings, Sun, Moon, Monitor } from "lucide-react";
+import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface TopbarProps {
   onMenuClick: () => void;
@@ -31,6 +33,8 @@ export function Topbar({
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  const { theme, setTheme } = useTheme();
 
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6 sticky top-0 z-30">
@@ -87,6 +91,38 @@ export function Topbar({
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
+              <div className="px-1.5 py-1.5">
+                <p className="px-0.5 pb-1.5 text-xs text-muted-foreground">Theme</p>
+                <ToggleGroup
+                  value={theme ? [theme] : []}
+                  onValueChange={(value) => value[0] && setTheme(value[0])}
+                  variant="outline"
+                  aria-label="Theme"
+                  className="w-full"
+                >
+                  <ToggleGroupItem
+                    value="light"
+                    aria-label="Light theme"
+                    className="min-h-[44px] min-w-[44px] flex-1"
+                  >
+                    <Sun className="h-4 w-4" />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value="dark"
+                    aria-label="Dark theme"
+                    className="min-h-[44px] min-w-[44px] flex-1"
+                  >
+                    <Moon className="h-4 w-4" />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value="system"
+                    aria-label="System theme"
+                    className="min-h-[44px] min-w-[44px] flex-1"
+                  >
+                    <Monitor className="h-4 w-4" />
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
