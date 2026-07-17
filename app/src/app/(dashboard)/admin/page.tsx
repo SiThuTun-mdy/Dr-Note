@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, Activity, Calendar, Settings, FileText, Shield, BarChart3, ClipboardList } from "lucide-react"
+import { Users, Activity } from "lucide-react"
 import { TodayVisitCountCard } from "@/components/features/patients/today-visit-count-card"
 import { TodayVisitWaitingCountCard } from "@/components/features/patients/today-visit-waiting-count-card"
 
