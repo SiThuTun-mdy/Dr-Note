@@ -304,6 +304,7 @@ The `frontend-design` plugin provides guidance for distinctive, intentional visu
 | clsx | ^2.1 | Class names |
 | Tailwind Merge | ^3.6 | Merge Tailwind classes |
 | tw-animate-css | ^1.4 | Animations |
+| next-themes | ^0.4.6 | Light/dark/system theme switching |
 
 ### Backend/Database
 
