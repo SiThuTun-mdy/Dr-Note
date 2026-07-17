@@ -16,6 +16,12 @@ const ALLOWED_ROLES = new Set(["admin", "receptionist"])
 interface RegisterPatientResult {
   success: boolean
   patientId?: string
+  /**
+   * Whether the set-password email reached Supabase. Registration itself
+   * succeeded even when this is false — the receptionist just needs to
+   * resend the link instead of the patient waiting on an email.
+   */
+  emailSent?: boolean
   error?: string
   fieldErrors?: Partial<Record<keyof PatientRegistrationInput, string>>
 }
@@ -61,7 +67,10 @@ export async function registerPatient(
   // Create the auth user on a non-cookie client so this call cannot touch
   // the receptionist's own session (docs/guide/01-database-schema.md,
   // issue #20 context). The temp password is random and never surfaced —
-  // the patient sets their own via the emailRedirectTo confirmation link.
+  // the patient sets their own via the set-password email sent below.
+  // (emailRedirectTo only matters while email confirmation is ON; with it
+  // OFF Supabase sends no confirmation email, hence the explicit recovery
+  // email after registration completes.)
   const serviceClient = createServiceClient()
   const tempPassword = generateTempPassword()
   const { data: signUpData, error: signUpError } =
@@ -157,5 +166,26 @@ export async function registerPatient(
     return { success: false, error: "Unable to register patient. Please try again." }
   }
 
-  return { success: true, patientId: newUserId }
+  // Identity provisioning: email the patient a link to set their own
+  // password. A recovery email is used (not the signup confirmation) because
+  // it is sent regardless of the project's email-confirmation setting, and
+  // works with the anon key (docs/12-Architecture.md §3: no service-role key
+  // in app code). The link lands on /auth/confirm which verifies the OTP and
+  // forwards to /set-password with a session.
+  const { error: emailError } = await serviceClient.auth.resetPasswordForEmail(
+    email,
+    { redirectTo: `${getSiteUrl()}/auth/confirm?next=/set-password` }
+  )
+
+  if (emailError) {
+    // Registration is already complete — don't fail the whole flow over a
+    // transient email problem; surface it so the receptionist can resend.
+    console.error(
+      `[PatientRegistration] set-password email failed for user ${newUserId}`,
+      emailError
+    )
+    return { success: true, patientId: newUserId, emailSent: false }
+  }
+
+  return { success: true, patientId: newUserId, emailSent: true }
 }

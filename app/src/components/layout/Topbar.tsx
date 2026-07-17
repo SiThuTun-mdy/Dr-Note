@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Menu, Bell, LogOut, User, Settings, Sun, Moon, Monitor } from "lucide-react";
+import { ChangePasswordDialog } from "@/components/features/shared/change-password-dialog";
+import { Menu, Bell, KeyRound, LogOut, User, Settings, Sun, Moon, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -27,6 +29,7 @@ export function Topbar({
   userName,
   userRole,
 }: TopbarProps) {
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const initials = userName
     .split(" ")
     .map((n) => n[0])
@@ -91,6 +94,12 @@ export function Topbar({
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => setChangePasswordOpen(true)}>
+                <KeyRound className="mr-2 h-4 w-4" />
+                Change password
+              </DropdownMenuItem>
+
               <div className="px-1.5 py-1.5">
                 <p className="px-0.5 pb-1.5 text-xs text-muted-foreground">Theme</p>
                 <ToggleGroup
@@ -123,6 +132,7 @@ export function Topbar({
                   </ToggleGroupItem>
                 </ToggleGroup>
               </div>
+
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
@@ -144,6 +154,11 @@ export function Topbar({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <ChangePasswordDialog
+        open={changePasswordOpen}
+        onOpenChange={setChangePasswordOpen}
+      />
     </header>
   );
 }

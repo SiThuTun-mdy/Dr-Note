@@ -317,3 +317,58 @@ Recommendation: Add auth check.
 | Medium remediation plan | ❌ Required |
 
 **Release Status: BLOCKED**
+
+## Patient identity provisioning email (17 Jul 2026)
+
+Scope: `reception/patients/new/actions.ts` now sends the patient a
+set-password link via `resetPasswordForEmail` after successful registration
+(recovery emails are sent regardless of the email-confirmation setting);
+`patient-registration-form.tsx` surfaces send success/failure to the
+receptionist.
+
+### Findings
+
+No new findings.
+
+### Verified as sound
+- Anon-key client only — complies with docs/12-Architecture.md §3 (no
+  service-role key in app code).
+- `redirectTo` is built server-side from `getSiteUrl()` (env), never from
+  user input; `/auth/confirm` still allowlists `next` to `/set-password`
+  (open-redirect protection unchanged).
+- Email address comes from Zod-validated input and the send happens only
+  after the authenticated + role-checked (`admin`/`receptionist`)
+  registration fully succeeds — no enumeration surface added.
+- Email-send failure is logged server-side with context and surfaced to the
+  client only as a boolean `emailSent` flag — no provider error details
+  leak.
+- Recovery link grants a one-time session to the inbox owner, who then sets
+  their own password and is signed out (`set-password/actions.ts`) —
+  intended provisioning behavior; temp password remains random and never
+  surfaced.
+
+## Change Password dialog (17 Jul 2026)
+
+Scope: new `changePassword` server action + dialog
+(`components/features/shared/change-password-{actions.ts,dialog.tsx}`),
+`changePasswordSchema` validator, and a "Change password" item in the Topbar
+avatar menu (available to all roles — Topbar renders in the `(dashboard)`
+shell, which includes patients' `/patients/[id]` landing page).
+
+### Findings
+
+No new findings.
+
+### Verified as sound
+- Requires an authenticated session (`auth.getUser`) before any work.
+- Current password is re-verified via `signInWithPassword` on the non-cookie
+  service client (anon key) before `updateUser` — Supabase alone would let a
+  hijacked session rotate the password without knowing it. The throwaway
+  sign-in cannot clobber the caller's real session, and Supabase's auth rate
+  limiting throttles brute-force attempts against the current password.
+- Server-side Zod validation (min 8 chars, confirmation match, must differ
+  from current password); wrong current password surfaces as a field error
+  with no detail leakage; `updateUser` failures log server-side and return a
+  generic message.
+- No passwords logged; dialog inputs use `type="password"` with proper
+  `autocomplete` hints.

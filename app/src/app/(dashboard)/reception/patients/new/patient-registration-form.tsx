@@ -89,7 +89,15 @@ export function PatientRegistrationForm() {
         return;
       }
 
-      toast.success("Patient registered");
+      if (result.emailSent === false) {
+        toast.warning(
+          "Patient registered, but the set-password email could not be sent.",
+        );
+      } else {
+        toast.success(
+          "Patient registered. A set-password link has been emailed to them.",
+        );
+      }
       if (result.patientId) {
         router.push(`/patients/${result.patientId}`);
       }
