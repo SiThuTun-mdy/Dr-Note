@@ -1,3 +1,10 @@
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Consultation",
+  description: "Consultation management",
+}
+
 export default function ConsultationPage() {
   return (
     <div>

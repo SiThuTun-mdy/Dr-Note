@@ -14,12 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { prescriptionSchema } from "@/lib/validators/prescription";
 import { createPrescription } from "@/app/(dashboard)/doctor/visits/[id]/actions";
@@ -37,6 +32,7 @@ interface PrescriptionFormProps {
   doctorId: string;
   diagnoses: Diagnosis[];
   onSuccess?: () => void;
+  disabled?: boolean;
 }
 
 type FormData = {
@@ -58,6 +54,7 @@ export function PrescriptionForm({
   doctorId,
   diagnoses,
   onSuccess,
+  disabled,
 }: PrescriptionFormProps) {
   const [saving, setSaving] = useState(false);
 
@@ -74,7 +71,16 @@ export function PrescriptionForm({
       visit_id: visitId,
       diagnosis_id: null,
       instruction: "",
-      items: [{ medicine_name: "", dosage: "", frequency: "", duration: "", route: "", quantity: undefined }],
+      items: [
+        {
+          medicine_name: "",
+          dosage: "",
+          frequency: "",
+          duration: "",
+          route: "",
+          quantity: undefined,
+        },
+      ],
     },
   });
 
@@ -119,6 +125,13 @@ export function PrescriptionForm({
           <div className="space-y-2">
             <Label htmlFor="diagnosis">Linked diagnosis (optional)</Label>
             <Select
+              items={[
+                { value: "none", label: "No diagnosis linked" },
+                ...diagnoses.map((d) => ({
+                  value: d.id,
+                  label: `${d.code} — ${d.title}`,
+                })),
+              ]}
               onValueChange={(value) => {
                 const selected = value as string | null;
                 setValue("diagnosis_id", selected === "none" ? null : selected);
@@ -148,7 +161,9 @@ export function PrescriptionForm({
               className="min-h-[80px]"
             />
             {errors.instruction && (
-              <p className="text-xs text-destructive">{errors.instruction.message}</p>
+              <p className="text-xs text-destructive">
+                {errors.instruction.message}
+              </p>
             )}
           </div>
 
@@ -251,9 +266,11 @@ export function PrescriptionForm({
           </div>
 
           {/* Submit */}
-          <Button type="submit" disabled={saving}>
-            {saving ? "Saving..." : "Save prescription"}
-          </Button>
+          <div className="flex flex-row items-center justify-end pb-3">
+            <Button type="submit" disabled={saving || disabled}>
+              {saving ? "Saving..." : "Save prescription"}
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

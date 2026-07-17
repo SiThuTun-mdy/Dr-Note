@@ -1,5 +1,11 @@
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server";
 import { PrescriptionsTable } from "./prescriptions-table";
+
+export const metadata: Metadata = {
+  title: "Prescriptions",
+  description: "View all prescriptions",
+};
 
 export interface PrescriptionData {
   id: string;

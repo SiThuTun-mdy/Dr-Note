@@ -1,4 +1,10 @@
+import type { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Notes",
+  description: "Clinical notes",
+}
 
 export default function NotesPage() {
   return (

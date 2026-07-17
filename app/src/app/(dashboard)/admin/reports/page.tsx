@@ -1,4 +1,10 @@
+import type { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Reports",
+  description: "System reports and analytics",
+}
 
 export default function ReportsPage() {
   return (

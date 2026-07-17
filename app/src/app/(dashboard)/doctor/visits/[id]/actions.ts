@@ -36,6 +36,7 @@ export async function addDiagnosis(input: AddDiagnosisInput) {
     if (error.code === "23505") {
       return { error: "This diagnosis has already been added to this visit." };
     }
+    console.error("[addDiagnosis] Failed:", error.message, { visit_id: input.visit_id, diagnosis_id: input.diagnosis_id });
     return { error: "Failed to add diagnosis. Please try again." };
   }
 
@@ -52,6 +53,7 @@ export async function removeDiagnosis(input: RemoveDiagnosisInput) {
     .eq("id", input.visit_diagnosis_id);
 
   if (error) {
+    console.error("[removeDiagnosis] Failed:", error.message, { visit_diagnosis_id: input.visit_diagnosis_id });
     return { error: "Failed to remove diagnosis. Please try again." };
   }
 
@@ -68,6 +70,7 @@ export async function saveDiagnosisNote(input: SaveDiagnosisNoteInput) {
     .eq("id", input.visit_id);
 
   if (error) {
+    console.error("[saveDiagnosisNote] Failed:", error.message, { visit_id: input.visit_id });
     return { error: "Failed to save note. Please try again." };
   }
 
@@ -75,8 +78,13 @@ export async function saveDiagnosisNote(input: SaveDiagnosisNoteInput) {
   return { success: true };
 }
 
-export async function searchDiagnoses(query: string) {
+export async function searchDiagnoses(
+  query: string,
+  options?: { limit?: number; offset?: number }
+) {
   const supabase = await createClient();
+  const limit = options?.limit ?? 20;
+  const offset = options?.offset ?? 0;
 
   let qb = supabase
     .from("diagnoses")
@@ -87,7 +95,7 @@ export async function searchDiagnoses(query: string) {
     qb = qb.or(`code.ilike.%${query}%,title.ilike.%${query}%`);
   }
 
-  const { data, error } = await qb.limit(20);
+  const { data, error } = await qb.range(offset, offset + limit - 1);
 
   if (error) {
     return [];
@@ -101,7 +109,7 @@ export async function getVisitWithDetails(visitId: string) {
 
   const { data: visit, error: visitError } = await supabase
     .from("visits")
-    .select("*")
+    .select("id, patient_id, doctor_id, status, chief_complaint, visit_date, visit_type, diagnosis_note, created_at")
     .eq("id", visitId)
     .single();
 
@@ -109,41 +117,38 @@ export async function getVisitWithDetails(visitId: string) {
     return null;
   }
 
-  // Fetch patient name
-  const { data: patient } = await supabase
-    .from("users")
-    .select("name, email")
-    .eq("id", visit.patient_id)
-    .single();
-
-  // Fetch doctor name if assigned
-  let doctor = null;
-  if (visit.doctor_id) {
-    const { data } = await supabase
-      .from("users")
-      .select("name, email")
-      .eq("id", visit.doctor_id)
-      .single();
-    doctor = data;
-  }
-
-  const { data: screening } = await supabase
-    .from("screenings")
-    .select("*")
-    .eq("visit_id", visitId)
-    .single();
-
-  const { data: diagnoses } = await supabase
-    .from("visit_diagnoses")
-    .select("*, diagnosis:diagnoses(id, code, title)")
-    .eq("visit_id", visitId);
+  // Fetch related data in parallel (all depend only on visit data already fetched)
+  const [patientResult, doctorResult, screeningResult, diagnosesResult] =
+    await Promise.all([
+      supabase
+        .from("users")
+        .select("name, email")
+        .eq("id", visit.patient_id)
+        .single(),
+      visit.doctor_id
+        ? supabase
+            .from("users")
+            .select("name, email")
+            .eq("id", visit.doctor_id)
+            .single()
+        : Promise.resolve({ data: null, error: null }),
+      supabase
+        .from("screenings")
+        .select("height_cm, weight_kg, bmi, bp_systolic, bp_diastolic, heart_rate, temperature_c, oxygen_saturation")
+        .eq("visit_id", visitId)
+        .single(),
+      supabase
+        .from("visit_diagnoses")
+        .select("*, diagnosis:diagnoses(id, code, title)")
+        .eq("visit_id", visitId),
+    ]);
 
   return {
     ...visit,
-    patient,
-    doctor,
-    screening,
-    diagnoses: diagnoses || [],
+    patient: patientResult.data,
+    doctor: doctorResult.data,
+    screening: screeningResult.data,
+    diagnoses: diagnosesResult.data || [],
   };
 }
 
@@ -176,6 +181,7 @@ export async function createPrescription(input: CreatePrescriptionInput) {
   // Step 2: Get authenticated user
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
+    console.error("[createPrescription] Auth failed:", authError?.message);
     return { error: "Authentication required." };
   }
 
@@ -187,6 +193,7 @@ export async function createPrescription(input: CreatePrescriptionInput) {
     .single();
 
   if (visitError || !visit) {
+    console.error("[createPrescription] Visit not found:", visitError?.message, { visit_id: input.visit_id });
     return { error: "Visit not found." };
   }
 
@@ -207,6 +214,7 @@ export async function createPrescription(input: CreatePrescriptionInput) {
     .single();
 
   if (prescriptionError || !prescription) {
+    console.error("[createPrescription] Insert failed:", prescriptionError?.message, { visit_id: input.visit_id });
     return { error: "Failed to create prescription. Please try again." };
   }
 
@@ -226,6 +234,7 @@ export async function createPrescription(input: CreatePrescriptionInput) {
     .insert(items);
 
   if (itemsError) {
+    console.error("[createPrescription] Items insert failed:", itemsError.message, { prescription_id: prescription.id });
     return { error: "Failed to add prescription items. Please try again." };
   }
 
@@ -260,6 +269,7 @@ export async function assignDoctorToVisit(visitId: string) {
 
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
+    console.error("[assignDoctorToVisit] Auth failed:", authError?.message);
     return { error: "Authentication required." };
   }
 
@@ -270,7 +280,54 @@ export async function assignDoctorToVisit(visitId: string) {
     .is("doctor_id", null);
 
   if (error) {
+    console.error("[assignDoctorToVisit] Failed:", error.message, { visit_id: visitId });
     return { error: "Failed to assign doctor." };
+  }
+
+  revalidatePath(`/doctor/visits/${visitId}`);
+  revalidatePath("/my-queue");
+  revalidatePath("/consultations");
+  return { success: true };
+}
+
+export async function completeVisit(visitId: string) {
+  const supabase = await createClient();
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    console.error("[completeVisit] Auth failed:", authError?.message);
+    return { error: "Authentication required." };
+  }
+
+  // Verify the visit exists and is assigned to this doctor
+  const { data: visit, error: visitError } = await supabase
+    .from("visits")
+    .select("id, doctor_id, status")
+    .eq("id", visitId)
+    .single();
+
+  if (visitError || !visit) {
+    console.error("[completeVisit] Visit not found:", visitError?.message, { visit_id: visitId });
+    return { error: "Visit not found." };
+  }
+
+  if (visit.doctor_id !== user.id) {
+    return { error: "You are not assigned to this visit." };
+  }
+
+  if (visit.status !== "with_doctor") {
+    return { error: "Only visits in progress can be completed." };
+  }
+
+  // Mark as completed
+  const { error } = await supabase
+    .from("visits")
+    .update({ status: "completed" })
+    .eq("id", visitId);
+
+  if (error) {
+    console.error("[completeVisit] Failed:", error.message, { visit_id: visitId });
+    return { error: "Failed to complete visit. Please try again." };
   }
 
   revalidatePath(`/doctor/visits/${visitId}`);

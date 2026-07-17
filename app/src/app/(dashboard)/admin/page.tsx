@@ -1,12 +1,19 @@
+import type { Metadata } from "next"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, Activity, Calendar, Settings, FileText, Shield, BarChart3, ClipboardList } from "lucide-react"
+import { Users, Activity } from "lucide-react"
 import { TodayVisitCountCard } from "@/components/features/patients/today-visit-count-card"
 import { TodayVisitWaitingCountCard } from "@/components/features/patients/today-visit-waiting-count-card"
+
+export const metadata: Metadata = {
+  title: "Admin Dashboard",
+  description: "System overview and admin tools",
+}
 
 
 export default function AdminPage() {
   return (
     <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
       {/* Stats cards — design system §4: admin → user management */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>

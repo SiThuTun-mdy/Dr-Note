@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { getUserRoles } from "@/lib/auth/roles"
 import { getStaffProfile } from "@/components/features/profile/profile-actions"
+
+export const metadata: Metadata = {
+  title: "My Profile",
+  description: "View and update your personal details",
+}
 import { StaffProfileView } from "@/components/features/profile/profile-view"
 import { ProfileError } from "@/components/features/profile/profile-error"
 

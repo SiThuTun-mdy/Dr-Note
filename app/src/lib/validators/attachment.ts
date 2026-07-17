@@ -12,6 +12,8 @@ export const ALLOWED_MIME_TYPES = [
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+export const uuidSchema = z.string().uuid();
+
 export const attachmentFileSchema = z
   .custom<File>()
   .refine((f) => f.size <= MAX_FILE_SIZE, "File must be under 10MB")
