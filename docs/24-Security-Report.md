@@ -317,3 +317,32 @@ Recommendation: Add auth check.
 | Medium remediation plan | ❌ Required |
 
 **Release Status: BLOCKED**
+
+## Patient identity provisioning email (17 Jul 2026)
+
+Scope: `reception/patients/new/actions.ts` now sends the patient a
+set-password link via `resetPasswordForEmail` after successful registration
+(recovery emails are sent regardless of the email-confirmation setting);
+`patient-registration-form.tsx` surfaces send success/failure to the
+receptionist.
+
+### Findings
+
+No new findings.
+
+### Verified as sound
+- Anon-key client only — complies with docs/12-Architecture.md §3 (no
+  service-role key in app code).
+- `redirectTo` is built server-side from `getSiteUrl()` (env), never from
+  user input; `/auth/confirm` still allowlists `next` to `/set-password`
+  (open-redirect protection unchanged).
+- Email address comes from Zod-validated input and the send happens only
+  after the authenticated + role-checked (`admin`/`receptionist`)
+  registration fully succeeds — no enumeration surface added.
+- Email-send failure is logged server-side with context and surfaced to the
+  client only as a boolean `emailSent` flag — no provider error details
+  leak.
+- Recovery link grants a one-time session to the inbox owner, who then sets
+  their own password and is signed out (`set-password/actions.ts`) —
+  intended provisioning behavior; temp password remains random and never
+  surfaced.

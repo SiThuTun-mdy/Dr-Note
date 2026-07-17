@@ -38,6 +38,7 @@
 | File attachments: upload/download/delete for visits (Supabase Storage) — PR #65 | #36 |
 | Screening form: vitals (nurse) — PR #65 | #26 |
 | Visit summary: printable view with vitals, diagnoses, prescriptions — PR #65 | #35 |
+| Patient identity provisioning: registration now emails the patient a set-password link (`resetPasswordForEmail` → `/auth/confirm` → `/set-password`); works with email confirmation OFF; send failure surfaced to receptionist | — |
 
 ### 📐 Standard Requirements
 > **All tables must use `<DataTable>` with search and pagination.** New list/table pages must integrate the reusable `DataTable` component (`src/components/ui/data-table.tsx`) which provides client-side search and pagination out of the box. Pass `searchKeys` for columns to search, `pageSize` for rows per page, and `filters` slot for dropdowns.

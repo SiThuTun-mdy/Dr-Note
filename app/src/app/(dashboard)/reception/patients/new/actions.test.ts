@@ -4,6 +4,7 @@ const mockUser = { id: 'receptionist-1' }
 const mockGetUser = vi.fn()
 const mockFrom = vi.fn()
 const mockSignUp = vi.fn()
+const mockResetPasswordForEmail = vi.fn()
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => ({
@@ -14,7 +15,7 @@ vi.mock('@/lib/supabase/server', () => ({
 
 vi.mock('@/lib/supabase/service', () => ({
   createServiceClient: vi.fn(() => ({
-    auth: { signUp: mockSignUp },
+    auth: { signUp: mockSignUp, resetPasswordForEmail: mockResetPasswordForEmail },
   })),
 }))
 
@@ -84,6 +85,68 @@ describe('registerPatient', () => {
 
     expect(result.success).toBe(false)
     expect(mockSignUp).not.toHaveBeenCalled()
+  })
+
+  // Queues the from() mocks for every step after the role check succeeds:
+  // roles lookup, then the users / patient_profiles / user_roles inserts.
+  function mockHappyPathInserts() {
+    mockFrom.mockReturnValueOnce({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
+            data: { id: 'role-patient' },
+            error: null,
+          }),
+        }),
+      }),
+    })
+    for (let i = 0; i < 3; i++) {
+      mockFrom.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValue({ error: null }),
+      })
+    }
+  }
+
+  it('sends the set-password email after successful registration', async () => {
+    mockRoleLookup('receptionist')
+    mockSignUp.mockResolvedValueOnce({
+      data: { user: { id: 'new-patient-1' } },
+      error: null,
+    })
+    mockHappyPathInserts()
+    mockResetPasswordForEmail.mockResolvedValueOnce({ error: null })
+
+    const { registerPatient } = await import('./actions')
+    const result = await registerPatient(validInput)
+
+    expect(result.success).toBe(true)
+    expect(result.patientId).toBe('new-patient-1')
+    expect(result.emailSent).toBe(true)
+    expect(mockResetPasswordForEmail).toHaveBeenCalledWith(
+      validInput.email,
+      expect.objectContaining({
+        redirectTo: expect.stringContaining('/auth/confirm?next=/set-password'),
+      })
+    )
+  })
+
+  it('still succeeds (emailSent: false) when the email send fails', async () => {
+    mockRoleLookup('receptionist')
+    mockSignUp.mockResolvedValueOnce({
+      data: { user: { id: 'new-patient-2' } },
+      error: null,
+    })
+    mockHappyPathInserts()
+    mockResetPasswordForEmail.mockResolvedValueOnce({
+      error: { message: 'rate limit exceeded' },
+    })
+
+    const { registerPatient } = await import('./actions')
+    const result = await registerPatient(validInput)
+
+    expect(result.success).toBe(true)
+    expect(result.patientId).toBe('new-patient-2')
+    expect(result.emailSent).toBe(false)
   })
 
   it('maps a duplicate-email signUp error to a field error', async () => {
