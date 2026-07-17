@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { PatientRegistrationForm } from "./patient-registration-form"
+
+export const metadata: Metadata = {
+  title: "Patient Registration",
+  description: "Register a new patient",
+}
 
 const ALLOWED_ROLES = new Set(["admin", "receptionist"])
 
@@ -36,7 +42,7 @@ export default async function NewPatientPage() {
 
   return (
     <div className="max-w-lg">
-      <h2 className="text-2xl font-bold mb-6">Patient Registration</h2>
+      <h1 className="text-2xl font-bold mb-6">Patient Registration</h1>
       <PatientRegistrationForm />
     </div>
   )

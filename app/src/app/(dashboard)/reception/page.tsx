@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Reception",
+  description: "Reception dashboard and patient intake",
+};
 import { SameDayVisitDataTable } from "@/components/features/patients/same-day-visit-data-table";
 import { TodayVisitCountCard } from "@/components/features/patients/today-visit-count-card";
 import { TodayVisitWaitingCountCard } from "@/components/features/patients/today-visit-waiting-count-card";
@@ -9,6 +15,7 @@ import { TodayPatientRegistrationCountCard } from "@/components/features/patient
 export default function ReceptionPage() {
   return (
     <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-foreground">Reception</h1>
       {/* Stats cards — design system §4: reception → today's queue + "Register patient" */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <TodayVisitCountCard />

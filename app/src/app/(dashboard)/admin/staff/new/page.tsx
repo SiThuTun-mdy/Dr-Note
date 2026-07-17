@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { userHasRole } from "@/lib/auth/roles"
+
+export const metadata: Metadata = {
+  title: "Add Staff",
+  description: "Onboard a new staff member",
+}
 import { StaffOnboardingForm } from "./staff-onboarding-form"
 
 export default async function NewStaffPage() {
@@ -21,7 +27,7 @@ export default async function NewStaffPage() {
 
   return (
     <div className="max-w-lg">
-      <h2 className="text-2xl font-bold mb-6">Add staff member</h2>
+      <h1 className="text-2xl font-bold mb-6">Add staff member</h1>
       <StaffOnboardingForm />
     </div>
   )

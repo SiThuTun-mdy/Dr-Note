@@ -1,7 +1,13 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 
 import { createClient } from "@/lib/supabase/server"
+
+export const metadata: Metadata = {
+  title: "Patient Profile",
+  description: "View patient details and visit history",
+}
 import { getUserRoles } from "@/lib/auth/roles"
 import { PatientProfileView } from "@/components/features/patients/patient-profile-view"
 import { VisitHistorySection } from "@/components/features/patients/visit-history-section"

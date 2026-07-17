@@ -1,4 +1,10 @@
+import type { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Register Patient",
+  description: "Register a new patient",
+}
 
 export default function RegisterPatientPage() {
   return (

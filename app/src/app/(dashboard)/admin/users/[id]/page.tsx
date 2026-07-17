@@ -1,7 +1,13 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { createClient } from "@/lib/supabase/server"
+
+export const metadata: Metadata = {
+  title: "User Profile",
+  description: "View staff member profile",
+}
 import { userHasRole } from "@/lib/auth/roles"
 import { getStaffProfile } from "@/components/features/profile/profile-actions"
 import { StaffProfileView } from "@/components/features/profile/profile-view"

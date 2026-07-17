@@ -1,5 +1,11 @@
+import type { Metadata } from "next"
 import { PatientsDataTable, type PatientTableRow } from "@/components/features/patients/patients-data-table"
 import { createClient } from "@/lib/supabase/server"
+
+export const metadata: Metadata = {
+  title: "Patients",
+  description: "Browse and manage patient profiles",
+}
 
 interface PatientProfileSummary {
   dob: string | null

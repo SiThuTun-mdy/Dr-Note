@@ -1,5 +1,11 @@
+import type { Metadata } from "next"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { VisitQueue } from "@/components/features/queue/visit-queue"
+
+export const metadata: Metadata = {
+  title: "Queue",
+  description: "Live view of today's patient queue",
+}
 
 export default function QueuePage() {
   return (

@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { VisitCreationForm } from "./visit-creation-form"
+
+export const metadata: Metadata = {
+  title: "New Visit",
+  description: "Create a new patient visit",
+}
 
 const ALLOWED_ROLES = new Set(["admin", "receptionist"])
 
@@ -61,7 +67,7 @@ export default async function NewVisitPage({ searchParams }: Props) {
 
   return (
     <div className="max-w-lg">
-      <h2 className="text-2xl font-bold mb-6">New visit</h2>
+      <h1 className="text-2xl font-bold mb-6">New visit</h1>
       <VisitCreationForm prefillPatient={prefillPatient} />
     </div>
   )

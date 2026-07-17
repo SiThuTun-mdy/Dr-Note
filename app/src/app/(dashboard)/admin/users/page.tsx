@@ -120,7 +120,7 @@ export default function AdminUsersPage() {
   if (loading) {
     return (
       <>
-        <h2 className="text-2xl font-bold mb-6">User Management</h2>
+        <h1 className="text-2xl font-bold mb-6">User Management</h1>
         <Card>
           <CardContent className="p-6">
             <div className="space-y-4">
@@ -138,7 +138,7 @@ export default function AdminUsersPage() {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">User Management</h2>
+        <h1 className="text-2xl font-bold">User Management</h1>
         <Button nativeButton={false} render={<Link href="/admin/staff/new" />}>
           <UserPlus />
           Add staff

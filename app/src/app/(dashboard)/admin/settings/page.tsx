@@ -1,4 +1,10 @@
+import type { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Settings",
+  description: "System configuration",
+}
 
 export default function SettingsPage() {
   return (

@@ -1,3 +1,10 @@
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Waiting",
+  description: "Patients currently waiting",
+}
+
 export default function WaitingPage() {
   return (
     <div>
