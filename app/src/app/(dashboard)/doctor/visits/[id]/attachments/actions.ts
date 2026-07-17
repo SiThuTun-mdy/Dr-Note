@@ -4,13 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import {
   attachmentUploadSchema,
+  uuidSchema,
   ALLOWED_MIME_TYPES,
   MAX_FILE_SIZE,
 } from "@/lib/validators/attachment";
 
 const BUCKET_NAME = "visit-attachments";
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface AttachmentRecord {
   id: string;
@@ -57,6 +56,7 @@ export async function uploadAttachment(
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) {
+    console.error("[uploadAttachment] Auth failed:", authError?.message);
     return { error: "Authentication required." };
   }
 
@@ -68,6 +68,7 @@ export async function uploadAttachment(
     .single();
 
   if (visitError || !visit) {
+    console.error("[uploadAttachment] Visit not found:", visitError?.message, { visit_id: visitId });
     return { error: "Visit not found." };
   }
 
@@ -85,6 +86,7 @@ export async function uploadAttachment(
     });
 
   if (uploadError) {
+    console.error("[uploadAttachment] Storage upload failed:", uploadError.message, { visit_id: visitId, path: storagePath });
     return { error: "Failed to upload file. Please try again." };
   }
 
@@ -101,6 +103,7 @@ export async function uploadAttachment(
     .single();
 
   if (insertError) {
+    console.error("[uploadAttachment] DB insert failed:", insertError.message, { visit_id: visitId, path: storagePath });
     // Attempt to clean up the uploaded file if DB insert fails
     await supabase.storage.from(BUCKET_NAME).remove([storagePath]);
     return { error: "Failed to save attachment record. Please try again." };
@@ -114,7 +117,7 @@ export async function getVisitAttachments(
   visitId: string
 ): Promise<AttachmentRecord[]> {
   // Validate visit ID format
-  if (!visitId || !UUID_RE.test(visitId)) {
+  if (!uuidSchema.safeParse(visitId).success) {
     return [];
   }
 
@@ -146,7 +149,7 @@ export async function getVisitAttachmentCount(
   visitId: string
 ): Promise<number> {
   // Validate visit ID format
-  if (!visitId || !UUID_RE.test(visitId)) {
+  if (!uuidSchema.safeParse(visitId).success) {
     return 0;
   }
 
@@ -177,10 +180,10 @@ export async function deleteAttachment(
   visitId: string
 ): Promise<{ success?: boolean; error?: string }> {
   // Validate inputs
-  if (!attachmentId || !UUID_RE.test(attachmentId)) {
+  if (!uuidSchema.safeParse(attachmentId).success) {
     return { error: "Invalid attachment ID." };
   }
-  if (!visitId || !UUID_RE.test(visitId)) {
+  if (!uuidSchema.safeParse(visitId).success) {
     return { error: "Invalid visit ID." };
   }
 
@@ -192,6 +195,7 @@ export async function deleteAttachment(
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) {
+    console.error("[deleteAttachment] Auth failed:", authError?.message);
     return { error: "Authentication required." };
   }
 
@@ -203,6 +207,7 @@ export async function deleteAttachment(
     .single();
 
   if (fetchError || !attachment) {
+    console.error("[deleteAttachment] Not found:", fetchError?.message, { attachment_id: attachmentId });
     return { error: "Attachment not found." };
   }
 
@@ -228,6 +233,7 @@ export async function deleteAttachment(
     .remove([attachment.file_path]);
 
   if (storageError) {
+    console.error("[deleteAttachment] Storage delete failed:", storageError.message, { path: attachment.file_path });
     return { error: "Failed to delete file from storage. Please try again." };
   }
 
@@ -238,6 +244,7 @@ export async function deleteAttachment(
     .eq("id", attachmentId);
 
   if (deleteError) {
+    console.error("[deleteAttachment] DB delete failed:", deleteError.message, { attachment_id: attachmentId });
     return { error: "Failed to delete attachment record. Please try again." };
   }
 
@@ -249,7 +256,7 @@ export async function getAttachmentDownloadUrl(
   attachmentId: string
 ): Promise<{ url?: string; error?: string }> {
   // Validate attachment ID format
-  if (!attachmentId || !UUID_RE.test(attachmentId)) {
+  if (!uuidSchema.safeParse(attachmentId).success) {
     return { error: "Invalid attachment ID." };
   }
 
@@ -261,6 +268,7 @@ export async function getAttachmentDownloadUrl(
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) {
+    console.error("[getAttachmentDownloadUrl] Auth failed:", authError?.message);
     return { error: "Authentication required." };
   }
 
@@ -272,6 +280,7 @@ export async function getAttachmentDownloadUrl(
     .single();
 
   if (fetchError || !attachment) {
+    console.error("[getAttachmentDownloadUrl] Not found:", fetchError?.message, { attachment_id: attachmentId });
     return { error: "Attachment not found." };
   }
 
@@ -293,6 +302,7 @@ export async function getAttachmentDownloadUrl(
     .createSignedUrl(attachment.file_path, 3600); // 1 hour expiry
 
   if (error) {
+    console.error("[getAttachmentDownloadUrl] Signed URL failed:", error.message, { path: attachment.file_path });
     return { error: "Failed to generate download link." };
   }
 

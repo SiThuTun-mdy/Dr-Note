@@ -1,55 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// Create mock functions for the chain
-const mockEq = vi.fn();
-const mockSingle = vi.fn();
-const mockSelect = vi.fn();
-const mockOrder = vi.fn();
-const mockFrom = vi.fn();
-
-// Build chain that returns itself at each step
-const mockChain = {
-  select: mockSelect,
-  eq: mockEq,
-  single: mockSingle,
-  order: mockOrder,
-};
-
-// Each method returns mockChain to allow chaining
-mockSelect.mockReturnValue(mockChain);
-mockEq.mockReturnValue(mockChain);
-mockOrder.mockReturnValue(mockChain);
-mockSingle.mockResolvedValue({ data: null, error: null });
-
-vi.mock("@/lib/supabase/server", () => ({
-  createClient: vi.fn(() => ({
-    from: mockFrom,
-  })),
-}));
+import { resetSupabaseMocks, mocks } from "@test-utils/supabase-mock";
 
 describe("getVisitSummary", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    // Re-setup chain returns after clearAllMocks
-    mockSelect.mockReturnValue(mockChain);
-    mockEq.mockReturnValue(mockChain);
-    mockOrder.mockReturnValue(mockChain);
-    mockSingle.mockResolvedValue({ data: null, error: null });
-    mockFrom.mockReturnValue(mockChain);
+    resetSupabaseMocks();
   });
 
   it("should return null when visit is not found", async () => {
-    mockSingle.mockResolvedValue({ data: null, error: { message: "not found" } });
+    mocks.mockSingle.mockResolvedValue({ data: null, error: { message: "not found" } });
 
     const { getVisitSummary } = await import("./actions");
     const result = await getVisitSummary("nonexistent-id");
 
     expect(result).toBeNull();
-    expect(mockFrom).toHaveBeenCalledWith("visits");
+    expect(mocks.mockFrom).toHaveBeenCalledWith("visits");
   });
 
   it("should return null when visit exists but RLS blocks access", async () => {
-    mockSingle.mockResolvedValue({ data: null, error: { code: "PGRST116", message: "Row not found" } });
+    mocks.mockSingle.mockResolvedValue({ data: null, error: { code: "PGRST116", message: "Row not found" } });
 
     const { getVisitSummary } = await import("./actions");
     const result = await getVisitSummary("restricted-id");
@@ -84,7 +52,7 @@ describe("getVisitSummary", () => {
     };
 
     // First call: fetch visit
-    mockSingle
+    mocks.mockSingle
       .mockResolvedValueOnce({ data: mockVisit, error: null })
       // Patient
       .mockResolvedValueOnce({ data: mockPatient, error: null })
@@ -93,22 +61,13 @@ describe("getVisitSummary", () => {
       // Screening
       .mockResolvedValueOnce({ data: mockScreening, error: null });
 
-    // Promise.all calls - these use eq which returns mockChain, then resolve
-    // Diagnoses and prescriptions don't use .single()
-    mockSelect
-      .mockReturnValueOnce(mockChain) // patient select
-      .mockReturnValueOnce(mockChain) // doctor select
-      .mockReturnValueOnce(mockChain) // screening select
-      .mockReturnValueOnce(mockChain) // diagnoses select
-      .mockReturnValueOnce(mockChain); // prescriptions select
-
     const { getVisitSummary } = await import("./actions");
 
     const result = await getVisitSummary("visit-123");
 
     // The result should have the visit data merged with related data
     expect(result).not.toBeNull();
-    expect(mockFrom).toHaveBeenCalledWith("visits");
+    expect(mocks.mockFrom).toHaveBeenCalledWith("visits");
   });
 
   it("should handle visit with no doctor assigned", async () => {
@@ -126,7 +85,7 @@ describe("getVisitSummary", () => {
 
     const mockPatient = { name: "Jane Doe", email: "jane@example.com" };
 
-    mockSingle
+    mocks.mockSingle
       .mockResolvedValueOnce({ data: mockVisit, error: null })
       .mockResolvedValueOnce({ data: mockPatient, error: null })
       .mockResolvedValueOnce({ data: null, error: null }); // no doctor
@@ -151,7 +110,7 @@ describe("getVisitSummary", () => {
       created_at: "2026-07-14T08:00:00Z",
     };
 
-    mockSingle
+    mocks.mockSingle
       .mockResolvedValueOnce({ data: mockVisit, error: null })
       .mockResolvedValueOnce({ data: { name: "Bob", email: "bob@example.com" }, error: null })
       .mockResolvedValueOnce({ data: { name: "Dr. Lee", email: "lee@example.com" }, error: null })
@@ -176,7 +135,7 @@ describe("getVisitSummary", () => {
       created_at: "2026-07-14T07:00:00Z",
     };
 
-    mockSingle
+    mocks.mockSingle
       .mockResolvedValueOnce({ data: mockVisit, error: null })
       .mockResolvedValueOnce({ data: { name: "Alice", email: "alice@example.com" }, error: null })
       .mockResolvedValueOnce({ data: { name: "Dr. Park", email: "park@example.com" }, error: null })

@@ -97,11 +97,6 @@ const navigationByRole: Record<
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
-      name: "My queue",
-      href: "/my-queue",
-      icon: <ClipboardList className="h-5 w-5" />,
-    },
-    {
       name: "Patients",
       href: "/patients",
       icon: <Users className="h-5 w-5" />,
@@ -110,16 +105,6 @@ const navigationByRole: Record<
       name: "Consultations",
       href: "/consultations",
       icon: <Stethoscope className="h-5 w-5" />,
-    },
-    {
-      name: "Prescriptions",
-      href: "/prescriptions",
-      icon: <FileText className="h-5 w-5" />,
-    },
-    {
-      name: "History",
-      href: "/history",
-      icon: <History className="h-5 w-5" />,
     },
     {
       name: "My profile",

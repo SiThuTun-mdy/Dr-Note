@@ -38,25 +38,31 @@ export async function getDoctorDashboardStats(): Promise<DoctorDashboardStats> {
   const endOfDay = new Date(startOfDay)
   endOfDay.setDate(endOfDay.getDate() + 1)
 
-  // Fetch today's visits assigned to this doctor
-  const { data: todayVisits } = await supabase
+  // Single query: fetch all visits assigned to this doctor
+  const { data: allVisits } = await supabase
     .from("visits")
-    .select("id, status, chief_complaint, patient_id, visit_date")
+    .select("id, status, chief_complaint, patient_id, visit_date, created_at")
     .eq("doctor_id", user.id)
-    .gte("visit_date", startOfDay.toISOString())
-    .lt("visit_date", endOfDay.toISOString())
-
-  // Fetch all active visits in my queue (waiting, screening, with_doctor)
-  const { data: queueVisits } = await supabase
-    .from("visits")
-    .select("id, status, chief_complaint, patient_id, visit_date")
-    .eq("doctor_id", user.id)
-    .in("status", ["waiting", "screening", "with_doctor"])
     .order("created_at", { ascending: true })
+
+  if (!allVisits || allVisits.length === 0) {
+    return defaultStats
+  }
+
+  // Filter in JS for today stats
+  const todayVisits = allVisits.filter((v) => {
+    const visitDate = new Date(v.visit_date)
+    return visitDate >= startOfDay && visitDate < endOfDay
+  })
+
+  // Filter in JS for queue (active statuses, any date)
+  const queueVisits = allVisits.filter((v) =>
+    ["waiting", "screening", "with_doctor"].includes(v.status)
+  )
 
   // Fetch patient names for queue
   const queuePatientIds = [
-    ...new Set((queueVisits || []).map((v) => v.patient_id)),
+    ...new Set(queueVisits.map((v) => v.patient_id)),
   ]
 
   let patientMap: Record<string, string> = {}
@@ -71,13 +77,13 @@ export async function getDoctorDashboardStats(): Promise<DoctorDashboardStats> {
     }
   }
 
-  const todayPatients = todayVisits?.length || 0
+  const todayPatients = todayVisits.length
   const pendingConsultations =
-    todayVisits?.filter((v) => v.status === "with_doctor").length || 0
+    todayVisits.filter((v) => v.status === "with_doctor").length
   const completedToday =
-    todayVisits?.filter((v) => v.status === "completed").length || 0
+    todayVisits.filter((v) => v.status === "completed").length
 
-  const myQueue = (queueVisits || []).map((v) => ({
+  const myQueue = queueVisits.map((v) => ({
     id: v.id,
     patientName: patientMap[v.patient_id] || "Unknown",
     status: v.status,

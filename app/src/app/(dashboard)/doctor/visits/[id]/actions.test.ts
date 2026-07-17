@@ -1,53 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// Create mock functions for the chain
-const mockEq = vi.fn();
-const mockSingle = vi.fn();
-const mockLimit = vi.fn();
-const mockOr = vi.fn();
-const mockOrder = vi.fn();
-const mockInsert = vi.fn();
-const mockDelete = vi.fn();
-const mockUpdate = vi.fn();
-const mockSelect = vi.fn();
-const mockFrom = vi.fn();
-
-// Build chain that returns itself at each step
-const mockChain = {
-  select: mockSelect,
-  insert: mockInsert,
-  delete: mockDelete,
-  update: mockUpdate,
-  eq: mockEq,
-  single: mockSingle,
-  limit: mockLimit,
-  order: mockOrder,
-  or: mockOr,
-};
-
-// Each method returns mockChain to allow chaining
-mockSelect.mockReturnValue(mockChain);
-mockDelete.mockReturnValue(mockChain);
-mockUpdate.mockReturnValue(mockChain);
-mockEq.mockReturnValue(mockChain);
-mockSingle.mockResolvedValue({ data: null, error: null });
-mockLimit.mockResolvedValue({ data: [], error: null });
-mockOrder.mockReturnValue(mockChain);
-mockOr.mockReturnValue(mockChain);
-
-// insert() returns a chain with select() → single()
-const mockInsertChain = {
-  select: vi.fn().mockReturnValue({
-    single: mockSingle,
-  }),
-};
-mockInsert.mockReturnValue(mockInsertChain);
-
-vi.mock("@/lib/supabase/server", () => ({
-  createClient: vi.fn(() => ({
-    from: mockFrom,
-  })),
-}));
+import { resetSupabaseMocks, mocks } from "@test-utils/supabase-mock";
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
@@ -55,19 +7,7 @@ vi.mock("next/cache", () => ({
 
 describe("Diagnosis Server Actions", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    // Re-setup chain returns after clearAllMocks
-    mockSelect.mockReturnValue(mockChain);
-    mockDelete.mockReturnValue(mockChain);
-    mockUpdate.mockReturnValue(mockChain);
-    mockEq.mockReturnValue(mockChain);
-    mockSingle.mockResolvedValue({ data: null, error: null });
-    mockLimit.mockResolvedValue({ data: [], error: null });
-    mockOrder.mockReturnValue(mockChain);
-    mockOr.mockReturnValue(mockChain);
-    mockInsertChain.select.mockReturnValue({ single: mockSingle });
-    mockInsert.mockReturnValue(mockInsertChain);
-    mockFrom.mockReturnValue(mockChain);
+    resetSupabaseMocks();
   });
 
   describe("addDiagnosis", () => {
@@ -81,8 +21,8 @@ describe("Diagnosis Server Actions", () => {
       });
 
       expect(result).toEqual({ success: true });
-      expect(mockFrom).toHaveBeenCalledWith("visit_diagnoses");
-      expect(mockInsert).toHaveBeenCalledWith({
+      expect(mocks.mockFrom).toHaveBeenCalledWith("visit_diagnoses");
+      expect(mocks.mockInsert).toHaveBeenCalledWith({
         visit_id: "visit-123",
         diagnosis_id: "diag-456",
         diagnosis_type: "primary",
@@ -90,7 +30,7 @@ describe("Diagnosis Server Actions", () => {
     });
 
     it("should return error on duplicate diagnosis", async () => {
-      mockSingle.mockResolvedValue({
+      mocks.mockSingle.mockResolvedValue({
         data: null,
         error: { code: "23505", message: "duplicate key" },
       });
@@ -109,7 +49,7 @@ describe("Diagnosis Server Actions", () => {
     });
 
     it("should return generic error on other failures", async () => {
-      mockSingle.mockResolvedValue({
+      mocks.mockSingle.mockResolvedValue({
         data: null,
         error: { code: "OTHER", message: "database error" },
       });
@@ -138,9 +78,9 @@ describe("Diagnosis Server Actions", () => {
       });
 
       expect(result).toEqual({ success: true });
-      expect(mockFrom).toHaveBeenCalledWith("visit_diagnoses");
-      expect(mockDelete).toHaveBeenCalled();
-      expect(mockEq).toHaveBeenCalledWith("id", "vd-123");
+      expect(mocks.mockFrom).toHaveBeenCalledWith("visit_diagnoses");
+      expect(mocks.mockDelete).toHaveBeenCalled();
+      expect(mocks.mockEq).toHaveBeenCalledWith("id", "vd-123");
     });
   });
 
@@ -154,17 +94,17 @@ describe("Diagnosis Server Actions", () => {
       });
 
       expect(result).toEqual({ success: true });
-      expect(mockFrom).toHaveBeenCalledWith("visits");
-      expect(mockUpdate).toHaveBeenCalledWith({
+      expect(mocks.mockFrom).toHaveBeenCalledWith("visits");
+      expect(mocks.mockUpdate).toHaveBeenCalledWith({
         diagnosis_note: "Patient shows signs of hypertension",
       });
-      expect(mockEq).toHaveBeenCalledWith("id", "visit-123");
+      expect(mocks.mockEq).toHaveBeenCalledWith("id", "visit-123");
     });
   });
 
   describe("searchDiagnoses", () => {
     it("should search diagnoses by code or title", async () => {
-      mockLimit.mockResolvedValue({
+      mocks.mockRange.mockResolvedValue({
         data: [
           { id: "1", code: "I10", title: "Essential hypertension" },
         ],
@@ -177,11 +117,11 @@ describe("Diagnosis Server Actions", () => {
 
       expect(results).toHaveLength(1);
       expect(results[0].code).toBe("I10");
-      expect(mockFrom).toHaveBeenCalledWith("diagnoses");
+      expect(mocks.mockFrom).toHaveBeenCalledWith("diagnoses");
     });
 
     it("should return empty array on error", async () => {
-      mockLimit.mockResolvedValue({
+      mocks.mockRange.mockResolvedValue({
         data: null,
         error: { message: "database error" },
       });

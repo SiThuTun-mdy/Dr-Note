@@ -2,18 +2,23 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/features/shared/StatusBadge";
 import { DiagnosisPicker } from "./diagnosis-picker";
 import { DiagnosisList } from "./diagnosis-list";
 import { DiagnosisNote } from "./diagnosis-note";
 import { PrescriptionForm } from "./prescription-form";
 import { PrescriptionList } from "./prescription-list";
 import { toast } from "sonner";
-import { addDiagnosis, removeDiagnosis, getVisitPrescriptions, assignDoctorToVisit } from "@/app/(dashboard)/doctor/visits/[id]/actions";
+import {
+  addDiagnosis,
+  removeDiagnosis,
+  getVisitPrescriptions,
+  assignDoctorToVisit,
+  completeVisit,
+} from "@/app/(dashboard)/doctor/visits/[id]/actions";
 import { getVisitAttachmentCount } from "@/app/(dashboard)/doctor/visits/[id]/attachments/actions";
-import { Paperclip } from "lucide-react";
-import Link from "next/link";
+import { AttachmentsDialog } from "@/components/features/attachments/attachments-dialog";
 
 interface VisitData {
   id: string;
@@ -44,42 +49,46 @@ interface VisitData {
 
 interface ConsultViewProps {
   visit: VisitData;
+  currentUserId: string | null;
 }
 
-const statusBadgeClasses: Record<string, string> = {
-  waiting: "bg-amber-100 text-amber-800",
-  screening: "bg-sky-100 text-sky-800",
-  with_doctor: "bg-violet-100 text-violet-800",
-  completed: "bg-green-100 text-green-800",
-};
-
-export function ConsultView({ visit }: ConsultViewProps) {
+export function ConsultView({ visit, currentUserId }: ConsultViewProps) {
   const [diagnoses, setDiagnoses] = useState(visit.diagnoses);
-  const [prescriptions, setPrescriptions] = useState<Array<{
-    id: string;
-    instruction: string | null;
-    created_at: string;
-    diagnosis: { code: string; title: string } | null;
-    items: Array<{
+  const [prescriptions, setPrescriptions] = useState<
+    Array<{
       id: string;
-      medicine_name: string;
-      dosage: string | null;
-      frequency: string | null;
-      duration: string | null;
-      route: string | null;
-      quantity: number | null;
-    }>;
-  }>>([]);
+      instruction: string | null;
+      created_at: string;
+      diagnosis: { code: string; title: string } | null;
+      items: Array<{
+        id: string;
+        medicine_name: string;
+        dosage: string | null;
+        frequency: string | null;
+        duration: string | null;
+        route: string | null;
+        quantity: number | null;
+      }>;
+    }>
+  >([]);
   const [attachmentCount, setAttachmentCount] = useState(0);
+  const [isLoadingPrescriptions, setIsLoadingPrescriptions] = useState(true);
+  const [isLoadingAttachmentCount, setIsLoadingAttachmentCount] =
+    useState(true);
+  const isUnassigned = !visit.doctor_id;
 
   useEffect(() => {
     const fetchPrescriptions = async () => {
+      setIsLoadingPrescriptions(true);
       const data = await getVisitPrescriptions(visit.id);
       setPrescriptions(data);
+      setIsLoadingPrescriptions(false);
     };
     const fetchAttachmentCount = async () => {
+      setIsLoadingAttachmentCount(true);
       const count = await getVisitAttachmentCount(visit.id);
       setAttachmentCount(count);
+      setIsLoadingAttachmentCount(false);
     };
     fetchPrescriptions();
     fetchAttachmentCount();
@@ -87,7 +96,7 @@ export function ConsultView({ visit }: ConsultViewProps) {
 
   const handleAddDiagnosis = async (
     diagnosis: { id: string; code: string; title: string },
-    type: string
+    type: string,
   ) => {
     const result = await addDiagnosis({
       visit_id: visit.id,
@@ -163,27 +172,36 @@ export function ConsultView({ visit }: ConsultViewProps) {
                   Assume care
                 </Button>
               )}
-              <Badge
-                variant="secondary"
-                className={statusBadgeClasses[visit.status]}
-              >
-                {visit.status.replace("_", " ")}
-              </Badge>
+              <StatusBadge
+                status={
+                  visit.status as
+                    | "waiting"
+                    | "screening"
+                    | "with_doctor"
+                    | "completed"
+                }
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-xs font-semibold text-muted-foreground">Visit type</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Visit type
+              </p>
               <p>{visit.visit_type}</p>
             </div>
             <div>
-              <p className="text-xs font-semibold text-muted-foreground">Date</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Date
+              </p>
               <p>{new Date(visit.created_at).toLocaleDateString()}</p>
             </div>
             <div className="col-span-2">
-              <p className="text-xs font-semibold text-muted-foreground">Chief complaint</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Chief complaint
+              </p>
               <p>{visit.chief_complaint}</p>
             </div>
           </div>
@@ -199,27 +217,42 @@ export function ConsultView({ visit }: ConsultViewProps) {
           <CardContent>
             <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
               <div>
-                <p className="text-xs font-semibold text-muted-foreground">Height</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Height
+                </p>
                 <p>{visit.screening.height_cm} cm</p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-muted-foreground">Weight</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Weight
+                </p>
                 <p>{visit.screening.weight_kg} kg</p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-muted-foreground">Blood pressure</p>
-                <p>{visit.screening.bp_systolic}/{visit.screening.bp_diastolic} mmHg</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Blood pressure
+                </p>
+                <p>
+                  {visit.screening.bp_systolic}/{visit.screening.bp_diastolic}{" "}
+                  mmHg
+                </p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-muted-foreground">Heart rate</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Heart rate
+                </p>
                 <p>{visit.screening.heart_rate} bpm</p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-muted-foreground">Temperature</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Temperature
+                </p>
                 <p>{visit.screening.temperature_c}°C</p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-muted-foreground">SpO2</p>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  SpO2
+                </p>
                 <p>{visit.screening.oxygen_saturation}%</p>
               </div>
             </div>
@@ -233,10 +266,7 @@ export function ConsultView({ visit }: ConsultViewProps) {
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Diagnoses</h2>
         <DiagnosisPicker onAdd={handleAddDiagnosis} />
-        <DiagnosisList
-          diagnoses={diagnoses}
-          onRemove={handleRemoveDiagnosis}
-        />
+        <DiagnosisList diagnoses={diagnoses} onRemove={handleRemoveDiagnosis} />
       </div>
 
       <div className="border-t" />
@@ -245,6 +275,7 @@ export function ConsultView({ visit }: ConsultViewProps) {
       <DiagnosisNote
         visitId={visit.id}
         initialNote={visit.diagnosis_note || ""}
+        disabled={isUnassigned}
       />
 
       <div className="border-t" />
@@ -252,11 +283,18 @@ export function ConsultView({ visit }: ConsultViewProps) {
       {/* Prescriptions */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Prescriptions</h2>
-        <PrescriptionList prescriptions={prescriptions} />
+        {isLoadingPrescriptions ? (
+          <div className="text-sm text-muted-foreground">
+            Loading prescriptions...
+          </div>
+        ) : (
+          <PrescriptionList prescriptions={prescriptions} />
+        )}
         <PrescriptionForm
           visitId={visit.id}
           doctorId={visit.doctor?.email || ""}
           diagnoses={visit.diagnoses.map((d) => d.diagnosis)}
+          disabled={isUnassigned}
           onSuccess={() => {
             getVisitPrescriptions(visit.id).then(setPrescriptions);
           }}
@@ -266,22 +304,51 @@ export function ConsultView({ visit }: ConsultViewProps) {
       <div className="border-t" />
 
       {/* Attachments */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="se-y-4pac ">
+        <div className="flex items-center justify-between rounded-lg border p-4">
           <h2 className="text-lg font-semibold">Attachments</h2>
-          <Link href={`/doctor/visits/${visit.id}/attachments`}>
-            <Button variant="outline" size="sm">
-              <Paperclip className="mr-1.5 h-4 w-4" />
-              Manage files
-              {attachmentCount > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {attachmentCount}
-                </Badge>
-              )}
-            </Button>
-          </Link>
+          {!isLoadingAttachmentCount && (
+            <AttachmentsDialog
+              visitId={visit.id}
+              attachmentCount={attachmentCount}
+              disabled={isUnassigned}
+            />
+          )}
         </div>
       </div>
+
+      {/* Complete visit */}
+      {visit.doctor_id &&
+        visit.doctor_id === currentUserId &&
+        visit.status === "with_doctor" && (
+          <>
+            <div className="border-t" />
+            <div className="flex items-center justify-between rounded-lg border bg-muted/50 p-4">
+              <div>
+                <p className="text-sm font-medium">
+                  Ready to complete this visit?
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Make sure you have added diagnoses, notes, and prescriptions.
+                </p>
+              </div>
+              <Button
+                variant="default"
+                onClick={async () => {
+                  const result = await completeVisit(visit.id);
+                  if (result.error) {
+                    toast.error(result.error);
+                  } else {
+                    toast.success("Visit completed");
+                    window.location.reload();
+                  }
+                }}
+              >
+                Complete visit
+              </Button>
+            </div>
+          </>
+        )}
     </div>
   );
 }
