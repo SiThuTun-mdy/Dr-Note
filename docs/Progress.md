@@ -51,6 +51,7 @@
 |------|-------|----------|
 | Production release: prod env config, public URL, deployed smoke test | #40 | 🔴 demo-blocker |
 | Staff profile feature: review + QA completed, blocked by High RLS defect (`staff_profiles_update` self-update bypass) | — | 🔴 security-blocker |
+| Dark mode: Light/Dark/System theme toggle in Topbar user menu; reviewed, QA passed (13 new tests, 305/305 total); PR #91 open awaiting merge | #75 | — |
 
 ### 📋 Backlog
 
@@ -80,6 +81,7 @@
 
 | PR | Title | Status |
 |----|-------|--------|
+| #91 | feat(ui): add light/dark/system theme toggle (#75) | ✅ Open |
 | #62 | feat(visit): add visit creation flow for receptionist (#24) | ✅ Open |
 | #61 | feat(pages): implement list pages with pagination | ✅ Open |
 | #60 | feat(prescription): add prescription form with dynamic items (#34) | ✅ Open |
