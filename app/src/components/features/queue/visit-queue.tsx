@@ -6,7 +6,6 @@ import { ClipboardList, RefreshCw } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
-import { TableRow, TableCell } from "@/components/ui/table"
 import {
   Select,
   SelectContent,
@@ -19,7 +18,7 @@ import { getTodayVisits } from "@/app/(dashboard)/queue/actions"
 import type { VisitStatus } from "@/components/features/shared/StatusBadge"
 
 /** Poll interval: 10 seconds as per requirements. */
-const POLL_INTERVAL_MS = 1_800_000
+const POLL_INTERVAL_MS = 10_000
 
 const STATUS_OPTIONS: { value: VisitStatus | "all"; label: string }[] = [
   { value: "all", label: "All statuses" },
@@ -50,7 +49,7 @@ export function VisitQueue() {
     refetchInterval: POLL_INTERVAL_MS,
   })
 
-  const visits = data?.data ?? []
+  const visits = useMemo(() => data?.data ?? [], [data])
   const userRole = data?.userRole ?? null
 
   // All hooks must be called before any early returns (Rules of Hooks)

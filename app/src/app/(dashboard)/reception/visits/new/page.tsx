@@ -11,7 +11,12 @@ const roleDashboard: Record<string, string> = {
   receptionist: "/reception",
 }
 
-export default async function NewVisitPage() {
+type Props = {
+  searchParams: Promise<{ patientId?: string }>
+}
+
+export default async function NewVisitPage({ searchParams }: Props) {
+  const params = await searchParams
   const supabase = await createClient()
 
   const {
@@ -34,10 +39,30 @@ export default async function NewVisitPage() {
     redirect(roleDashboard[roleName ?? ""] || "/login")
   }
 
+  // Fetch patient data if patientId is provided (from patient profile "New Visit" button)
+  let prefillPatient = null
+  if (params.patientId) {
+    const { data } = await supabase
+      .from("users")
+      .select("id, name, email, patient_profiles(nrc)")
+      .eq("id", params.patientId)
+      .maybeSingle()
+
+    if (data) {
+      const profile = data.patient_profiles as unknown as { nrc: string | null } | null
+      prefillPatient = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        nrc: profile?.nrc ?? null,
+      }
+    }
+  }
+
   return (
     <div className="max-w-lg">
       <h2 className="text-2xl font-bold mb-6">New visit</h2>
-      <VisitCreationForm />
+      <VisitCreationForm prefillPatient={prefillPatient} />
     </div>
   )
 }

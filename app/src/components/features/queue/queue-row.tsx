@@ -11,60 +11,19 @@ import {
   transitionVisitStatus,
   type VisitRow,
 } from "@/app/(dashboard)/queue/actions"
+import { getAvailableActions } from "@/lib/utils/visit-actions"
+
+/** Icon for the transition action button. */
+const actionIcon: Record<string, React.ReactNode> = {
+  waiting_screening: <ClipboardCheck className="h-4 w-4" />,
+  screening_with_doctor: <Stethoscope className="h-4 w-4" />,
+  with_doctor_completed: <CheckCircle2 className="h-4 w-4" />,
+}
 
 interface QueueRowProps {
   visit: VisitRow
   userRole: string | null
   onTransitionComplete: () => void
-}
-
-/** Human-readable label for the transition action button. */
-const actionLabel: Record<string, { label: string; icon: React.ReactNode }> = {
-  waiting_screening: {
-    label: "Start screening",
-    icon: <ClipboardCheck className="h-4 w-4" />,
-  },
-  screening_with_doctor: {
-    label: "Start consult",
-    icon: <Stethoscope className="h-4 w-4" />,
-  },
-  with_doctor_completed: {
-    label: "Complete",
-    icon: <CheckCircle2 className="h-4 w-4" />,
-  },
-}
-
-/**
- * Determine which transition actions the current user can perform on a visit.
- * Returns tuples of [targetStatus, label, icon].
- */
-function getAvailableActions(
-  status: VisitStatus,
-  userRole: string | null
-): Array<{ target: VisitStatus; label: string; icon: React.ReactNode }> {
-  if (!userRole) return []
-
-  const roleActions: Record<string, Array<[VisitStatus, VisitStatus]>> = {
-    nurse: [["waiting", "screening"]],
-    doctor: [
-      ["screening", "with_doctor"],
-      ["with_doctor", "completed"],
-    ],
-    admin: [
-      ["waiting", "screening"],
-      ["screening", "with_doctor"],
-      ["with_doctor", "completed"],
-    ],
-  }
-
-  const allowed = roleActions[userRole] ?? []
-  return allowed
-    .filter(([from]) => from === status)
-    .map(([from, to]) => {
-      const key = `${from}_${to}`
-      const action = actionLabel[key]
-      return { target: to, label: action?.label ?? to, icon: action?.icon ?? null }
-    })
 }
 
 /** Format created_at into a short time string (e.g. "10:30 AM"). */
@@ -117,18 +76,21 @@ export function QueueRow({
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
-          {actions.map((action) => (
-            <Button
-              key={action.target}
-              variant="outline"
-              size="sm"
-              disabled={isPending}
-              onClick={() => handleAction(action.target)}
-            >
-              {action.icon}
-              {action.label}
-            </Button>
-          ))}
+          {actions.map((action) => {
+            const key = `${visit.status}_${action.target}`
+            return (
+              <Button
+                key={action.target}
+                variant="outline"
+                size="sm"
+                disabled={isPending}
+                onClick={() => handleAction(action.target)}
+              >
+                {actionIcon[key]}
+                {action.label}
+              </Button>
+            )
+          })}
         </div>
       </TableCell>
     </TableRow>

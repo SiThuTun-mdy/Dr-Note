@@ -88,7 +88,7 @@ export async function createVisit(
   }
 
   // Create the visit
-  const { data: visit, error: visitError } = await supabase
+  const { error: visitError } = await supabase
     .from("visits")
     .insert({
       patient_id: patientId,
@@ -207,30 +207,43 @@ export async function searchDoctors(query: string) {
 
   if (!roleName || !ALLOWED_ROLES.has(roleName)) return []
 
-  // Escape LIKE wildcards to prevent pattern manipulation
-  const safeQuery = query.replace(/[%_\\]/g, "\\$&")
+  // Step 1: Get all user-role mappings to find doctor user IDs
+  const { data: allUserRoles } = await supabase
+    .from("user_roles")
+    .select("user_id, roles(name)")
 
-  // Search doctors by name or email
-  const { data: doctors } = await supabase
+  // Build a set of user IDs that have the "doctor" role
+  const doctorUserIds = new Set<string>()
+  for (const ur of allUserRoles ?? []) {
+    const roleData = ur.roles as unknown as { name: string } | null
+    if (roleData?.name === "doctor") {
+      doctorUserIds.add(ur.user_id)
+    }
+  }
+
+  if (doctorUserIds.size === 0) return []
+
+  // Step 2: Fetch all users, then filter to doctors and search in JS
+  const { data: allUsers, error: searchError } = await supabase
     .from("users")
-    .select(`
-      id,
-      name,
-      email,
-      user_roles!inner(roles(name))
-    `)
-    .or(`name.ilike.%${safeQuery}%,email.ilike.%${safeQuery}%`)
-    .limit(10)
+    .select("id, name, email")
 
-  // Filter to only doctors
-  return (doctors || [])
-    .filter((d) => {
-      const roles = d.user_roles as unknown as { roles: { name: string } }[]
-      return roles?.some((r) => r.roles?.name === "doctor")
-    })
+  if (searchError || !allUsers) return []
+
+  // Filter to doctors, then by search query
+  const lowerQuery = query.toLowerCase()
+  return allUsers
+    .filter(
+      (u) =>
+        doctorUserIds.has(u.id) &&
+        (u.name?.toLowerCase().includes(lowerQuery) ||
+          u.email?.toLowerCase().includes(lowerQuery))
+    )
+    .slice(0, 10)
     .map((d) => ({
       id: d.id,
       name: d.name,
       email: d.email,
     }))
 }
+
