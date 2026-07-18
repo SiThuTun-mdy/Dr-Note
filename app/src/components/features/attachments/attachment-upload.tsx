@@ -206,8 +206,9 @@ export function AttachmentUpload({
           multiple
           accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx"
           onChange={handleFileChange}
-          className="hidden"
+          className="sr-only"
           aria-hidden="true"
+          tabIndex={-1}
         />
 
         {/* Pending files list */}
