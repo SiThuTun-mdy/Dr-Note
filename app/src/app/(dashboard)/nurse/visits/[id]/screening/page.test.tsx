@@ -41,7 +41,7 @@ import { toast } from "sonner"
 describe("ScreeningPage", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockCreateScreening.mockResolvedValue({ success: true })
+    mockCreateScreening.mockResolvedValue({ success: true, doctorAssigned: true })
   })
 
   describe("Page layout", () => {
@@ -201,7 +201,7 @@ describe("ScreeningPage", () => {
       expect(toast.success).toHaveBeenCalledWith("Screening recorded", {
         description: "Visit advanced to doctor consultation.",
       })
-      expect(mockPush).toHaveBeenCalledWith("/queue")
+      expect(mockPush).toHaveBeenCalledWith("/screening")
     })
 
     it("shows error toast when submission fails", async () => {
