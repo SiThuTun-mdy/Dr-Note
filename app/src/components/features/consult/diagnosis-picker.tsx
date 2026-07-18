@@ -33,25 +33,31 @@ export function DiagnosisPicker({ onAdd, disabled }: DiagnosisPickerProps) {
   const [showResults, setShowResults] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleSearch = useCallback(async (value: string) => {
+  const handleSearch = useCallback((value: string) => {
     setQuery(value);
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
     if (value.trim().length < 2) {
       setResults([]);
       setShowResults(false);
       return;
     }
 
-    setLoading(true);
-    try {
-      const data = await searchDiagnoses(value);
-      setResults(data);
-      setShowResults(true);
-    } catch {
-      toast.error("Failed to search diagnoses");
-    } finally {
-      setLoading(false);
-    }
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const data = await searchDiagnoses(value);
+        setResults(data);
+        setShowResults(true);
+      } catch {
+        toast.error("Failed to search diagnoses");
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
   }, []);
 
   const handleSelect = (diagnosis: Diagnosis) => {
@@ -73,7 +79,12 @@ export function DiagnosisPicker({ onAdd, disabled }: DiagnosisPickerProps) {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
   }, []);
 
   return (

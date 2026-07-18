@@ -47,10 +47,11 @@ export default async function ConsultationsPage({ searchParams }: PageProps) {
   const tab = (params?.tab as TabValue) || (isAdmin ? "all" : "mine");
   const statusFilter = params?.status || "all";
 
-  // Build query based on tab
+  // Build query based on tab (exclude waiting — not yet screened)
   let query = supabase
     .from("visits")
-    .select("id, patient_id, doctor_id, visit_type, status, chief_complaint, visit_date, created_at");
+    .select("id, patient_id, doctor_id, visit_type, status, chief_complaint, visit_date, created_at")
+    .neq("status", "waiting");
 
   if (tab === "mine") {
     query = query.eq("doctor_id", user?.id || "");

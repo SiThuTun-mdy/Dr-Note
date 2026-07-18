@@ -106,18 +106,43 @@ describe("Diagnosis Server Actions", () => {
     it("should search diagnoses by code or title", async () => {
       mocks.mockRange.mockResolvedValue({
         data: [
-          { id: "1", code: "I10", title: "Essential hypertension" },
+          { id: "1", code: "BA00", title: "Essential hypertension" },
         ],
         error: null,
       });
 
       const { searchDiagnoses } = await import("./actions");
 
-      const results = await searchDiagnoses("I10");
+      const results = await searchDiagnoses("BA00");
 
       expect(results).toHaveLength(1);
-      expect(results[0].code).toBe("I10");
+      expect(results[0].code).toBe("BA00");
       expect(mocks.mockFrom).toHaveBeenCalledWith("diagnoses");
+      expect(mocks.mockOr).toHaveBeenCalledWith(
+        "code.ilike.%BA00%,title.ilike.%BA00%"
+      );
+    });
+
+    it("should strip filter metacharacters and wildcards from the query", async () => {
+      mocks.mockRange.mockResolvedValue({ data: [], error: null });
+
+      const { searchDiagnoses } = await import("./actions");
+
+      await searchDiagnoses("Influenza, (virus) %_\\ not identified");
+
+      expect(mocks.mockOr).toHaveBeenCalledWith(
+        "code.ilike.%Influenza virus not identified%,title.ilike.%Influenza virus not identified%"
+      );
+    });
+
+    it("should skip the filter when the query is only metacharacters", async () => {
+      mocks.mockRange.mockResolvedValue({ data: [], error: null });
+
+      const { searchDiagnoses } = await import("./actions");
+
+      await searchDiagnoses(",()%_");
+
+      expect(mocks.mockOr).not.toHaveBeenCalled();
     });
 
     it("should return empty array on error", async () => {
@@ -128,7 +153,7 @@ describe("Diagnosis Server Actions", () => {
 
       const { searchDiagnoses } = await import("./actions");
 
-      const results = await searchDiagnoses("I10");
+      const results = await searchDiagnoses("BA00");
 
       expect(results).toEqual([]);
     });

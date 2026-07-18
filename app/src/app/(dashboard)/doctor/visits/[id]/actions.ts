@@ -91,8 +91,15 @@ export async function searchDiagnoses(
     .select("id, code, title")
     .order("code");
 
-  if (query.trim()) {
-    qb = qb.or(`code.ilike.%${query}%,title.ilike.%${query}%`);
+  // Strip characters that have structural meaning in the PostgREST or() filter
+  // (commas separate conditions, parens group them) and ilike wildcards, so
+  // user input is always treated as a literal search term.
+  const sanitized = query
+    .replace(/[,()%_\\]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (sanitized) {
+    qb = qb.or(`code.ilike.%${sanitized}%,title.ilike.%${sanitized}%`);
   }
 
   const { data, error } = await qb.range(offset, offset + limit - 1);

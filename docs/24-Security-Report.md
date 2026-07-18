@@ -372,3 +372,52 @@ No new findings.
   generic message.
 - No passwords logged; dialog inputs use `type="password"` with proper
   `autocomplete` hints.
+
+---
+
+## WHO ICD-11 diagnoses catalog (18 Jul 2026)
+
+**Files reviewed:** `app/supabase/migrations/00009_icd11_catalog.sql`,
+`app/src/app/(dashboard)/doctor/visits/[id]/actions.ts` (`searchDiagnoses`),
+`app/src/components/features/consult/diagnosis-picker.tsx`.
+
+**Change:** replaced the 12-row ICD-10 starter catalog with 4,330 WHO ICD-11
+MMS 2026-01 stem codes (static seed, no external API), remapped the 12 legacy
+rows in place (FKs preserved), added `pg_trgm` search indexes, sanitized the
+search input, debounced the picker.
+
+### Findings
+
+No new findings.
+
+**[FIND-ICD-01] Severity: Low — Input validation — RESOLVED IN THIS CHANGE**
+Category: Validation
+File: `app/src/app/(dashboard)/doctor/visits/[id]/actions.ts` (`searchDiagnoses`)
+Description: The previous implementation interpolated raw user input into the
+PostgREST `or()` filter string. Commas/parentheses in a query (e.g. searching
+`"Influenza, virus"`) broke the filter syntax, and `%`/`_` acted as
+uncontrolled `ilike` wildcards. Not exploitable for data leakage — any
+injected filter could only reference the `diagnoses` table's own non-sensitive
+columns and the RLS `diagnoses_select using (true)` policy already permits
+reads — but it was a correctness/robustness defect on user input.
+Recommendation (done): metacharacters `,()` and wildcards `%_\` are now
+stripped server-side before building the filter; covered by unit tests.
+
+### Verified as sound
+- Migration is static DML/DDL only — no dynamic SQL, no function/trigger/RLS
+  changes, no new write paths. Titles are SQL-escaped by the generator and were
+  validated end-to-end on a disposable Postgres 15 instance (idempotent re-run
+  verified; legacy code remap guarded with `not exists`).
+- `diagnoses` keeps its existing posture: RLS enabled, SELECT-only policy, no
+  INSERT/UPDATE/DELETE policies — the catalog remains read-only for all client
+  roles; seeding runs as migration owner.
+- Catalog content is public WHO classification data — no PII, no PHI. WHO
+  attribution (CC BY-ND 3.0 IGO) recorded in the migration header.
+- `pg_trgm` installed into the `extensions` schema (Supabase convention), not
+  `public`.
+
+### Observation (pre-existing, unchanged, tracked)
+- `.env.local` in `app/` mixes real credentials with free-text account notes
+  (plaintext passwords). It is gitignored and local-only, but the free-text
+  lines also break `supabase` CLI env parsing. Recommend moving the notes out
+  of the file. Not introduced by this change.
