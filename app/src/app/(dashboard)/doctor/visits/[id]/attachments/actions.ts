@@ -11,6 +11,47 @@ import {
 
 const BUCKET_NAME = "visit-attachments";
 
+/**
+ * Verify the authenticated user has a legitimate relationship to the visit.
+ * Returns the visit record if authorized, or null if not.
+ *
+ * Authorized roles:
+ * - The patient who owns the visit (patient_id = auth.uid())
+ * - The doctor assigned to the visit (doctor_id = auth.uid())
+ * - Staff with admin role (has_permission('users.manage'))
+ */
+async function authorizeVisitAccess(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  visitId: string
+): Promise<{ id: string } | null> {
+  const { data: visit, error } = await supabase
+    .from("visits")
+    .select("id, patient_id, doctor_id")
+    .eq("id", visitId)
+    .single();
+
+  if (error || !visit) return null;
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  // Patient owns this visit
+  if (visit.patient_id === user.id) return { id: visit.id };
+
+  // Doctor is assigned to this visit
+  if (visit.doctor_id === user.id) return { id: visit.id };
+
+  // Admin role (full access)
+  const { data: isAdmin } = await supabase.rpc("has_permission", {
+    perm: "users.manage",
+  });
+  if (isAdmin) return { id: visit.id };
+
+  return null;
+}
+
 export interface AttachmentRecord {
   id: string;
   visit_id: string;
@@ -123,13 +164,14 @@ export async function getVisitAttachments(
 
   const supabase = await createClient();
 
-  // Auth check
+  // Auth + authorization: verify user has a relationship to this visit
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) {
-    return [];
-  }
+  if (!user) return [];
+
+  const authorizedVisit = await authorizeVisitAccess(supabase, visitId);
+  if (!authorizedVisit) return [];
 
   const { data, error } = await supabase
     .from("attachments")
@@ -155,13 +197,14 @@ export async function getVisitAttachmentCount(
 
   const supabase = await createClient();
 
-  // Auth check
+  // Auth + authorization: verify user has a relationship to this visit
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) {
-    return 0;
-  }
+  if (!user) return 0;
+
+  const authorizedVisit = await authorizeVisitAccess(supabase, visitId);
+  if (!authorizedVisit) return 0;
 
   const { count, error } = await supabase
     .from("attachments")
@@ -284,15 +327,11 @@ export async function getAttachmentDownloadUrl(
     return { error: "Attachment not found." };
   }
 
-  // Verify the user can read the associated visit
-  // Use generic error message to avoid leaking visit existence information
-  const { error: visitError } = await supabase
-    .from("visits")
-    .select("id")
-    .eq("id", attachment.visit_id)
-    .single();
-
-  if (visitError) {
+  // Verify the user has a legitimate relationship to the visit
+  // (patient owner, assigned doctor, or admin) — not just visit existence
+  const authorizedVisit = await authorizeVisitAccess(supabase, attachment.visit_id);
+  if (!authorizedVisit) {
+    // Generic error to avoid leaking visit/attachment existence
     return { error: "Attachment not found." };
   }
 

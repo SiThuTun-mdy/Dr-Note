@@ -71,6 +71,8 @@ describe("attachment server actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetUser.mockResolvedValue({ data: { user: mockUser }, error: null });
+    // Default: not admin (rpc returns false)
+    mockRpc.mockResolvedValue({ data: false, error: null });
   });
 
   describe("uploadAttachment", () => {
@@ -234,6 +236,12 @@ describe("attachment server actions", () => {
     });
 
     it("returns empty array on database error", async () => {
+      // Set up visit access (user is the doctor assigned to this visit)
+      visitsChain.single.mockResolvedValue({
+        data: { id: VALID_UUID, patient_id: "other-patient", doctor_id: mockUser.id },
+        error: null,
+      });
+      // The attachments query fails
       attachmentsChain.limit.mockResolvedValue({
         data: null,
         error: { message: "DB error" },
@@ -244,6 +252,11 @@ describe("attachment server actions", () => {
     });
 
     it("returns attachments list on success", async () => {
+      // Set up visit access (user is the doctor assigned to this visit)
+      visitsChain.single.mockResolvedValue({
+        data: { id: VALID_UUID, patient_id: "other-patient", doctor_id: mockUser.id },
+        error: null,
+      });
       const mockAttachments = [
         {
           id: VALID_UUID_2,
@@ -445,7 +458,7 @@ describe("attachment server actions", () => {
         error: null,
       });
       visitsChain.single.mockResolvedValue({
-        data: { id: VALID_UUID_2 },
+        data: { id: VALID_UUID_2, patient_id: "other-patient", doctor_id: mockUser.id },
         error: null,
       });
       mockCreateSignedUrl.mockResolvedValue({
@@ -467,7 +480,7 @@ describe("attachment server actions", () => {
         error: null,
       });
       visitsChain.single.mockResolvedValue({
-        data: { id: VALID_UUID_2 },
+        data: { id: VALID_UUID_2, patient_id: "other-patient", doctor_id: mockUser.id },
         error: null,
       });
       mockCreateSignedUrl.mockResolvedValue({
