@@ -40,6 +40,7 @@
 | Visit summary: printable view with vitals, diagnoses, prescriptions — PR #65 | #35 |
 | Patient identity provisioning: registration now emails the patient a set-password link (`resetPasswordForEmail` → `/auth/confirm` → `/set-password`); works with email confirmation OFF; send failure surfaced to receptionist | — |
 | Change Password dialog: all roles can change their own password from the Topbar avatar menu; current password re-verified server-side before update | — |
+| WHO ICD-11 diagnoses catalog: 4,330 official MMS 2026-01 stem codes seeded (migration `00009`), legacy 12 ICD-10 rows remapped in place (FKs preserved), `pg_trgm` search indexes, `searchDiagnoses` input sanitization + picker debounce — see `docs/10-Decisions.md` 2026-07-18 | — |
 
 ### 📐 Standard Requirements
 > **All tables must use `<DataTable>` with search and pagination.** New list/table pages must integrate the reusable `DataTable` component (`src/components/ui/data-table.tsx`) which provides client-side search and pagination out of the box. Pass `searchKeys` for columns to search, `pageSize` for rows per page, and `filters` slot for dropdowns.
