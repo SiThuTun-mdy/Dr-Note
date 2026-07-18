@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { prescriptionSchema } from "@/lib/validators/prescription";
+import { escapeSearchTerm } from "@/lib/utils/search";
 import { revalidatePath } from "next/cache";
 
 export type DiagnosisType = "primary" | "secondary" | "suspected";
@@ -92,7 +93,8 @@ export async function searchDiagnoses(
     .order("code");
 
   if (query.trim()) {
-    qb = qb.or(`code.ilike.%${query}%,title.ilike.%${query}%`);
+    const safeQuery = escapeSearchTerm(query);
+    qb = qb.or(`code.ilike.%${safeQuery}%,title.ilike.%${safeQuery}%`);
   }
 
   const { data, error } = await qb.range(offset, offset + limit - 1);

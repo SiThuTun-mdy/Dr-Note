@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { escapeSearchTerm } from "@/lib/utils/search"
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -41,12 +42,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ patients: [] })
   }
 
+  // Escape LIKE metacharacters and PostgREST filter syntax so user input
+  // stays DATA, not filter syntax (prevents filter injection).
+  const safeQuery = escapeSearchTerm(q)
+
   // Search patients by name, email, or phone
   const { data, error } = await supabase
     .from("users")
     .select("id, name, email, phone")
     .in("id", patientIds)
-    .or(`name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`)
+    .or(`name.ilike.%${safeQuery}%,email.ilike.%${safeQuery}%,phone.ilike.%${safeQuery}%`)
     .order("name", { ascending: true })
     .limit(20)
 

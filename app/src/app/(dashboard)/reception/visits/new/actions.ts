@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { escapeSearchTerm } from "@/lib/utils/search"
 import {
   visitCreationSchema,
   type VisitCreationInput,
@@ -132,8 +133,8 @@ export async function searchPatients(query: string) {
 
   if (!roleName || !ALLOWED_ROLES.has(roleName)) return []
 
-  // Escape LIKE wildcards to prevent pattern manipulation
-  const safeQuery = query.replace(/[%_\\]/g, "\\$&")
+  // Escape LIKE wildcards and PostgREST filter syntax to prevent injection
+  const safeQuery = escapeSearchTerm(query)
 
   // Search patients by name or NRC
   const { data: patients } = await supabase
