@@ -31,7 +31,7 @@ test.describe("CRUD: Emergency Contacts", () => {
 
     // Verify database persistence
     const contacts = await getEmergencyContacts(PATIENT_ID)
-    const added = contacts.find((c: any) => c.name === "U Thein Aung")
+    const added = contacts.find((c: { name: string }) => c.name === "U Thein Aung")
     expect(added).toBeTruthy()
     expect(added.relationship).toBe("Brother")
     expect(added.phone).toBe("09123456789")
@@ -70,7 +70,7 @@ test.describe("CRUD: Emergency Contacts", () => {
 
     // Verify database deletion
     const contacts = await getEmergencyContacts(PATIENT_ID)
-    const removed = contacts.find((c: any) => c.name === "Temporary Contact")
+    const removed = contacts.find((c: { name: string }) => c.name === "Temporary Contact")
     expect(removed).toBeFalsy()
   })
 
