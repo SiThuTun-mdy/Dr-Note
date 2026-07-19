@@ -25,9 +25,9 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `ai-sdlc-skill` | Project evaluation framework, RACI templates |
-| Agent | `product-manager` | Impact/effort analysis, task breakdown |
+| Agent | `product-manager` | Project evaluation, task breakdown |
 | Command | `/create-issue` | Create GitHub issues for project tasks |
+| | | |
 
 **Human Verify Gate:**
 - Team vote on project selection
@@ -52,9 +52,9 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `doctor-note-domain-skill` | Medical domain knowledge, clinical workflow patterns |
-| MCP | Supabase MCP | Schema design, database planning |
-| Agent | `architect` | Architecture decisions, tech stack review |
+| | | |
+| | | |
+| | | |
 
 **Human Verify Gate:**
 - PM sign-off on PRD (`docs/02-PRD.md`)
@@ -78,9 +78,9 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `supabase-skill` | RLS patterns, migration best practices |
 | MCP | Supabase MCP | `apply_migration`, `get_advisors`, `list_tables` |
-| Command | `/supabase-setup` | Project provisioning, environment config |
+| | | |
+| | | |
 
 **Human Verify Gate:**
 - Migration files reviewed before applying (`supabase/migrations/`)
@@ -106,9 +106,9 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `backend-skill` | Server actions, middleware, auth patterns |
 | MCP | Supabase MCP | Auth config, `has_permission` RPC, user management |
-| Hook | `secret-scan.sh` | Prevents service-role key leaks in code |
+| Hook | `secret-scan.sh` | Prevents service-role key leaks (PostToolUse) |
+| | | |
 
 **Human Verify Gate:**
 - Manual login testing across all 4 roles
@@ -133,15 +133,12 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `react-best-practices` | React Hook Form + Zod, component patterns |
-| MCP | Context7 MCP | Next.js 16 + Supabase docs lookup |
-| Agent | `developer` | Code generation, feature implementation |
-| Command | `/next-task` | Pull next task from backlog, create branch, full workflow |
+| Command | `/next-task` | Pull next task, create branch, start workflow |
 | Command | `/create-pr` | Create PR with description after implementation |
-| Command | `/check-tasks` | Check task status and dependencies |
-| Command | `/create-issue` | Create GitHub issue for new features |
 | Command | `/qa` | Run lint, tsc, build, tests before PR |
 | Command | `/review` | Self-review code for security and quality |
+| | | |
+| | | |
 
 **Human Verify Gate:**
 - Developer self-review checklist (security, error handling, input validation)
@@ -167,9 +164,10 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `security-review-skill` | Security checklist, vulnerability patterns |
 | MCP | Supabase MCP | `apply_migration` for RLS, `get_advisors` for scan |
 | Command | `/security-review` | Automated security scan after every feature |
+| Hook | `secret-scan.sh` | Prevents secret leaks in code |
+| | | |
 
 **Human Verify Gate:**
 - Security review checklist (SQL injection, auth bypass, data exposure, CSRF)
@@ -194,9 +192,10 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `qa-testing-skill` | Test generation patterns, mock strategies |
-| MCP | Chrome DevTools MCP | Browser testing, upload/download verification |
-| Agent | `qa` | Test orchestration, E2E test creation |
+| MCP | Chrome DevTools MCP | Browser navigation, screenshots, file upload testing |
+| Command | `/qa` | Full QA cycle: lint, tsc, build, tests |
+| | | |
+| | | |
 
 **Human Verify Gate:**
 - QA report (`docs/26-QA-Report.md`) — structured defect log with severity levels
@@ -221,9 +220,10 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `ai-sdlc-skill` | Review workflow, defect severity ranking |
 | Hook | `lint.sh` | Auto-lint on every file edit (PostToolUse) |
-| Command | `/qa` | Full QA cycle: lint, tsc, build, tests, report |
+| Hook | `typecheck.sh` | Auto type-check on every file edit (PostToolUse) |
+| Command | `/qa` | Full QA cycle with report generation |
+| | | |
 
 **Human Verify Gate:**
 - Code review report (`docs/23-Review-Report.md`) — severity-ranked findings
@@ -248,9 +248,9 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 | Category | Tool | Purpose |
 |---|---|---|
-| Skill | `devops-deploy-skill` | Deploy checks, environment verification |
-| Command | `/release-check` | Pre-deploy validation checklist |
 | Hook | `progress-reminder.sh` | Reminds to update Progress.md on task completion |
+| | | |
+| | | |
 
 **Human Verify Gate:**
 - Release Manager GO required before production deployment
@@ -265,57 +265,62 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 ## Complete AI Tool Inventory
 
-### Skills (Domain Knowledge)
+### Skills (Domain Knowledge) — Available in `.claude/skills/`
 
-| Skill | Stage Used | Purpose |
+| Skill | Purpose | Verified Used |
 |---|---|---|
-| `doctor-note-domain-skill` | Planning | Medical domain, clinical workflows |
-| `supabase-skill` | Infrastructure | RLS patterns, migrations, Supabase best practices |
-| `backend-skill` | Auth, Features | Server actions, middleware, API patterns |
-| `react-best-practices` | Features | React Hook Form, Zod, component patterns |
-| `security-review-skill` | Security | Vulnerability patterns, security checklist |
-| `qa-testing-skill` | Testing | Test generation, mock strategies |
-| `ai-sdlc-skill` | Review | SDLC workflow, defect severity ranking |
-| `devops-deploy-skill` | Deployment | Deploy checks, environment verification |
-| `ui-ux-pro-max` | Features | UI/UX patterns, shadcn components |
+| `doctor-note-domain-skill` | Medical domain, clinical workflows | ⚪ Not verified |
+| `supabase-skill` | RLS patterns, migrations | ⚪ Not verified |
+| `backend-skill` | Server actions, middleware | ⚪ Not verified |
+| `react-best-practices` | React Hook Form, Zod | ⚪ Not verified |
+| `security-review-skill` | Vulnerability patterns | ⚪ Not verified |
+| `qa-testing-skill` | Test generation, mocks | ⚪ Not verified |
+| `ai-sdlc-skill` | SDLC workflow | ⚪ Not verified |
+| `devops-deploy-skill` | Deploy checks | ⚪ Not verified |
+| `ui-ux-pro-max` | UI/UX patterns | ⚪ Not verified |
 
-### MCP Servers (Live Integrations)
+### MCP Servers (Live Integrations) — Verified
 
-| MCP Server | Stages Used | Key Capabilities |
+| MCP Server | Verified Used | Evidence |
 |---|---|---|
-| Supabase MCP | All | `apply_migration`, `get_advisors`, `execute_sql`, `list_tables`, `get_logs` |
-| Context7 MCP | Features | Framework documentation lookup (Next.js, Supabase) |
-| Chrome DevTools MCP | Testing | Browser navigation, screenshots, file upload, console logs |
+| Supabase MCP | ✅ Yes | `apply_migration`, `get_advisors`, `execute_sql` in prior sessions |
+| Context7 MCP | ⚪ Not verified | Available but not demonstrated in this session |
+| Chrome DevTools MCP | ✅ Yes | Browser navigation, screenshots, file upload in this session |
 
-### Agents (Specialized Roles)
+### Agents (Specialized Roles) — Available in `.claude/agents/`
 
-| Agent | Stage Used | Purpose |
+| Agent | Purpose | Verified Used |
 |---|---|---|
-| `architect` | Planning | Architecture decisions, tech stack review |
-| `developer` | Features | Code generation, feature implementation |
-| `qa` | Testing | Test orchestration, E2E creation |
-| `reviewer` | Review | Code review, security analysis |
-| `release-manager` | Deployment | Deploy approval, release validation |
+| `architect` | Architecture decisions | ⚪ Not verified |
+| `developer` | Code generation | ⚪ Not verified |
+| `qa` | Test orchestration | ⚪ Not verified |
+| `reviewer` | Code review | ⚪ Not verified |
+| `release-manager` | Deploy approval | ⚪ Not verified |
+| `product-manager` | Project evaluation | ⚪ Not verified |
 
-### Commands (Slash Commands)
+### Commands (Slash Commands) — Verified
 
-| Command | Stage Used | Purpose |
+| Command | Verified Used | Evidence |
 |---|---|---|
-| `/supabase-setup` | Infrastructure | Project provisioning |
-| `/security-review` | Security | Automated security scan |
-| `/qa` | Review | Full QA cycle (lint, tsc, build, tests) |
-| `/release-check` | Deployment | Pre-deploy validation |
-| `/next-task` | All | Workflow coordinator for next task |
-| `/create-pr` | Features | PR creation with description |
+| `/qa` | ✅ Yes | Invoked in this session for full QA cycle |
+| `/resume` | ✅ Yes | Invoked in this session |
+| `/next-task` | ⚪ Not verified | Available, not demonstrated |
+| `/create-pr` | ⚪ Not verified | Available, not demonstrated |
+| `/security-review` | ⚪ Not verified | Available, not demonstrated |
+| `/review` | ⚪ Not verified | Available, not demonstrated |
+| `/check-tasks` | ⚪ Not verified | Available, not demonstrated |
+| `/create-issue` | ⚪ Not verified | Available, not demonstrated |
+| `/release-check` | ⚪ Not verified | Available, not demonstrated |
+| `/supabase-setup` | ⚪ Not verified | Available, not demonstrated |
 
-### Hooks (Automated Guards)
+### Hooks (Automated Guards) — Verified
 
-| Hook | Stage Used | Purpose |
+| Hook | Verified Used | Evidence |
 |---|---|---|
-| `secret-scan.sh` | All (PostToolUse) | Prevents service-role key leaks |
-| `lint.sh` | All (PostToolUse) | Auto-lint on every file edit |
-| `typecheck.sh` | All (PostToolUse) | Auto type-check on every file edit |
-| `progress-reminder.sh` | All (Stop) | Reminds to update Progress.md |
+| `secret-scan.sh` | ✅ Yes | Ran on every file edit (PostToolUse) |
+| `lint.sh` | ✅ Yes | Ran on every file edit (PostToolUse) |
+| `typecheck.sh` | ✅ Yes | Ran on every file edit (PostToolUse) |
+| `progress-reminder.sh` | ⚪ Not verified | Runs on Stop, not demonstrated |
 
 ---
 
@@ -398,5 +403,3 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 3. **Tests need maintenance** — AI-generated E2E tests go stale when UI changes
 4. **Human judgment still needed** — "Should we ship this?" is not an AI question
 5. **Documentation keeps AI honest** — Architecture docs + protected files prevent AI from going off-track
-6. **Skills encode domain knowledge** — Without `doctor-note-domain-skill`, AI misses medical workflow nuances
-7. **MCP bridges AI and live systems** — Supabase MCP lets AI verify schema, run queries, check advisories in real-time
