@@ -40,7 +40,7 @@ test.describe("CRUD: User Management", () => {
     await expect(page.getByText("Role assigned")).toBeVisible({ timeout: 10000 })
 
     const roles = await getUserRoles(DOCTOR_ID)
-    const nurseRole = roles.find((r: { roles?: { name: string } }) => r.roles?.name === "nurse")
+    const nurseRole = roles?.find((r) => (r as { roles?: { name: string }[] }).roles?.[0]?.name === "nurse")
     expect(nurseRole).toBeTruthy()
   })
 
@@ -73,8 +73,8 @@ test.describe("CRUD: User Management", () => {
     await expect(page.getByText("Role removed")).toBeVisible({ timeout: 10000 })
 
     const roles = await getUserRoles(DOCTOR_ID)
-    const receptionistRole = roles.find(
-      (r: { roles?: { name: string } }) => r.roles?.name === "receptionist"
+    const receptionistRole = roles?.find(
+      (r) => (r as { roles?: { name: string }[] }).roles?.[0]?.name === "receptionist"
     )
     expect(receptionistRole).toBeFalsy()
   })

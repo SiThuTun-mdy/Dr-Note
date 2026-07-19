@@ -51,7 +51,7 @@ test.describe("CRUD: Staff Onboarding", () => {
 
     // Verify role assignment
     const roles = await getUserRoles(user.id)
-    const nurseRole = roles.find((r: { roles?: { name: string } }) => r.roles?.name === "nurse")
+    const nurseRole = roles?.find((r) => (r as { roles?: { name: string }[] }).roles?.[0]?.name === "nurse")
     expect(nurseRole).toBeTruthy()
   })
 

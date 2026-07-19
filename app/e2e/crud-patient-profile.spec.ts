@@ -43,8 +43,8 @@ test.describe("CRUD: Patient Profile Update", () => {
       .select("name, phone")
       .eq("id", PATIENT_ID)
       .single()
-    expect(user.name).toBe("Ko Min Aung Updated")
-    expect(user.phone).toBe("09987654321")
+    expect(user!.name).toBe("Ko Min Aung Updated")
+    expect(user!.phone).toBe("09987654321")
   })
 
   test("cancels editing without saving", async ({ page }) => {
