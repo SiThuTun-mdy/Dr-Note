@@ -19,9 +19,13 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 - Database schema, folder structure, auth flow defined before any code
 - GitHub Project Board created for issue tracking
 
-**AI Tools:**
-- Claude Code — architecture review, tech stack recommendations
-- GitHub Projects — issue tracking, sprint planning
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `doctor-note-domain-skill` | Medical domain knowledge, clinical workflow patterns |
+| MCP | Supabase MCP | Schema design, database planning |
+| Agent | `architect` | Architecture decisions, tech stack review |
 
 **Human Verify Gate:**
 - PM sign-off on PRD (`docs/02-PRD.md`)
@@ -41,9 +45,13 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 - RLS policies created as migrations (append-only SQL files)
 - Seed data for demo accounts (admin, doctor, nurse, receptionist)
 
-**AI Tools:**
-- Supabase MCP Server — live database queries, migration management, advisory checks
-- Claude Code — SQL generation, RLS policy design
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `supabase-skill` | RLS patterns, migration best practices |
+| MCP | Supabase MCP | `apply_migration`, `get_advisors`, `list_tables` |
+| Command | `/supabase-setup` | Project provisioning, environment config |
 
 **Human Verify Gate:**
 - Migration files reviewed before applying (`supabase/migrations/`)
@@ -65,10 +73,13 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 - Protected routes with role-based middleware
 - Change password, temp password generation for staff onboarding
 
-**AI Tools:**
-- Claude Code — server action generation, middleware logic
-- Supabase MCP — auth configuration, user management
-- ESLint security plugin — `detect-object-injection` warnings
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `backend-skill` | Server actions, middleware, auth patterns |
+| MCP | Supabase MCP | Auth config, `has_permission` RPC, user management |
+| Hook | `secret-scan.sh` | Prevents service-role key leaks in code |
 
 **Human Verify Gate:**
 - Manual login testing across all 4 roles
@@ -89,10 +100,13 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 - File attachments with Supabase Storage
 - Visit status workflow + patient queue
 
-**AI Tools:**
-- Claude Code — component generation, server actions, form validation
-- Context7 MCP — Next.js 16 + Supabase documentation lookup
-- Supabase MCP — schema queries, live data verification
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `react-best-practices` | React Hook Form + Zod, component patterns |
+| MCP | Context7 MCP | Next.js 16 + Supabase docs lookup |
+| Agent | `developer` | Code generation, feature implementation |
 
 **Human Verify Gate:**
 - Developer self-review checklist (security, error handling, input validation)
@@ -114,10 +128,13 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 - Password entropy hardening
 - Defense-in-depth: app-layer + DB RLS + storage RLS
 
-**AI Tools:**
-- Claude Code — security pattern implementation
-- Supabase MCP — RLS policy creation, advisory scans
-- ESLint security rules — automated pattern detection
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `security-review-skill` | Security checklist, vulnerability patterns |
+| MCP | Supabase MCP | `apply_migration` for RLS, `get_advisors` for scan |
+| Command | `/security-review` | Automated security scan after every feature |
 
 **Human Verify Gate:**
 - Security review checklist (SQL injection, auth bypass, data exposure, CSRF)
@@ -138,11 +155,13 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 - 76 E2E tests (Playwright)
 - Manual browser testing via Chrome DevTools MCP
 
-**AI Tools:**
-- Claude Code — test generation, mock setup
-- Vitest — unit test runner
-- Playwright — E2E test runner
-- Chrome DevTools MCP — manual UI testing, file upload/download verification
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `qa-testing-skill` | Test generation patterns, mock strategies |
+| MCP | Chrome DevTools MCP | Browser testing, upload/download verification |
+| Agent | `qa` | Test orchestration, E2E test creation |
 
 **Human Verify Gate:**
 - QA report (`docs/26-QA-Report.md`) — structured defect log with severity levels
@@ -163,10 +182,13 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 - Security scan (`safe-code-check.sh`)
 - QA report with severity-ranked findings
 
-**AI Tools:**
-- ESLint — code quality
-- TypeScript compiler — type safety
-- Claude Code — automated code review, QA report generation
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `ai-sdlc-skill` | Review workflow, defect severity ranking |
+| Hook | `lint.sh` | Auto-lint on every file edit (PostToolUse) |
+| Command | `/qa` | Full QA cycle: lint, tsc, build, tests, report |
 
 **Human Verify Gate:**
 - Code review report (`docs/23-Review-Report.md`) — severity-ranked findings
@@ -187,9 +209,13 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 - Progress tracking in `docs/Progress.md`
 - Decision log in `docs/10-Decisions.md`
 
-**AI Tools:**
-- Claude Code — documentation updates
-- GitHub CLI (`gh`) — PR creation, issue management
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `devops-deploy-skill` | Deploy checks, environment verification |
+| Command | `/release-check` | Pre-deploy validation checklist |
+| Hook | `progress-reminder.sh` | Reminds to update Progress.md on task completion |
 
 **Human Verify Gate:**
 - Release Manager GO required before production deployment
@@ -199,6 +225,62 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 **Challenges:**
 - Keeping docs in sync with code (AI updates Progress.md but sometimes misses context)
 - Multi-role demo flow requires all features working end-to-end
+
+---
+
+## Complete AI Tool Inventory
+
+### Skills (Domain Knowledge)
+
+| Skill | Stage Used | Purpose |
+|---|---|---|
+| `doctor-note-domain-skill` | Planning | Medical domain, clinical workflows |
+| `supabase-skill` | Infrastructure | RLS patterns, migrations, Supabase best practices |
+| `backend-skill` | Auth, Features | Server actions, middleware, API patterns |
+| `react-best-practices` | Features | React Hook Form, Zod, component patterns |
+| `security-review-skill` | Security | Vulnerability patterns, security checklist |
+| `qa-testing-skill` | Testing | Test generation, mock strategies |
+| `ai-sdlc-skill` | Review | SDLC workflow, defect severity ranking |
+| `devops-deploy-skill` | Deployment | Deploy checks, environment verification |
+| `ui-ux-pro-max` | Features | UI/UX patterns, shadcn components |
+
+### MCP Servers (Live Integrations)
+
+| MCP Server | Stages Used | Key Capabilities |
+|---|---|---|
+| Supabase MCP | All | `apply_migration`, `get_advisors`, `execute_sql`, `list_tables`, `get_logs` |
+| Context7 MCP | Features | Framework documentation lookup (Next.js, Supabase) |
+| Chrome DevTools MCP | Testing | Browser navigation, screenshots, file upload, console logs |
+
+### Agents (Specialized Roles)
+
+| Agent | Stage Used | Purpose |
+|---|---|---|
+| `architect` | Planning | Architecture decisions, tech stack review |
+| `developer` | Features | Code generation, feature implementation |
+| `qa` | Testing | Test orchestration, E2E creation |
+| `reviewer` | Review | Code review, security analysis |
+| `release-manager` | Deployment | Deploy approval, release validation |
+
+### Commands (Slash Commands)
+
+| Command | Stage Used | Purpose |
+|---|---|---|
+| `/supabase-setup` | Infrastructure | Project provisioning |
+| `/security-review` | Security | Automated security scan |
+| `/qa` | Review | Full QA cycle (lint, tsc, build, tests) |
+| `/release-check` | Deployment | Pre-deploy validation |
+| `/next-task` | All | Workflow coordinator for next task |
+| `/create-pr` | Features | PR creation with description |
+
+### Hooks (Automated Guards)
+
+| Hook | Stage Used | Purpose |
+|---|---|---|
+| `secret-scan.sh` | All (PostToolUse) | Prevents service-role key leaks |
+| `lint.sh` | All (PostToolUse) | Auto-lint on every file edit |
+| `typecheck.sh` | All (PostToolUse) | Auto type-check on every file edit |
+| `progress-reminder.sh` | All (Stop) | Reminds to update Progress.md |
 
 ---
 
@@ -254,45 +336,32 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 ## AI-Human Collaboration Model
 
 ```
-┌─────────────────────────────────────────────┐
-│           Human owns: Strategy              │
-│  PRD, Architecture, Security decisions,     │
-│  QA approval, Deployment go/no-go           │
-├─────────────────────────────────────────────┤
-│           AI owns: Execution                │
-│  Code generation, Test creation,            │
-│  Documentation, Lint/Type fixes,            │
-│  Migration SQL, RLS policies                │
-├─────────────────────────────────────────────┤
-│         Shared: Review & Verify             │
-│  Code review, Security scan, QA report,     │
-│  Manual testing, Browser verification       │
-└─────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│              Human owns: Strategy                    │
+│  PRD, Architecture, Security decisions,              │
+│  QA approval, Deployment go/no-go                    │
+├──────────────────────────────────────────────────────┤
+│              AI owns: Execution                      │
+│  Skills (domain knowledge)                           │
+│  MCP (live database/browser access)                  │
+│  Agents (specialized roles)                          │
+│  Commands (workflow automation)                      │
+│  Hooks (automated guards)                            │
+├──────────────────────────────────────────────────────┤
+│            Shared: Review & Verify                   │
+│  Code review, Security scan, QA report,              │
+│  Manual testing, Browser verification                │
+└──────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Lessons Learned
 
-1. **AI is fast but needs guardrails** — Protected files, security hooks, branch protection
-2. **RLS is the real security boundary** — AI-generated app code is not enough
+1. **AI is fast but needs guardrails** — Hooks (`secret-scan`, `lint`, `typecheck`) catch mistakes automatically
+2. **RLS is the real security boundary** — AI-generated app code is not enough; DB policies are the backstop
 3. **Tests need maintenance** — AI-generated E2E tests go stale when UI changes
 4. **Human judgment still needed** — "Should we ship this?" is not an AI question
-5. **Documentation keeps AI honest** — Architecture docs prevent AI from going off-track
-
----
-
-## AI Tools Used in This Project
-
-| Tool | Purpose | Integration |
-|---|---|---|
-| Claude Code | Code generation, review, testing, docs | CLI / VS Code |
-| Supabase MCP | Database queries, migrations, RLS, auth | MCP Server |
-| Context7 MCP | Framework documentation lookup | MCP Server |
-| Chrome DevTools MCP | Browser testing, UI verification | MCP Server |
-| GitHub Copilot | Code suggestions | VS Code extension |
-| Vitest | Unit testing | npm scripts |
-| Playwright | E2E testing | npm scripts |
-| ESLint | Code quality | Pre-commit hooks |
-| TypeScript | Type safety | Build pipeline |
-| GitHub CLI | PR/issue management | CLI |
+5. **Documentation keeps AI honest** — Architecture docs + protected files prevent AI from going off-track
+6. **Skills encode domain knowledge** — Without `doctor-note-domain-skill`, AI misses medical workflow nuances
+7. **MCP bridges AI and live systems** — Supabase MCP lets AI verify schema, run queries, check advisories in real-time
