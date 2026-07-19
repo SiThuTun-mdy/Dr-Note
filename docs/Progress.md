@@ -40,6 +40,8 @@
 | Visit summary: printable view with vitals, diagnoses, prescriptions — PR #65 | #35 |
 | Patient identity provisioning: registration now emails the patient a set-password link (`resetPasswordForEmail` → `/auth/confirm` → `/set-password`); works with email confirmation OFF; send failure surfaced to receptionist | — |
 | Change Password dialog: all roles can change their own password from the Topbar avatar menu; current password re-verified server-side before update | — |
+| PostgREST filter injection fix: extracted shared `escapeSearchTerm()` helper, fixed 2 vulnerable `.or()` call sites, refactored 1 existing inline escape — PR #96 | #79 |
+| Attachment access control: authorizeVisitAccess() + Storage RLS policies for defense in depth — PR #97 | #36 |
 
 ### 📐 Standard Requirements
 > **All tables must use `<DataTable>` with search and pagination.** New list/table pages must integrate the reusable `DataTable` component (`src/components/ui/data-table.tsx`) which provides client-side search and pagination out of the box. Pass `searchKeys` for columns to search, `pageSize` for rows per page, and `filters` slot for dropdowns.
@@ -81,6 +83,7 @@
 
 | PR | Title | Status |
 |----|-------|--------|
+| #96 | fix(security): escape PostgREST filter syntax in search queries (#79) | ✅ Open |
 | #91 | feat(ui): add light/dark/system theme toggle (#75) | ✅ Open |
 | #62 | feat(visit): add visit creation flow for receptionist (#24) | ✅ Open |
 | #61 | feat(pages): implement list pages with pagination | ✅ Open |

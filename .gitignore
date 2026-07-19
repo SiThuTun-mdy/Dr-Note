@@ -148,3 +148,5 @@ vite.config.ts.timestamp-*
 .vite/
 .playwright-mcp/
 .vscode/settings.json
+test-results/
+playwright-report/

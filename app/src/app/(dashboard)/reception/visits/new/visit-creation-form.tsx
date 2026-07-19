@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { useState, useCallback, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Search, User, X } from "lucide-react"
-import { toast } from "sonner"
-import { isRedirectError } from "next/dist/client/components/redirect-error"
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Search, User, X } from "lucide-react";
+import { toast } from "sonner";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-import { createVisit, searchPatients, searchDoctors } from "./actions"
+import { createVisit, searchPatients, searchDoctors } from "./actions";
 import {
   visitCreationSchema,
   type VisitCreationInput,
-} from "@/lib/validators/visit"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/lib/validators/visit";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -30,39 +30,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useDebounce } from "@/hooks/use-debounce"
+} from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDebounce } from "@/hooks/use-debounce";
 
 interface Patient {
-  id: string
-  name: string
-  email: string
-  nrc: string | null
+  id: string;
+  name: string;
+  email: string;
+  nrc: string | null;
 }
 
 interface Doctor {
-  id: string
-  name: string
-  email: string
+  id: string;
+  name: string;
+  email: string;
 }
 
 interface VisitCreationFormProps {
-  prefillPatient?: Patient | null
+  prefillPatient?: Patient | null;
 }
 
 export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [patientQuery, setPatientQuery] = useState("")
-  const [patientResults, setPatientResults] = useState<Patient[]>([])
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(prefillPatient ?? null)
-  const [doctorQuery, setDoctorQuery] = useState("")
-  const [doctorResults, setDoctorResults] = useState<Doctor[]>([])
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
-  const [isSearchingPatient, setIsSearchingPatient] = useState(false)
-  const [isSearchingDoctor, setIsSearchingDoctor] = useState(false)
-  const debouncedDoctorQuery = useDebounce(doctorQuery, 300)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [patientQuery, setPatientQuery] = useState("");
+  const [patientResults, setPatientResults] = useState<Patient[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(
+    prefillPatient ?? null,
+  );
+  const [doctorQuery, setDoctorQuery] = useState("");
+  const [doctorResults, setDoctorResults] = useState<Doctor[]>([]);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [isSearchingPatient, setIsSearchingPatient] = useState(false);
+  const [isSearchingDoctor, setIsSearchingDoctor] = useState(false);
+  const debouncedDoctorQuery = useDebounce(doctorQuery, 300);
 
   const form = useForm<VisitCreationInput>({
     resolver: zodResolver(visitCreationSchema),
@@ -72,87 +74,101 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
       chiefComplaint: "",
       doctorId: null,
     },
-  })
-
+  });
 
   const handlePatientSearch = useCallback(async (query: string) => {
-    setPatientQuery(query)
+    setPatientQuery(query);
     if (query.length < 2) {
-      setPatientResults([])
-      return
+      setPatientResults([]);
+      return;
     }
 
-    setIsSearchingPatient(true)
+    setIsSearchingPatient(true);
     try {
-      const results = await searchPatients(query)
-      setPatientResults(results)
+      const results = await searchPatients(query);
+      setPatientResults(results);
     } catch {
-      setPatientResults([])
+      setPatientResults([]);
     } finally {
-      setIsSearchingPatient(false)
+      setIsSearchingPatient(false);
     }
-  }, [])
+  }, []);
 
   const handleDoctorSearch = useCallback(async (query: string) => {
-    setDoctorQuery(query)
-  }, [])
+    setDoctorQuery(query);
+  }, []);
 
   // Trigger doctor search when debounced query changes
   useEffect(() => {
     if (debouncedDoctorQuery.length < 2) {
-      return
+      return;
     }
 
-    let cancelled = false
+    let cancelled = false;
     const search = async () => {
-      setIsSearchingDoctor(true)
+      setIsSearchingDoctor(true);
       try {
-        const results = await searchDoctors(debouncedDoctorQuery)
-        if (!cancelled) setDoctorResults(results)
+        const results = await searchDoctors(debouncedDoctorQuery);
+        if (!cancelled) setDoctorResults(results);
       } catch {
-        if (!cancelled) setDoctorResults([])
+        if (!cancelled) setDoctorResults([]);
       } finally {
-        if (!cancelled) setIsSearchingDoctor(false)
+        if (!cancelled) setIsSearchingDoctor(false);
       }
-    }
-    search()
+    };
+    search();
 
-    return () => { cancelled = true }
-  }, [debouncedDoctorQuery])
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedDoctorQuery]);
+  const selectPatient = (patient: Patient) => {
+    setSelectedPatient(patient);
+    form.setValue("patientId", patient.id, { shouldValidate: true });
+    setPatientResults([]);
+    setPatientQuery("");
+  };
+
+  const clearPatient = () => {
+    setSelectedPatient(null);
+    form.setValue("patientId", "");
+  };
 
   const selectDoctor = (doctor: Doctor) => {
-    setSelectedDoctor(doctor)
-    setDoctorResults([])
-    setDoctorQuery("")
-    form.setValue("doctorId", doctor.id)
-  }
+    setSelectedDoctor(doctor);
+    setDoctorResults([]);
+    setDoctorQuery("");
+    form.setValue("doctorId", doctor.id);
+  };
 
   const clearDoctor = () => {
-    setSelectedDoctor(null)
-    form.setValue("doctorId", null)
-  }
+    setSelectedDoctor(null);
+    form.setValue("doctorId", null);
+  };
 
   async function onSubmit(values: VisitCreationInput) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const result = await createVisit(values)
+      const result = await createVisit(values);
 
       if (!result.success) {
         if (result.fieldErrors) {
           for (const [field, message] of Object.entries(result.fieldErrors)) {
-            form.setError(field as keyof VisitCreationInput, { message })
+            form.setError(field as keyof VisitCreationInput, { message });
           }
         }
-        toast.error(result.error || "Unable to create visit. Please try again.")
-        return
+        toast.error(
+          result.error || "Unable to create visit. Please try again.",
+        );
+        return;
       }
 
-      toast.success("Visit created successfully")
+      toast.success("Visit created successfully");
     } catch (err) {
-      if (isRedirectError(err)) throw err
-      toast.error("Something went wrong. Please try again.")
+      if (isRedirectError(err)) throw err;
+      toast.error("Something went wrong. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -169,7 +185,6 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
               control={form.control}
               name="patientId"
               render={({ field, fieldState }) => (
-
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Patient *</label>
                   {/* Hidden input keeps the registered field in the DOM for native form submit */}
@@ -179,10 +194,13 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
                       <div className="flex items-center gap-3">
                         <User className="h-5 w-5 text-muted-foreground" />
                         <div>
-                          <p className="text-sm font-medium">{selectedPatient.name}</p>
+                          <p className="text-sm font-medium">
+                            {selectedPatient.name}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {selectedPatient.email}
-                            {selectedPatient.nrc && ` · NRC: ${selectedPatient.nrc}`}
+                            {selectedPatient.nrc &&
+                              ` · NRC: ${selectedPatient.nrc}`}
                           </p>
                         </div>
                       </div>
@@ -191,8 +209,8 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          setSelectedPatient(null)
-                          field.onChange("")
+                          setSelectedPatient(null);
+                          field.onChange("");
                         }}
                         disabled={isSubmitting}
                       >
@@ -220,15 +238,17 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
                               type="button"
                               className="w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-3"
                               onClick={() => {
-                                setSelectedPatient(patient)
-                                setPatientResults([])
-                                setPatientQuery("")
-                                field.onChange(patient.id)
+                                setSelectedPatient(patient);
+                                setPatientResults([]);
+                                setPatientQuery("");
+                                field.onChange(patient.id);
                               }}
                             >
                               <User className="h-4 w-4 text-muted-foreground" />
                               <div>
-                                <p className="text-sm font-medium">{patient.name}</p>
+                                <p className="text-sm font-medium">
+                                  {patient.name}
+                                </p>
                                 <p className="text-xs text-muted-foreground">
                                   {patient.email}
                                   {patient.nrc && ` · NRC: ${patient.nrc}`}
@@ -241,7 +261,9 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
                     </div>
                   )}
                   {fieldState.error && (
-                    <p className="text-sm text-destructive">{fieldState.error.message}</p>
+                    <p className="text-sm text-destructive">
+                      {fieldState.error.message}
+                    </p>
                   )}
                 </div>
               )}
@@ -309,7 +331,9 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
                         <div className="flex items-center gap-3">
                           <User className="h-5 w-5 text-muted-foreground" />
                           <div>
-                            <p className="text-sm font-medium">{selectedDoctor.name}</p>
+                            <p className="text-sm font-medium">
+                              {selectedDoctor.name}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                               {selectedDoctor.email}
                             </p>
@@ -349,7 +373,9 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
                               >
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <div>
-                                  <p className="text-sm font-medium">{doctor.name}</p>
+                                  <p className="text-sm font-medium">
+                                    {doctor.name}
+                                  </p>
                                   <p className="text-xs text-muted-foreground">
                                     {doctor.email}
                                   </p>
@@ -390,5 +416,5 @@ export function VisitCreationForm({ prefillPatient }: VisitCreationFormProps) {
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }
