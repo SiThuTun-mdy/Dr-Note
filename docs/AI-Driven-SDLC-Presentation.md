@@ -107,6 +107,12 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 | Skill | `react-best-practices` | React Hook Form + Zod, component patterns |
 | MCP | Context7 MCP | Next.js 16 + Supabase docs lookup |
 | Agent | `developer` | Code generation, feature implementation |
+| Command | `/next-task` | Pull next task from backlog, create branch, full workflow |
+| Command | `/create-pr` | Create PR with description after implementation |
+| Command | `/check-tasks` | Check task status and dependencies |
+| Command | `/create-issue` | Create GitHub issue for new features |
+| Command | `/qa` | Run lint, tsc, build, tests before PR |
+| Command | `/review` | Self-review code for security and quality |
 
 **Human Verify Gate:**
 - Developer self-review checklist (security, error handling, input validation)
