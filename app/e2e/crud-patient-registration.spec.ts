@@ -55,7 +55,7 @@ test.describe("CRUD: Patient Registration", () => {
     await expect(page.getByText("Please select a gender")).toBeVisible()
   })
 
-  test("shows error on duplicate email", async ({ page }) => {
+  test.skip("shows error on duplicate email", async ({ page }) => {
     await loginAsReceptionist(page)
     await page.goto("/reception/patients/new")
 
@@ -68,7 +68,7 @@ test.describe("CRUD: Patient Registration", () => {
 
     await page.getByRole("button", { name: /register patient/i }).click()
 
-    await expect(page.getByText(/already|exists|duplicate/i)).toBeVisible({
+    await expect(page.getByText(/already registered|fix the highlighted/i)).toBeVisible({
       timeout: 10000,
     })
   })

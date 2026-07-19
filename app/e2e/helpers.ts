@@ -23,20 +23,20 @@ async function loginAs(page: Page, role: Role) {
 
 export async function loginAsAdmin(page: Page) {
   await loginAs(page, "admin")
-  await expect(page.getByRole("heading", { name: /admin/i })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Admin dashboard", exact: true })).toBeVisible()
 }
 
 export async function loginAsDoctor(page: Page) {
   await loginAs(page, "doctor")
-  await expect(page.getByRole("heading", { name: /doctor/i })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Doctor dashboard", exact: true })).toBeVisible()
 }
 
 export async function loginAsNurse(page: Page) {
   await loginAs(page, "nurse")
-  await expect(page.getByRole("heading", { name: /nurse/i })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Nurse dashboard", exact: true })).toBeVisible()
 }
 
 export async function loginAsReceptionist(page: Page) {
   await loginAs(page, "receptionist")
-  await expect(page.getByRole("heading", { name: /reception/i })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Reception dashboard", exact: true })).toBeVisible()
 }

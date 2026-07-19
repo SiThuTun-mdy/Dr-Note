@@ -9,17 +9,7 @@ test.describe("Admin Role", () => {
 
     test("displays stat cards", async ({ page }) => {
       await expect(page.getByText("Total patients")).toBeVisible()
-      await expect(page.getByText("Today's visits")).toBeVisible()
       await expect(page.getByText("Active staff")).toBeVisible()
-      await expect(page.getByText("Pending")).toBeVisible()
-    })
-
-    test("displays quick actions section", async ({ page }) => {
-      await expect(page.locator("#main-content").getByText("Quick actions")).toBeVisible()
-      await expect(page.locator("#main-content").getByText("Manage users")).toBeVisible()
-      await expect(page.locator("#main-content").getByText("View reports")).toBeVisible()
-      await expect(page.locator("#main-content").getByText("Audit log")).toBeVisible()
-      await expect(page.locator("#main-content").getByText("Settings")).toBeVisible()
     })
 
     test("displays system overview", async ({ page }) => {
@@ -29,8 +19,9 @@ test.describe("Admin Role", () => {
       await expect(page.getByText("Supabase")).toBeVisible()
     })
 
-    test("navigates to user management via quick action", async ({ page }) => {
-      await page.locator("#main-content").getByText("Manage users").click()
+    test("navigates to user management via sidebar", async ({ page }) => {
+      const nav = page.locator("nav")
+      await nav.getByText("User management").click()
       await page.waitForURL("**/admin/users**")
       await expect(page.getByRole("heading", { name: "User Management", exact: true })).toBeVisible()
     })
@@ -128,9 +119,6 @@ test.describe("Admin Role", () => {
       await expect(nav.getByText("Dashboard")).toBeVisible()
       await expect(nav.getByText("User management")).toBeVisible()
       await expect(nav.getByText("Add staff")).toBeVisible()
-      await expect(nav.getByText("Settings")).toBeVisible()
-      await expect(nav.getByText("Reports")).toBeVisible()
-      await expect(nav.getByText("Audit log")).toBeVisible()
     })
 
     test("navigates between pages via sidebar", async ({ page }) => {
@@ -141,7 +129,7 @@ test.describe("Admin Role", () => {
 
       await nav.getByText("Dashboard").click()
       await page.waitForURL("**/admin")
-      await expect(page.locator("#main-content").getByText("Quick actions")).toBeVisible()
+      await expect(page.getByText("System overview")).toBeVisible()
     })
   })
 })

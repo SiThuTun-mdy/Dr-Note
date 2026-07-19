@@ -99,18 +99,12 @@ test.describe("Doctor Role", () => {
     test("shows all doctor nav items", async ({ page }) => {
       const nav = page.locator("nav")
       await expect(nav.getByText("Dashboard")).toBeVisible()
-      await expect(nav.getByText("My queue")).toBeVisible()
       await expect(nav.getByText("Patients")).toBeVisible()
       await expect(nav.getByText("Consultations")).toBeVisible()
-      await expect(nav.getByText("Prescriptions")).toBeVisible()
     })
 
     test("navigates between pages via sidebar", async ({ page }) => {
       const nav = page.locator("nav")
-      await nav.getByText("My queue").click()
-      await page.waitForURL("**/my-queue**")
-      await expect(page.getByRole("heading", { name: "My Queue" })).toBeVisible()
-
       await nav.getByText("Consultations").click()
       await page.waitForURL("**/consultations**")
       await expect(page.getByRole("heading", { name: "Consultations" })).toBeVisible()

@@ -30,7 +30,7 @@ test.describe("Nurse Dashboard", () => {
     if (await patientLink.isVisible()) {
       await patientLink.click()
       await page.waitForURL("**/screening**")
-      await expect(page.getByText("Screening vitals")).toBeVisible()
+      await expect(page.getByRole("heading", { name: "Screening vitals" })).toBeVisible()
     }
   })
 })

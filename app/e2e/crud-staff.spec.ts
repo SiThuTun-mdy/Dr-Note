@@ -27,7 +27,8 @@ test.describe("CRUD: Staff Onboarding", () => {
     await page.getByLabel("Staff code").fill("TST001")
     await page.getByLabel("Role").click()
     await page.getByRole("option", { name: "Nurse" }).click()
-    await page.getByLabel("Department").fill("Emergency")
+    await page.getByLabel("Department").click()
+    await page.getByRole("option", { name: /emergency/i }).click()
 
     // Submit
     await page.getByRole("button", { name: /create staff account/i }).click()
@@ -46,7 +47,7 @@ test.describe("CRUD: Staff Onboarding", () => {
     // Verify staff profile
     const profile = await getStaffProfile(user.id)
     expect(profile.staff_code).toBe("TST001")
-    expect(profile.department).toBe("Emergency")
+    expect(profile.department).toBe("Emergency & Urgent Care")
 
     // Verify role assignment
     const roles = await getUserRoles(user.id)
