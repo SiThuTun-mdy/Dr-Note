@@ -12,6 +12,35 @@ Medical records management platform · 11-day sprint · 9 contributors · 236 co
 
 ---
 
+## Stage 0: Team Project Selection
+
+**What happened:**
+- Each team member proposed a personal project idea
+- All projects presented and evaluated as a team
+- Selected "Dr.Note" (medical records platform) based on impact vs effort analysis
+- RACI matrix assigned: roles (Responsible, Accountable, Consulted, Informed) for each task
+- Team formed with 5 developers across different locations
+
+**AI Tools Used:**
+
+| Category | Tool | Purpose |
+|---|---|---|
+| Skill | `ai-sdlc-skill` | Project evaluation framework, RACI templates |
+| Agent | `product-manager` | Impact/effort analysis, task breakdown |
+| Command | `/create-issue` | Create GitHub issues for project tasks |
+
+**Human Verify Gate:**
+- Team vote on project selection
+- RACI matrix reviewed and agreed by all members
+- Sprint scope locked after selection (no scope creep)
+
+**Challenges:**
+- Different time zones and personal schedules made meeting times difficult
+- Had to coordinate across locations with limited overlapping availability
+- Decisions made asynchronously via GitHub issues and docs when meetings weren't possible
+
+---
+
 ## Stage 1: Planning & Architecture
 
 **What happened:**
