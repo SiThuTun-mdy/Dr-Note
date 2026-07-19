@@ -55,12 +55,12 @@ test.describe("CRUD: Patient Registration", () => {
     await expect(page.getByText("Please select a gender")).toBeVisible()
   })
 
-  test.skip("shows error on duplicate email", async ({ page }) => {
+  test.skip("shows error on duplicate email — covered by unit tests", async ({ page }) => {
     await loginAsReceptionist(page)
     await page.goto("/reception/patients/new")
 
     await page.getByLabel("Full name").fill("Duplicate Email Patient")
-    await page.getByLabel("Email").fill("patient1@drnote.com")
+    await page.getByLabel("Email").fill(TEST_EMAIL)
     await page.getByLabel("Date of birth").fill("1990-01-01")
 
     await page.getByRole("combobox", { name: /gender/i }).click()
@@ -68,7 +68,7 @@ test.describe("CRUD: Patient Registration", () => {
 
     await page.getByRole("button", { name: /register patient/i }).click()
 
-    await expect(page.getByText(/already registered|fix the highlighted/i)).toBeVisible({
+    await expect(page.locator("[data-slot=form-message]").filter({ hasText: /already registered/i })).toBeVisible({
       timeout: 10000,
     })
   })
